@@ -168,6 +168,116 @@ This approach avoids brittle prompt parsing and makes the AI responses fully typ
 * Docker
 * Makefile-based developer tooling
 
+## Design Decisions
+
+Several architectural decisions were made to keep the system predictable, maintainable, and useful for real musicians.
+
+### Structured AI Output
+
+Instead of parsing free-form text from the AI model, the application uses the OpenAI **Responses API with a strict JSON schema**.
+
+This guarantees that responses always match the expected structure.
+
+Benefits:
+
+* Eliminates fragile text parsing
+* Ensures type-safe responses
+* Makes UI rendering deterministic
+* Simplifies error handling
+
+Example schema fields returned by the AI:
+
+* `nextChordSuggestions`
+* `pianoVoicing`
+* `guitarVoicing`
+* `progressionIdeas`
+* `structureSuggestions`
+
+Using structured outputs allows the AI to behave more like a typed API than a chatbot.
+
+---
+
+### Musical Voicing Visualization
+
+Chord suggestions are accompanied by **instrument-specific visualizations**.
+
+This makes the system practical for musicians instead of purely theoretical.
+
+Two visualization libraries are used:
+
+* `piano-chart` for keyboard diagrams
+* `svguitar` for guitar chord diagrams
+
+The AI returns structured voicings that map directly into these libraries.
+
+Example:
+
+```json id="czn5r4"
+"pianoVoicing": {
+  "leftHand": ["F2", "C3"],
+  "rightHand": ["A3", "E4", "G4", "C5"]
+}
+```
+
+---
+
+### Separation of Concerns
+
+The application separates responsibilities into three layers:
+
+**UI Layer**
+
+Handles user interaction and rendering.
+
+**API Layer**
+
+Handles communication with the OpenAI API and schema validation.
+
+**Visualization Layer**
+
+Handles rendering instrument diagrams.
+
+This keeps the AI integration isolated from UI components.
+
+---
+
+### Deterministic Rendering
+
+Because the AI output follows a strict schema, the UI can safely assume:
+
+* all required fields exist
+* types match expectations
+* optional values are explicit (`null`)
+
+This eliminates many runtime edge cases.
+
+---
+
+### Developer Experience
+
+Developer tooling is intentionally simple.
+
+The project includes:
+
+* `Makefile` commands for common workflows
+* Docker support for reproducible environments
+* Yarn for dependency management
+* TypeScript for strong typing across the stack
+
+This keeps onboarding fast and commands consistent.
+
+---
+
+### Future Extensions
+
+The current architecture allows for several natural extensions:
+
+* MIDI playback of generated chords
+* Voice-leading optimization between suggestions
+* Export to MIDI / DAW formats
+* Saving and sharing progressions
+* Training the model on genre-specific harmonic datasets
+
 ## Author
 
 Carl Welch
