@@ -29,3 +29,11 @@ clean:
 
 setup-env:
 	cp .env.local.example .env.local
+
+help:
+	@echo "Available commands:"
+	@echo "  make install      Install dependencies"
+	@echo "  make dev          Run development server"
+	@echo "  make build        Build project"
+	@echo "  make start        Run production build"
+	@echo "  make docker-dev   Run with Docker"
