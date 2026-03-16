@@ -1,0 +1,90 @@
+'use client';
+
+import { useEffect, useId } from 'react';
+import { SVGuitarChord } from 'svguitar';
+
+type Finger = [number, number | 'x', string?];
+
+type Barre = {
+    fromString: number;
+    toString: number;
+    fret: number;
+    text?: string;
+};
+
+type Props = {
+    title: string;
+    fingers: Finger[];
+    barres?: Barre[];
+    position?: number | null;
+};
+
+export default function GuitarChordDiagram({
+  title,
+  fingers,
+  barres = [],
+  position,
+}: Props) {
+  const id = useId().replace(/:/g, '');
+
+  useEffect(() => {
+    const selector = `#guitar-chart-${id}`;
+    const container = document.querySelector(selector);
+
+    if (!container) {
+      return;
+    }
+
+    container.innerHTML = '';
+
+    const normalizedPosition =
+            typeof position === 'number' && position >= 1 ? position : 1;
+
+    try {
+      new SVGuitarChord(selector)
+        .configure({
+          strings: 6,
+          frets: 6,
+          position: normalizedPosition,
+          tuning: ['E', 'A', 'D', 'G', 'B', 'E'],
+
+          fingerSize:1,
+
+          // DARK THEME COLORS
+          backgroundColor: 'transparent',
+          color: '#fff',
+          fingerColor: '#3b82f6',      // blue finger dots
+          fingerTextColor: '#ffffff',  // finger numbers
+        })
+        .chord({
+          title,
+          fingers,
+          barres,
+          position: normalizedPosition,
+        })
+        .draw();
+
+      console.log('svguitar render ok', {
+        title,
+        position: normalizedPosition,
+        fingers,
+        barres,
+      });
+    } catch (error) {
+      console.error('svguitar render failed', {
+        title,
+        position: normalizedPosition,
+        fingers,
+        barres,
+        error,
+      });
+    }
+  }, [id, title, fingers, barres, position]);
+
+  return (
+    <div
+      id={`guitar-chart-${id}`}
+      style={{ minHeight: 220, minWidth: 160 }}
+    />
+  );
+}

@@ -1,0 +1,57 @@
+export type InstrumentPreference = 'guitar' | 'piano' | 'both';
+export type Adventurousness = 'safe' | 'balanced' | 'surprising';
+
+export type PianoVoicing = {
+  leftHand: string[];
+  rightHand: string[];
+};
+
+export type GuitarVoicing = {
+  title: string;
+  position: number | null;
+  fingers: Array<{
+    string: number;
+    fret: number | 'x';
+    finger: string | null;
+  }>;
+  barres: Array<{
+    fromString: number;
+    toString: number;
+    fret: number;
+    text: string | null;
+  }>;
+};
+
+export type NextChordSuggestion = {
+  chord: string;
+  romanNumeral: string | null;
+  functionExplanation: string;
+  tensionLevel: number;
+  confidence: number;
+  voicingHint: string | null;
+  pianoVoicing: PianoVoicing | null;
+  guitarVoicing: GuitarVoicing | null;
+};
+
+export type ChordSuggestionResponse = {
+  inputSummary: {
+    seedChords: string[];
+    mood: string | null;
+    mode: string | null;
+    genre: string | null;
+    instrument: InstrumentPreference | null;
+    adventurousness: Adventurousness | null;
+  };
+  nextChordSuggestions: NextChordSuggestion[];
+  progressionIdeas: Array<{
+    label: string;
+    chords: string[];
+    feel: string;
+    performanceTip: string | null;
+  }>;
+  structureSuggestions: Array<{
+    section: 'verse' | 'pre-chorus' | 'chorus' | 'bridge' | 'outro';
+    bars: number;
+    harmonicIdea: string;
+  }>;
+};

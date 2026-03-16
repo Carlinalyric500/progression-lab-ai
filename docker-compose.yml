@@ -1,0 +1,15 @@
+version: '3.9'
+
+services:
+  web:
+    build: .
+    container_name: music-chord-app
+    ports:
+      - '3000:3000'
+    environment:
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      OPENAI_MODEL: ${OPENAI_MODEL:-gpt-5.4}
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/.next
