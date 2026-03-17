@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import {
   Alert,
   Box,
@@ -21,10 +22,10 @@ import {
 import type { Progression } from '../../lib/types';
 
 export default function MyProgressionsPage() {
+  const router = useRouter();
   const [progressions, setProgressions] = useState<Progression[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [requiresAuth, setRequiresAuth] = useState(false);
 
   useEffect(() => {
     loadProgressions();
@@ -34,13 +35,13 @@ export default function MyProgressionsPage() {
     try {
       setLoading(true);
       setError('');
-      setRequiresAuth(false);
       const data = await getMyProgressions();
       setProgressions(data);
     } catch (err) {
       const message = (err as Error).message || 'Failed to load progressions';
       if (message.toLowerCase().includes('unauthorized')) {
-        setRequiresAuth(true);
+        router.replace('/auth');
+        return;
       }
       setError(message);
     } finally {
@@ -91,15 +92,6 @@ export default function MyProgressionsPage() {
         {error && (
           <Alert severity="error" onClose={() => setError('')}>
             {error}
-            {requiresAuth ? (
-              <Box sx={{ mt: 1 }}>
-                <Link href="/auth" passHref>
-                  <Button variant="contained" size="small">
-                    Login to continue
-                  </Button>
-                </Link>
-              </Box>
-            ) : null}
           </Alert>
         )}
 

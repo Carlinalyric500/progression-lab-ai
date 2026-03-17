@@ -31,7 +31,12 @@ function getAuthSecret(): string {
   }
 
   if (process.env.NODE_ENV === 'production') {
-    throw new Error('AUTH_SECRET is required in production');
+    // This will be caught by the API route try/catch and returned as a 500,
+    // which makes it obvious in Vercel logs that AUTH_SECRET is missing.
+    throw new Error(
+      'Server misconfiguration: AUTH_SECRET environment variable is not set. ' +
+      'Add AUTH_SECRET to your Vercel environment variables and redeploy.'
+    );
   }
 
   return 'dev-only-auth-secret-change-me';
