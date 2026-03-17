@@ -4,7 +4,7 @@
 
 The app also visualizes suggested voicings on **piano and guitar**, making it useful for musicians, producers, and songwriters.
 
-<img width="977" height="476" alt="image" src="https://github.com/user-attachments/assets/c42eb8a1-b5bd-4b82-ac14-a40f246e44de" />
+<img width="1220" height="560" alt="image" src="https://github.com/user-attachments/assets/504bbeda-646c-4620-bd18-158be6b9ff3c" />
 
 ## Features
 
@@ -17,8 +17,8 @@ The app also visualizes suggested voicings on **piano and guitar**, making it us
 * Genre-aware harmony generation
 * Audio playback of chord voicings using Tone.js
 
-<img width="984" height="1316" alt="image" src="https://github.com/user-attachments/assets/d3bec33a-e5ca-4997-b09e-5690f0fe705f" />
-<img width="963" height="441" alt="image" src="https://github.com/user-attachments/assets/c517aa90-538a-4fd5-9c57-640e67361f82" />
+<img width="1196" height="1199" alt="image" src="https://github.com/user-attachments/assets/939b31a5-1d79-407e-94b6-764e708cb45e" />
+<img width="1215" height="1254" alt="image" src="https://github.com/user-attachments/assets/5bf1697b-b886-439a-bbe0-724fee98e8f9" />
 
 ## Tech Stack
 
