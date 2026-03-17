@@ -1,18 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-import { prisma } from '../../../lib/prisma';
-import type { UpdateProgressionRequest } from '../../../types/progression';
+import { prisma } from '../../../../lib/prisma';
+import type { UpdateProgressionRequest } from '../../../../lib/types';
 
 const DEMO_USER_ID = 'demo-user-id';
 
 export async function GET(
   _request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const progression = await prisma.progression.findFirst({
       where: {
-        id: params.id,
+        id,
         userId: DEMO_USER_ID,
       },
     });
@@ -36,14 +37,15 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const body = (await request.json()) as UpdateProgressionRequest;
     const { title, chords, feel, scale, notes, tags, isPublic } = body;
 
     const progression = await prisma.progression.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         ...(title !== undefined && { title }),
         ...(chords !== undefined && { chords }),
@@ -67,11 +69,12 @@ export async function PUT(
 
 export async function DELETE(
   _request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     await prisma.progression.delete({
-      where: { id: params.id },
+      where: { id },
     });
 
     return new NextResponse(null, { status: 204 });

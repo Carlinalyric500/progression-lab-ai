@@ -1,8 +1,7 @@
 import type {
   CreateProgressionRequest,
-  ProgressionPayload,
   UpdateProgressionRequest,
-} from '@/lib/types';
+} from '../types';
 
 export async function createProgression(payload: CreateProgressionRequest) {
   const response = await fetch('/api/progressions', {

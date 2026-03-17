@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import {
   Alert,
@@ -26,7 +26,7 @@ export default function SharedProgressionPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  const loadProgression = async () => {
+  const loadProgression = useCallback(async () => {
     try {
       setLoading(true);
       setError('');
@@ -37,13 +37,13 @@ export default function SharedProgressionPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [shareId]);
 
-    useEffect(() => {
+  useEffect(() => {
     if (!shareId) return;
 
     loadProgression();
-  }, [shareId]);
+  }, [shareId, loadProgression]);
 
   const handleOpen = () => {
     // Store in sessionStorage and navigate to lab

@@ -15,7 +15,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 
-import type { Progression } from '@/lib/types';
+import type { Progression } from '../lib/types';
 
 type ProgressionCardProps = {
   progression: Progression;

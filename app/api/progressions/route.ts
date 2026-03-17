@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import { prisma } from '../../../lib/prisma';
-import type { CreateProgressionRequest } from '../types/progression';
+import type { CreateProgressionRequest } from '../../../lib/types';
 
 const DEMO_USER_ID = 'demo-user-id';
 

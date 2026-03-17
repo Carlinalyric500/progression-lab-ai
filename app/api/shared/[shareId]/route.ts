@@ -4,12 +4,13 @@ import { prisma } from '../../../../lib/prisma';
 
 export async function GET(
   _request: NextRequest,
-  { params }: { params: { shareId: string } }
+  { params }: { params: Promise<{ shareId: string }> }
 ) {
   try {
+    const { shareId } = await params;
     const progression = await prisma.progression.findFirst({
       where: {
-        shareId: params.shareId,
+        shareId,
         isPublic: true,
       },
     });
