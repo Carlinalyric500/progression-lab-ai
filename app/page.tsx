@@ -437,7 +437,7 @@ export default function HomePage() {
                         </Typography>
                       ) : null}
 
-                      {idea.length > 0 ? (
+                      {idea.pianoVoicings.length > 0 ? (
                         <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap">
                           <Button
                             variant="contained"
