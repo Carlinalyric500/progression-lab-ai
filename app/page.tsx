@@ -143,7 +143,7 @@ export default function HomePage() {
               height={48}
             />
             <Typography variant="h3" component="h1">
-              ProgressionLab.AI
+              ProgressionLab
             </Typography>
           </Box>
           <Typography variant="body1" color="text.secondary">
@@ -437,7 +437,7 @@ export default function HomePage() {
                         </Typography>
                       ) : null}
 
-                      {idea.pianoVoicings.length > 0 ? (
+                      {idea.git.length > 0 ? (
                         <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap">
                           <Button
                             variant="contained"
