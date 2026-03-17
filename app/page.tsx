@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 import {
   Alert,
   Box,
@@ -131,9 +132,17 @@ export default function HomePage() {
     <Container component="main" maxWidth="lg" sx={{ py: 6 }}>
       <Stack spacing={3}>
         <Box id="generator">
-          <Typography variant="h3" component="h1" gutterBottom>
-            ProgressionLab-AI
-          </Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+            <Image
+              src="/icon.png"
+              alt="ProgressionLab.AI logo"
+              width={48}
+              height={48}
+            />
+            <Typography variant="h3" component="h1">
+              ProgressionLab.AI
+            </Typography>
+          </Box>
           <Typography variant="body1" color="text.secondary">
             Enter a few chords, a mood, and a mode. Get back progression ideas,
             structure suggestions, and simple guitar/piano diagrams.

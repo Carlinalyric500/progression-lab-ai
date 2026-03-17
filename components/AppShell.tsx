@@ -52,7 +52,7 @@ export default function AppShell({ children }: Props) {
             }}
           >
             <Typography variant="h6" component="a" href="/" sx={{ textDecoration: 'none', color: 'text.primary' }}>
-              ProgressionLab-AI
+              ProgressionLab.AI
             </Typography>
 
             <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 1, alignItems: 'center' }}>
