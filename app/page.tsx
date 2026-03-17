@@ -376,7 +376,13 @@ export default function HomePage() {
                         />
                       )}
                       {item.pianoVoicing ? (
-                        <Box sx={{ width: '700px', alignSelf: 'center' }}>
+                        <Box
+                          sx={{
+                            width: '100%',
+                            maxWidth: { xs: '100%', lg: '700px' },
+                            alignSelf: 'center',
+                          }}
+                        >
                           <PianoChordDiagram
                             leftHand={item.pianoVoicing.leftHand}
                             rightHand={item.pianoVoicing.rightHand}
