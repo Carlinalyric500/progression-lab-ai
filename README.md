@@ -79,26 +79,6 @@ make dev
 
 Open `http://localhost:3000`.
 
-## Commands
-
-| Command | Purpose |
-| --- | --- |
-| `make install` | Install dependencies |
-| `make dev` | Run local dev server |
-| `make build` | Run Prisma generate + migrate deploy, then build |
-| `make start` | Run production server |
-| `make docker-build` | Build Docker services |
-| `make docker-up` | Start Docker services |
-| `make docker-down` | Stop Docker services |
-| `make docker-logs` | Follow Docker logs |
-| `make clean` | Remove build artifacts and `node_modules` |
-| `make setup-env` | Create `.env.local` from example |
-| `make vercel-link` | Link repo to a Vercel project |
-| `make vercel-pull` | Pull Vercel env vars into `.env.local` |
-| `make vercel-preview` | Create preview deployment |
-| `make vercel-prod` | Deploy to Vercel production |
-| `make vercel-prod-with-migrate` | Run Prisma migrate deploy, then production deploy |
-
 ## API Overview
 
 ### AI route
