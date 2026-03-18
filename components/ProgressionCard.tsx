@@ -1,7 +1,16 @@
 'use client';
 
 import { useState } from 'react';
-import { Box, Button, Card, CardContent, Chip, Stack, Typography } from '@mui/material';
+import {
+  Box,
+  Button,
+  Card,
+  CardContent,
+  Chip,
+  CircularProgress,
+  Stack,
+  Typography,
+} from '@mui/material';
 import FileCopyIcon from '@mui/icons-material/FileCopy';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
@@ -19,6 +28,7 @@ type ProgressionCardProps = {
   onOpen?: (progression: Progression) => void;
   canDelete?: boolean;
   canEdit?: boolean;
+  isDeleting?: boolean;
 };
 
 export default function ProgressionCard({
@@ -28,6 +38,7 @@ export default function ProgressionCard({
   onOpen,
   canDelete = true,
   canEdit = true,
+  isDeleting = false,
 }: ProgressionCardProps) {
   const [copied, setCopied] = useState(false);
 
@@ -163,10 +174,13 @@ export default function ProgressionCard({
                 size="small"
                 color="error"
                 variant="outlined"
-                startIcon={<DeleteIcon />}
+                startIcon={
+                  isDeleting ? <CircularProgress size={16} color="inherit" /> : <DeleteIcon />
+                }
                 onClick={() => onDelete(progression.id)}
+                disabled={isDeleting}
               >
-                Delete
+                {isDeleting ? 'Deleting...' : 'Delete'}
               </Button>
             )}
           </Stack>

@@ -60,6 +60,7 @@ export default function MyProgressionsPage() {
   const [myProgressions, setMyProgressions] = useState<Progression[]>([]);
   const [publicProgressions, setPublicProgressions] = useState<Progression[]>([]);
   const [loading, setLoading] = useState(true);
+  const [deletingProgressionId, setDeletingProgressionId] = useState<string | null>(null);
   const [error, setError] = useState('');
 
   const { control, setValue, watch } = useForm<FilterFormData>({
@@ -166,10 +167,13 @@ export default function MyProgressionsPage() {
     }
 
     try {
+      setDeletingProgressionId(id);
       await deleteProgression(id);
       setMyProgressions((prev) => prev.filter((p) => p.id !== id));
     } catch (err) {
       setError((err as Error).message || 'Failed to delete progression');
+    } finally {
+      setDeletingProgressionId(null);
     }
   };
 
@@ -364,6 +368,7 @@ export default function MyProgressionsPage() {
                 onOpen={handleOpen}
                 canEdit={false}
                 canDelete={viewMode === 'mine'}
+                isDeleting={deletingProgressionId === progression.id}
               />
             ))}
           </Box>

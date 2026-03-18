@@ -3,8 +3,10 @@
 import { useEffect } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import {
+  Alert,
   Autocomplete,
   Button,
+  CircularProgress,
   Chip,
   Dialog,
   DialogActions,
@@ -14,7 +16,6 @@ import {
   Stack,
   Switch,
   TextField,
-  Alert,
 } from '@mui/material';
 
 import AppTextField from './ui/TextField';
@@ -212,6 +213,7 @@ export default function SaveProgressionDialog({
           onClick={handleSubmit(onSubmit)}
           variant="contained"
           disabled={isSubmitting || Object.keys(errors).length > 0}
+          startIcon={isSubmitting ? <CircularProgress size={16} color="inherit" /> : undefined}
         >
           {isSubmitting ? 'Saving...' : 'Save'}
         </Button>
