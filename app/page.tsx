@@ -70,6 +70,20 @@ const GENRE_OPTIONS = [
   { value: 'custom', label: 'Custom' },
 ];
 
+const GENERATOR_CACHE_KEY = 'generatorCache';
+
+type GeneratorCache = {
+  seedChords: string;
+  mood: string;
+  mode: string;
+  customMode: string;
+  genre: string;
+  customGenre: string;
+  instrument: InstrumentPreference;
+  adventurousness: Adventurousness;
+  data: ChordSuggestionResponse;
+};
+
 export default function HomePage() {
   const [seedChords, setSeedChords] = useState('Fmaj7, F#m7');
   const [mood, setMood] = useState('dreamy, emotional, uplifting');
@@ -90,67 +104,98 @@ export default function HomePage() {
   >([]);
   const [selectedProgressionFeel, setSelectedProgressionFeel] = useState('');
   const [successMessageOpen, setSuccessMessageOpen] = useState(false);
+  const [isRestoringState, setIsRestoringState] = useState(true);
+
   useEffect(() => {
-    const raw = sessionStorage.getItem('loadedProgression');
-    if (!raw) {
-      return;
-    }
-
     try {
-      const parsed = JSON.parse(raw) as {
-        title?: string;
-        chords?: Array<{ name?: string } | string>;
-        pianoVoicings?: ChordSuggestionResponse['progressionIdeas'][number]['pianoVoicings'];
-        feel?: string;
-        scale?: string;
-      };
+      const rawLoadedProgression = sessionStorage.getItem('loadedProgression');
 
-      const chordNames = (parsed.chords ?? [])
-        .map((chord) => (typeof chord === 'string' ? chord : (chord.name ?? '').trim()))
-        .filter(Boolean);
+      if (rawLoadedProgression) {
+        try {
+          const parsed = JSON.parse(rawLoadedProgression) as {
+            title?: string;
+            chords?: Array<{ name?: string } | string>;
+            pianoVoicings?: ChordSuggestionResponse['progressionIdeas'][number]['pianoVoicings'];
+            feel?: string;
+            scale?: string;
+          };
 
-      if (chordNames.length > 0) {
-        setSeedChords(chordNames.join(', '));
+          const chordNames = (parsed.chords ?? [])
+            .map((chord) => (typeof chord === 'string' ? chord : (chord.name ?? '').trim()))
+            .filter(Boolean);
+
+          if (chordNames.length > 0) {
+            setSeedChords(chordNames.join(', '));
+          }
+
+          if (parsed.feel) {
+            setMood(parsed.feel);
+          }
+
+          if (parsed.scale) {
+            setMode(parsed.scale);
+          }
+
+          if (chordNames.length > 0) {
+            setIsLoadedFromSavedProgression(true);
+            const loadedVoicings = Array.isArray(parsed.pianoVoicings) ? parsed.pianoVoicings : [];
+
+            setData((prev) => ({
+              inputSummary: {
+                seedChords: chordNames,
+                mood: parsed.feel ?? prev?.inputSummary.mood ?? null,
+                mode: parsed.scale ?? prev?.inputSummary.mode ?? null,
+                genre: prev?.inputSummary.genre ?? null,
+                instrument: prev?.inputSummary.instrument ?? null,
+                adventurousness: prev?.inputSummary.adventurousness ?? null,
+              },
+              nextChordSuggestions: prev?.nextChordSuggestions ?? [],
+              progressionIdeas: [
+                {
+                  label: parsed.title || 'Loaded progression',
+                  chords: chordNames,
+                  feel: parsed.feel || 'Loaded from saved progression',
+                  performanceTip: null,
+                  pianoVoicings: loadedVoicings,
+                },
+              ],
+              structureSuggestions: prev?.structureSuggestions ?? [],
+            }));
+          }
+        } catch (err) {
+          console.error('Failed to load saved progression from session storage:', err);
+        } finally {
+          sessionStorage.removeItem('loadedProgression');
+          sessionStorage.removeItem(GENERATOR_CACHE_KEY);
+        }
+
+        return;
       }
 
-      if (parsed.feel) {
-        setMood(parsed.feel);
+      const rawGeneratorCache = sessionStorage.getItem(GENERATOR_CACHE_KEY);
+      if (!rawGeneratorCache) {
+        return;
       }
 
-      if (parsed.scale) {
-        setMode(parsed.scale);
-      }
+      try {
+        const parsedCache = JSON.parse(rawGeneratorCache) as GeneratorCache;
 
-      if (chordNames.length > 0) {
-        setIsLoadedFromSavedProgression(true);
-        const loadedVoicings = Array.isArray(parsed.pianoVoicings) ? parsed.pianoVoicings : [];
-
-        setData((prev) => ({
-          inputSummary: {
-            seedChords: chordNames,
-            mood: parsed.feel ?? prev?.inputSummary.mood ?? null,
-            mode: parsed.scale ?? prev?.inputSummary.mode ?? null,
-            genre: prev?.inputSummary.genre ?? null,
-            instrument: prev?.inputSummary.instrument ?? null,
-            adventurousness: prev?.inputSummary.adventurousness ?? null,
-          },
-          nextChordSuggestions: prev?.nextChordSuggestions ?? [],
-          progressionIdeas: [
-            {
-              label: parsed.title || 'Loaded progression',
-              chords: chordNames,
-              feel: parsed.feel || 'Loaded from saved progression',
-              performanceTip: null,
-              pianoVoicings: loadedVoicings,
-            },
-          ],
-          structureSuggestions: prev?.structureSuggestions ?? [],
-        }));
+        setSeedChords(parsedCache.seedChords);
+        setMood(parsedCache.mood);
+        setMode(parsedCache.mode);
+        setCustomMode(parsedCache.customMode);
+        setGenre(parsedCache.genre);
+        setCustomGenre(parsedCache.customGenre);
+        setInstrument(parsedCache.instrument);
+        setAdventurousness(parsedCache.adventurousness);
+        setIsLoadedFromSavedProgression(false);
+        setData(parsedCache.data);
+      } catch (err) {
+        console.error('Failed to restore generator cache from session storage:', err);
+        sessionStorage.removeItem(GENERATOR_CACHE_KEY);
       }
-    } catch (err) {
-      console.error('Failed to load saved progression from session storage:', err);
     } finally {
-      sessionStorage.removeItem('loadedProgression');
+      setIsRestoringState(false);
     }
   }, []);
 
@@ -197,6 +242,20 @@ export default function HomePage() {
 
       const json = (await response.json()) as ChordSuggestionResponse;
       setData(json);
+
+      const cachePayload: GeneratorCache = {
+        seedChords,
+        mood,
+        mode,
+        customMode,
+        genre,
+        customGenre,
+        instrument,
+        adventurousness,
+        data: json,
+      };
+
+      sessionStorage.setItem(GENERATOR_CACHE_KEY, JSON.stringify(cachePayload));
     } catch (err) {
       console.error(err);
       setError('Could not generate suggestions.');
@@ -204,6 +263,43 @@ export default function HomePage() {
       setLoading(false);
     }
   };
+
+  if (isRestoringState) {
+    return (
+      <Container component="main" maxWidth="lg" sx={{ py: 6 }}>
+        <Stack spacing={3}>
+          <Box id="generator">
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+              <Image src="/icon.png" alt="ProgressionLab.AI logo" width={48} height={48} />
+              <Typography variant="h3" component="h1">
+                ProgressionLab
+              </Typography>
+            </Box>
+            <Typography variant="body1" color="text.secondary">
+              Enter a few chords, a mood, and a mode. Get back progression ideas, structure
+              suggestions, and simple guitar/piano diagrams.
+            </Typography>
+          </Box>
+
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              py: 10,
+              gap: 2,
+            }}
+          >
+            <CircularProgress />
+            <Typography variant="body1" color="text.secondary">
+              Restoring your last generator session...
+            </Typography>
+          </Box>
+        </Stack>
+      </Container>
+    );
+  }
 
   return (
     <Container component="main" maxWidth="lg" sx={{ py: 6 }}>
