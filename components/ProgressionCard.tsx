@@ -10,6 +10,7 @@ import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 
 import type { Progression } from '../lib/types';
 import { playProgression } from '../lib/audio';
+import { getTagChipSx } from '../lib/tagMetadata';
 
 type ProgressionCardProps = {
   progression: Progression;
@@ -94,7 +95,7 @@ export default function ProgressionCard({
           {progression.tags && progression.tags.length > 0 && (
             <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
               {progression.tags.map((tag) => (
-                <Chip key={tag} label={tag} size="small" variant="outlined" />
+                <Chip key={tag} label={tag} size="small" variant="filled" sx={getTagChipSx(tag)} />
               ))}
             </Box>
           )}

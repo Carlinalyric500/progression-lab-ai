@@ -2,7 +2,9 @@
 
 import { useState } from 'react';
 import {
+  Autocomplete,
   Button,
+  Chip,
   Dialog,
   DialogActions,
   DialogContent,
@@ -14,6 +16,7 @@ import {
 } from '@mui/material';
 
 import { createProgression } from '../lib/api/progressions';
+import { getTagChipSx, PRESET_TAG_OPTIONS, sanitizeTags } from '../lib/tagMetadata';
 import type { ChordItem, PianoVoicing } from '../lib/types';
 
 type SaveProgressionDialogProps = {
@@ -37,7 +40,7 @@ export default function SaveProgressionDialog({
 }: SaveProgressionDialogProps) {
   const [title, setTitle] = useState('');
   const [notes, setNotes] = useState('');
-  const [tags, setTags] = useState('');
+  const [tags, setTags] = useState<string[]>([]);
   const [isPublic, setIsPublic] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -59,14 +62,14 @@ export default function SaveProgressionDialog({
         feel: defaultFeel,
         scale: defaultScale,
         notes: notes.trim() || undefined,
-        tags: tags.trim() ? tags.split(',').map((t) => t.trim()) : [],
+        tags: sanitizeTags(tags),
         isPublic,
       });
 
       // Reset form
       setTitle('');
       setNotes('');
-      setTags('');
+      setTags([]);
       setIsPublic(false);
 
       onSuccess?.();
@@ -104,14 +107,40 @@ export default function SaveProgressionDialog({
             disabled={loading}
           />
 
-          <TextField
-            label="Tags"
+          <Autocomplete<string, true, false, true>
+            multiple
+            freeSolo
+            options={PRESET_TAG_OPTIONS}
             value={tags}
-            onChange={(e) => setTags(e.target.value)}
-            placeholder="house, jazzy, uplifting"
-            helperText="Comma-separated"
-            fullWidth
+            onChange={(_, value) => {
+              setTags(sanitizeTags(value));
+            }}
+            filterSelectedOptions
             disabled={loading}
+            renderTags={(value, getTagProps) =>
+              value.map((option, index) => {
+                const { key, ...tagProps } = getTagProps({ index });
+                return (
+                  <Chip
+                    key={key}
+                    label={option}
+                    size="small"
+                    variant="outlined"
+                    sx={getTagChipSx(option)}
+                    {...tagProps}
+                  />
+                );
+              })
+            }
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label="Tags"
+                placeholder="Select or type tags"
+                helperText="Choose from preset genre/feeling tags or add your own"
+                fullWidth
+              />
+            )}
           />
 
           <FormControlLabel
