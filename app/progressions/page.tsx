@@ -1,28 +1,53 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Alert, Box, Button, CircularProgress, Container, Stack, Typography } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import Link from 'next/link';
 
 import ProgressionCard from '../../components/ProgressionCard';
-import { deleteProgression, getMyProgressions } from '../../lib/api/progressions';
+import AppTextField from '../../components/ui/AppTextField';
+import {
+  deleteProgression,
+  getMyProgressions,
+  getPublicProgressions,
+} from '../../lib/api/progressions';
 import type { Progression } from '../../lib/types';
+
+type ViewMode = 'mine' | 'public';
+
+function getFirstChordName(progression: Progression): string {
+  const firstChord = progression.chords?.[0] as { name?: string } | string | undefined;
+
+  if (typeof firstChord === 'string') {
+    return firstChord;
+  }
+
+  if (firstChord && typeof firstChord === 'object') {
+    return firstChord.name ?? '';
+  }
+
+  return '';
+}
 
 export default function MyProgressionsPage() {
   const router = useRouter();
-  const [progressions, setProgressions] = useState<Progression[]>([]);
+  const [viewMode, setViewMode] = useState<ViewMode>('mine');
+  const [myProgressions, setMyProgressions] = useState<Progression[]>([]);
+  const [publicProgressions, setPublicProgressions] = useState<Progression[]>([]);
+  const [tagQuery, setTagQuery] = useState('');
+  const [keyQuery, setKeyQuery] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
   useEffect(() => {
-    const loadProgressions = async () => {
+    const loadMyProgressions = async () => {
       try {
         setLoading(true);
         setError('');
         const data = await getMyProgressions();
-        setProgressions(data);
+        setMyProgressions(data);
       } catch (err) {
         const message = (err as Error).message || 'Failed to load progressions';
         if (message.toLowerCase().includes('unauthorized')) {
@@ -34,8 +59,49 @@ export default function MyProgressionsPage() {
         setLoading(false);
       }
     };
-    loadProgressions();
+
+    loadMyProgressions();
   }, [router]);
+
+  useEffect(() => {
+    if (viewMode !== 'public') {
+      return;
+    }
+
+    const loadPublicProgressions = async () => {
+      try {
+        setLoading(true);
+        setError('');
+        const data = await getPublicProgressions({ tag: tagQuery, key: keyQuery });
+        setPublicProgressions(data);
+      } catch (err) {
+        setError((err as Error).message || 'Failed to load public progressions');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadPublicProgressions();
+  }, [viewMode, tagQuery, keyQuery]);
+
+  const filteredMyProgressions = useMemo(() => {
+    const normalizedTagQuery = tagQuery.trim().toLowerCase();
+    const normalizedKeyQuery = keyQuery.trim().toLowerCase();
+
+    return myProgressions.filter((progression) => {
+      const matchesTag =
+        normalizedTagQuery.length === 0 ||
+        progression.tags.some((tag) => tag.toLowerCase().includes(normalizedTagQuery));
+
+      const firstChordName = getFirstChordName(progression).trim().toLowerCase();
+      const matchesKey =
+        normalizedKeyQuery.length === 0 || firstChordName.startsWith(normalizedKeyQuery);
+
+      return matchesTag && matchesKey;
+    });
+  }, [myProgressions, tagQuery, keyQuery]);
+
+  const displayedProgressions = viewMode === 'mine' ? filteredMyProgressions : publicProgressions;
 
   const handleDelete = async (id: string) => {
     if (!window.confirm('Are you sure you want to delete this progression?')) {
@@ -44,7 +110,7 @@ export default function MyProgressionsPage() {
 
     try {
       await deleteProgression(id);
-      setProgressions((prev) => prev.filter((p) => p.id !== id));
+      setMyProgressions((prev) => prev.filter((p) => p.id !== id));
     } catch (err) {
       setError((err as Error).message || 'Failed to delete progression');
     }
@@ -63,10 +129,12 @@ export default function MyProgressionsPage() {
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <Box>
             <Typography variant="h3" component="h1" gutterBottom>
-              My Progressions
+              {viewMode === 'mine' ? 'My Progressions' : 'Public Progressions'}
             </Typography>
             <Typography variant="body1" color="text.secondary">
-              View, edit, and share your saved chord progressions
+              {viewMode === 'mine'
+                ? 'View, edit, and share your saved chord progressions'
+                : 'Explore community-shared chord progressions'}
             </Typography>
           </Box>
           <Link href="/" passHref>
@@ -75,6 +143,48 @@ export default function MyProgressionsPage() {
             </Button>
           </Link>
         </Box>
+
+        <Stack direction={{ xs: 'column', md: 'row' }} spacing={2}>
+          <Stack direction="row" spacing={1}>
+            <Button
+              variant={viewMode === 'mine' ? 'contained' : 'outlined'}
+              onClick={() => setViewMode('mine')}
+            >
+              My Progressions
+            </Button>
+            <Button
+              variant={viewMode === 'public' ? 'contained' : 'outlined'}
+              onClick={() => setViewMode('public')}
+            >
+              Public
+            </Button>
+          </Stack>
+
+          <Box
+            sx={{
+              flex: 1,
+              display: 'grid',
+              gridTemplateColumns: {
+                xs: '1fr',
+                md: 'repeat(2, minmax(0, 1fr))',
+              },
+              gap: 1,
+            }}
+          >
+            <AppTextField
+              label="Search tags"
+              value={tagQuery}
+              onChange={(event) => setTagQuery(event.target.value)}
+              placeholder="house, cinematic, jazz..."
+            />
+            <AppTextField
+              label="Search key (first chord)"
+              value={keyQuery}
+              onChange={(event) => setKeyQuery(event.target.value)}
+              placeholder="C, F#m, Bb..."
+            />
+          </Box>
+        </Stack>
 
         {/* Error alert */}
         {error && (
@@ -91,19 +201,21 @@ export default function MyProgressionsPage() {
         )}
 
         {/* Empty state */}
-        {!loading && progressions.length === 0 && (
+        {!loading && displayedProgressions.length === 0 && (
           <Box sx={{ textAlign: 'center', py: 8 }}>
             <Typography variant="body1" color="text.secondary" sx={{ mb: 2 }}>
-              {`You haven't saved any progressions yet.`}
+              {viewMode === 'mine'
+                ? "You haven't saved any progressions yet."
+                : 'No public progressions match your filters yet.'}
             </Typography>
             <Link href="/" passHref>
-              <Button variant="contained">Create your first progression</Button>
+              <Button variant="contained">Create a progression</Button>
             </Link>
           </Box>
         )}
 
         {/* Progressions grid */}
-        {!loading && progressions.length > 0 && (
+        {!loading && displayedProgressions.length > 0 && (
           <Box
             sx={{
               display: 'grid',
@@ -114,14 +226,14 @@ export default function MyProgressionsPage() {
               gap: 2,
             }}
           >
-            {progressions.map((progression) => (
+            {displayedProgressions.map((progression) => (
               <ProgressionCard
                 key={progression.id}
                 progression={progression}
-                onDelete={handleDelete}
+                onDelete={viewMode === 'mine' ? handleDelete : undefined}
                 onOpen={handleOpen}
                 canEdit={false}
-                canDelete={true}
+                canDelete={viewMode === 'mine'}
               />
             ))}
           </Box>

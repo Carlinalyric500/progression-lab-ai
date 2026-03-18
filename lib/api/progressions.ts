@@ -80,3 +80,24 @@ export async function getSharedProgression(shareId: string) {
 
   return response.json();
 }
+
+export async function getPublicProgressions(filters?: { tag?: string; key?: string }) {
+  const searchParams = new URLSearchParams();
+
+  if (filters?.tag?.trim()) {
+    searchParams.set('tag', filters.tag.trim());
+  }
+
+  if (filters?.key?.trim()) {
+    searchParams.set('key', filters.key.trim());
+  }
+
+  const query = searchParams.toString();
+  const response = await fetch(query ? `/api/shared?${query}` : '/api/shared');
+
+  if (!response.ok) {
+    throw new Error(await readErrorMessage(response, 'Failed to fetch public progressions'));
+  }
+
+  return response.json();
+}
