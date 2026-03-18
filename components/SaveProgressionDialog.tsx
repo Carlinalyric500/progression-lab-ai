@@ -125,20 +125,14 @@ export default function SaveProgressionDialog({
             label="Make public & shareable"
           />
 
-          {error && (
-            <span style={{ color: 'red', fontSize: '0.875rem' }}>{error}</span>
-          )}
+          {error && <span style={{ color: 'red', fontSize: '0.875rem' }}>{error}</span>}
         </Stack>
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose} disabled={loading}>
           Cancel
         </Button>
-        <Button
-          onClick={handleSave}
-          variant="contained"
-          disabled={loading || !title.trim()}
-        >
+        <Button onClick={handleSave} variant="contained" disabled={loading || !title.trim()}>
           {loading ? 'Saving...' : 'Save'}
         </Button>
       </DialogActions>

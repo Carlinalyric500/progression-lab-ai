@@ -1,10 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-import {
-  createSessionToken,
-  setSessionCookie,
-  verifyPassword,
-} from '../../../../lib/auth';
+import { createSessionToken, setSessionCookie, verifyPassword } from '../../../../lib/auth';
 import { prisma } from '../../../../lib/prisma';
 
 export async function POST(request: NextRequest) {
@@ -18,19 +14,13 @@ export async function POST(request: NextRequest) {
     const password = body.password?.trim();
 
     if (!email || !password) {
-      return NextResponse.json(
-        { message: 'Email and password are required' },
-        { status: 400 }
-      );
+      return NextResponse.json({ message: 'Email and password are required' }, { status: 400 });
     }
 
     const user = await prisma.user.findUnique({ where: { email } });
 
     if (!user || !user.passwordHash || !verifyPassword(password, user.passwordHash)) {
-      return NextResponse.json(
-        { message: 'Invalid email or password' },
-        { status: 401 }
-      );
+      return NextResponse.json({ message: 'Invalid email or password' }, { status: 401 });
     }
 
     const response = NextResponse.json({

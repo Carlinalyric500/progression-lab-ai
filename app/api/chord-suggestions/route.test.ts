@@ -97,18 +97,16 @@ describe('POST /api/chord-suggestions', () => {
       output_text: JSON.stringify(validModelPayload),
     });
 
-    const response = await POST(
-      {
-        json: async () => ({
-          seedChords: ['Fmaj7', 'F#m7'],
-          mood: 'dreamy',
-          mode: 'lydian',
-          genre: 'piano house',
-          instrument: 'both',
-          adventurousness: 'balanced',
-        }),
-      } as never
-    );
+    const response = await POST({
+      json: async () => ({
+        seedChords: ['Fmaj7', 'F#m7'],
+        mood: 'dreamy',
+        mode: 'lydian',
+        genre: 'piano house',
+        instrument: 'both',
+        adventurousness: 'balanced',
+      }),
+    } as never);
 
     const body = await response.json();
 

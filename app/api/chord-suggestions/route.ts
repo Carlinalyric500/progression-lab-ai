@@ -8,24 +8,12 @@ const client = new OpenAI({
 const chordSuggestionSchema = {
   type: 'object',
   additionalProperties: false,
-  required: [
-    'inputSummary',
-    'nextChordSuggestions',
-    'progressionIdeas',
-    'structureSuggestions',
-  ],
+  required: ['inputSummary', 'nextChordSuggestions', 'progressionIdeas', 'structureSuggestions'],
   properties: {
     inputSummary: {
       type: 'object',
       additionalProperties: false,
-      required: [
-        'seedChords',
-        'mood',
-        'mode',
-        'genre',
-        'instrument',
-        'adventurousness',
-      ],
+      required: ['seedChords', 'mood', 'mode', 'genre', 'instrument', 'adventurousness'],
       properties: {
         seedChords: {
           type: 'array',
@@ -182,10 +170,7 @@ const chordSuggestionSchema = {
 export async function POST(req: NextRequest) {
   try {
     if (!process.env.OPENAI_API_KEY) {
-      return NextResponse.json(
-        { error: 'Missing OPENAI_API_KEY' },
-        { status: 500 }
-      );
+      return NextResponse.json({ error: 'Missing OPENAI_API_KEY' }, { status: 500 });
     }
 
     const body = await req.json();
@@ -275,10 +260,7 @@ When returning progressionIdeas, ensure pianoVoicings.length exactly matches cho
 
     if (!raw) {
       console.error('Empty output_text from OpenAI response:', response);
-      return NextResponse.json(
-        { error: 'OpenAI returned empty output' },
-        { status: 500 }
-      );
+      return NextResponse.json({ error: 'OpenAI returned empty output' }, { status: 500 });
     }
 
     let parsed;
@@ -287,10 +269,7 @@ When returning progressionIdeas, ensure pianoVoicings.length exactly matches cho
     } catch (parseError) {
       console.error('Failed to parse output_text:', raw);
       console.error(parseError);
-      return NextResponse.json(
-        { error: 'Model returned invalid JSON', raw },
-        { status: 500 }
-      );
+      return NextResponse.json({ error: 'Model returned invalid JSON', raw }, { status: 500 });
     }
 
     return NextResponse.json(parsed);
@@ -302,7 +281,7 @@ When returning progressionIdeas, ensure pianoVoicings.length exactly matches cho
         error: 'Failed to generate chord suggestions',
         details: error instanceof Error ? error.message : 'Unknown error',
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

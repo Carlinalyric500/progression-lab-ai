@@ -4,10 +4,7 @@ import { getSessionFromRequest } from '../../../../lib/auth';
 import { prisma } from '../../../../lib/prisma';
 import type { UpdateProgressionRequest } from '../../../../lib/types';
 
-export async function GET(
-  _request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function GET(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const session = getSessionFromRequest(_request);
     if (!session) {
@@ -23,26 +20,17 @@ export async function GET(
     });
 
     if (!progression) {
-      return NextResponse.json(
-        { message: 'Progression not found' },
-        { status: 404 }
-      );
+      return NextResponse.json({ message: 'Progression not found' }, { status: 404 });
     }
 
     return NextResponse.json(progression);
   } catch (error) {
     console.error('Failed to fetch progression:', error);
-    return NextResponse.json(
-      { message: 'Failed to fetch progression', error },
-      { status: 500 }
-    );
+    return NextResponse.json({ message: 'Failed to fetch progression', error }, { status: 500 });
   }
 }
 
-export async function PUT(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const session = getSessionFromRequest(request);
     if (!session) {
@@ -62,10 +50,7 @@ export async function PUT(
     });
 
     if (!existing) {
-      return NextResponse.json(
-        { message: 'Progression not found' },
-        { status: 404 }
-      );
+      return NextResponse.json({ message: 'Progression not found' }, { status: 404 });
     }
 
     const progression = await prisma.progression.update({
@@ -85,16 +70,13 @@ export async function PUT(
     return NextResponse.json(progression);
   } catch (error) {
     console.error('Failed to update progression:', error);
-    return NextResponse.json(
-      { message: 'Failed to update progression', error },
-      { status: 500 }
-    );
+    return NextResponse.json({ message: 'Failed to update progression', error }, { status: 500 });
   }
 }
 
 export async function DELETE(
   _request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const session = getSessionFromRequest(_request);
@@ -111,18 +93,12 @@ export async function DELETE(
     });
 
     if (result.count === 0) {
-      return NextResponse.json(
-        { message: 'Progression not found' },
-        { status: 404 }
-      );
+      return NextResponse.json({ message: 'Progression not found' }, { status: 404 });
     }
 
     return new NextResponse(null, { status: 204 });
   } catch (error) {
     console.error('Failed to delete progression:', error);
-    return NextResponse.json(
-      { message: 'Failed to delete progression', error },
-      { status: 500 }
-    );
+    return NextResponse.json({ message: 'Failed to delete progression', error }, { status: 500 });
   }
 }

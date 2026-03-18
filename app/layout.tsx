@@ -26,8 +26,7 @@ export const metadata: Metadata = {
 
   openGraph: {
     title: 'Progression Lab AI',
-    description:
-      'Generate chord progressions with AI and visualize them on piano and guitar.',
+    description: 'Generate chord progressions with AI and visualize them on piano and guitar.',
     url: 'https://progression-lab-ai.vercel.app',
     siteName: 'Progression Lab AI',
     images: [
@@ -45,8 +44,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Progression Lab AI',
-    description:
-      'AI-powered chord progression generator with piano and guitar visualizations.',
+    description: 'AI-powered chord progression generator with piano and guitar visualizations.',
     images: ['/og-image.png'],
   },
 

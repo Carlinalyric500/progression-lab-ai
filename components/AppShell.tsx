@@ -81,7 +81,12 @@ export default function AppShell({ children }: Props) {
               px: { xs: 0, sm: 2 },
             }}
           >
-            <Typography variant="h6" component="a" href="/" sx={{ textDecoration: 'none', color: 'text.primary' }}>
+            <Typography
+              variant="h6"
+              component="a"
+              href="/"
+              sx={{ textDecoration: 'none', color: 'text.primary' }}
+            >
               ProgressionLab.AI
             </Typography>
 
@@ -120,11 +125,7 @@ export default function AppShell({ children }: Props) {
         </Toolbar>
       </AppBar>
 
-      <Drawer
-        anchor="right"
-        open={mobileOpen}
-        onClose={() => setMobileOpen(false)}
-      >
+      <Drawer anchor="right" open={mobileOpen} onClose={() => setMobileOpen(false)}>
         <Box sx={{ width: 280, pt: 2 }} role="presentation">
           <List>
             {NAV_ITEMS.map((item) => (

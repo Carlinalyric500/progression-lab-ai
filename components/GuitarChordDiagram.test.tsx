@@ -52,21 +52,20 @@ describe('GuitarChordDiagram', () => {
     render(
       <GuitarChordDiagram
         title="G7"
-        fingers={[[6, 3, '2'], [5, 2, '1']]}
+        fingers={[
+          [6, 3, '2'],
+          [5, 2, '1'],
+        ]}
         barres={[]}
         position={0}
-      />
+      />,
     );
 
-    expect(mockSVGuitarChord).toHaveBeenCalledWith(
-      expect.stringMatching(/^#guitar-chart-/)
-    );
+    expect(mockSVGuitarChord).toHaveBeenCalledWith(expect.stringMatching(/^#guitar-chart-/));
     expect(mockConfigure).toHaveBeenCalledWith(
-      expect.objectContaining({ position: 2, strings: 6, frets: 6 })
+      expect.objectContaining({ position: 2, strings: 6, frets: 6 }),
     );
-    expect(mockChord).toHaveBeenCalledWith(
-      expect.objectContaining({ title: 'G7', position: 2 })
-    );
+    expect(mockChord).toHaveBeenCalledWith(expect.objectContaining({ title: 'G7', position: 2 }));
     expect(mockDraw).toHaveBeenCalledTimes(1);
   });
 
@@ -75,40 +74,24 @@ describe('GuitarChordDiagram', () => {
       throw new Error('draw failed');
     });
 
-    render(
-      <GuitarChordDiagram
-        title="Fmaj7"
-        fingers={[[6, 1, '1']]}
-        position={1}
-      />
-    );
+    render(<GuitarChordDiagram title="Fmaj7" fingers={[[6, 1, '1']]} position={1} />);
 
     expect(console.error).toHaveBeenCalledWith(
       'svguitar render failed',
-      expect.objectContaining({ title: 'Fmaj7', position: 1 })
+      expect.objectContaining({ title: 'Fmaj7', position: 1 }),
     );
   });
 
   it('re-renders diagram when props change', () => {
     const { rerender } = render(
-      <GuitarChordDiagram
-        title="Cmaj7"
-        fingers={[[5, 3, '3']]}
-        position={3}
-      />
+      <GuitarChordDiagram title="Cmaj7" fingers={[[5, 3, '3']]} position={3} />,
     );
 
-    rerender(
-      <GuitarChordDiagram
-        title="D7"
-        fingers={[[5, 5, '3']]}
-        position={5}
-      />
-    );
+    rerender(<GuitarChordDiagram title="D7" fingers={[[5, 5, '3']]} position={5} />);
 
     expect(mockDraw).toHaveBeenCalledTimes(2);
     expect(mockChord).toHaveBeenLastCalledWith(
-      expect.objectContaining({ title: 'D7', position: 5 })
+      expect.objectContaining({ title: 'D7', position: 5 }),
     );
   });
 });

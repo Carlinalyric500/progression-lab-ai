@@ -25,7 +25,7 @@ describe('AppCard', () => {
     const { container } = render(
       <AppCard noPadding>
         <div data-testid="direct-child">Test Content</div>
-      </AppCard>
+      </AppCard>,
     );
     const cardContent = container.querySelector('.MuiCardContent-root');
     expect(cardContent).not.toBeInTheDocument();
@@ -33,17 +33,13 @@ describe('AppCard', () => {
   });
 
   it('renders children without cardContent when noPadding is true', () => {
-    const { container } = render(
-      <AppCard noPadding>Direct Child</AppCard>
-    );
+    const { container } = render(<AppCard noPadding>Direct Child</AppCard>);
     const cardContent = container.querySelector('.MuiCardContent-root');
     expect(cardContent).not.toBeInTheDocument();
   });
 
   it('accepts CardProps for customization', () => {
-    const { container } = render(
-      <AppCard sx={{ backgroundColor: 'red' }}>Test</AppCard>
-    );
+    const { container } = render(<AppCard sx={{ backgroundColor: 'red' }}>Test</AppCard>);
     const card = container.querySelector('.MuiCard-root');
     expect(card).toBeInTheDocument();
   });
@@ -54,7 +50,7 @@ describe('AppCard', () => {
         <h1>Card Title</h1>
         <p>Card Description</p>
         <button>Action Button</button>
-      </AppCard>
+      </AppCard>,
     );
     expect(screen.getByText('Card Title')).toBeInTheDocument();
     expect(screen.getByText('Card Description')).toBeInTheDocument();
@@ -66,7 +62,7 @@ describe('AppCard', () => {
       <>
         <AppCard>Card 1</AppCard>
         <AppCard noPadding>Card 2</AppCard>
-      </>
+      </>,
     );
     const cards = container.querySelectorAll('.MuiCard-root');
     expect(cards).toHaveLength(2);

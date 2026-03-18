@@ -25,11 +25,7 @@ describe('AppTextField', () => {
     const user = userEvent.setup();
     const handleChange = jest.fn();
     const { container } = render(
-      <AppTextField
-        label="Input Field"
-        value="initial"
-        onChange={handleChange}
-      />
+      <AppTextField label="Input Field" value="initial" onChange={handleChange} />,
     );
 
     const input = container.querySelector('input') as HTMLInputElement;
@@ -39,9 +35,7 @@ describe('AppTextField', () => {
   });
 
   it('accepts placeholder prop', () => {
-    const { container } = render(
-      <AppTextField label="Test" placeholder="Enter text" />
-    );
+    const { container } = render(<AppTextField label="Test" placeholder="Enter text" />);
     const input = container.querySelector('input') as HTMLInputElement;
     expect(input).toHaveAttribute('placeholder', 'Enter text');
   });
@@ -53,17 +47,13 @@ describe('AppTextField', () => {
   });
 
   it('accepts additional MUI TextField props', () => {
-    const { container } = render(
-      <AppTextField label="Test" type="password" />
-    );
+    const { container } = render(<AppTextField label="Test" type="password" />);
     const input = container.querySelector('input') as HTMLInputElement;
     expect(input).toHaveAttribute('type', 'password');
   });
 
   it('renders with multiline support', () => {
-    const { container } = render(
-      <AppTextField label="Multiline" multiline rows={4} />
-    );
+    const { container } = render(<AppTextField label="Multiline" multiline rows={4} />);
     const textarea = container.querySelector('textarea');
     expect(textarea).toBeInTheDocument();
   });

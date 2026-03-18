@@ -35,7 +35,7 @@ function getAuthSecret(): string {
     // which makes it obvious in Vercel logs that AUTH_SECRET is missing.
     throw new Error(
       'Server misconfiguration: AUTH_SECRET environment variable is not set. ' +
-      'Add AUTH_SECRET to your Vercel environment variables and redeploy.'
+        'Add AUTH_SECRET to your Vercel environment variables and redeploy.',
     );
   }
 
@@ -43,9 +43,7 @@ function getAuthSecret(): string {
 }
 
 function sign(value: string): string {
-  return base64UrlEncode(
-    createHmac('sha256', getAuthSecret()).update(value).digest()
-  );
+  return base64UrlEncode(createHmac('sha256', getAuthSecret()).update(value).digest());
 }
 
 export function hashPassword(password: string): string {
@@ -106,10 +104,7 @@ export function parseSessionToken(token: string | undefined): SessionPayload | n
     return null;
   }
 
-  const signaturesMatch = timingSafeEqual(
-    providedSignatureBuffer,
-    expectedSignatureBuffer
-  );
+  const signaturesMatch = timingSafeEqual(providedSignatureBuffer, expectedSignatureBuffer);
 
   if (!signaturesMatch) {
     return null;

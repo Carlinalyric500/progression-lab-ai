@@ -1,15 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import {
-  Box,
-  Button,
-  Card,
-  CardContent,
-  Chip,
-  Stack,
-  Typography,
-} from '@mui/material';
+import { Box, Button, Card, CardContent, Chip, Stack, Typography } from '@mui/material';
 import FileCopyIcon from '@mui/icons-material/FileCopy';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
@@ -58,9 +50,7 @@ export default function ProgressionCard({
             </Typography>
             <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
               {progression.chords?.length > 0
-                ? (progression.chords as Array<{ name: string }>)
-                  .map((c) => c.name)
-                  .join(' → ')
+                ? (progression.chords as Array<{ name: string }>).map((c) => c.name).join(' → ')
                 : 'No chords'}
             </Typography>
           </Box>
@@ -100,11 +90,7 @@ export default function ProgressionCard({
           </Typography>
 
           {/* Actions */}
-          <Stack
-            direction="row"
-            spacing={1}
-            sx={{ justifyContent: 'flex-end', pt: 1 }}
-          >
+          <Stack direction="row" spacing={1} sx={{ justifyContent: 'flex-end', pt: 1 }}>
             {onOpen && (
               <Button
                 size="small"

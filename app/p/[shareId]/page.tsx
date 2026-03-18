@@ -2,15 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
-import {
-  Alert,
-  Box,
-  Button,
-  CircularProgress,
-  Container,
-  Stack,
-  Typography,
-} from '@mui/material';
+import { Alert, Box, Button, CircularProgress, Container, Stack, Typography } from '@mui/material';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import Link from 'next/link';

@@ -91,9 +91,7 @@ describe('HomePage', () => {
     await user.selectOptions(screen.getByLabelText(/Mode \/ scale/i), 'custom');
     await user.click(screen.getByRole('button', { name: 'Generate Ideas' }));
 
-    expect(
-      screen.getByText('Please enter a custom mode or scale.')
-    ).toBeInTheDocument();
+    expect(screen.getByText('Please enter a custom mode or scale.')).toBeInTheDocument();
     expect(fetchMock).not.toHaveBeenCalled();
   });
 

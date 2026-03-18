@@ -12,13 +12,7 @@ const sharedTokens: Omit<ThemeTokens, 'palette'> = {
     borderRadius: 12,
   },
   typography: {
-    fontFamily: [
-      'ui-sans-serif',
-      'system-ui',
-      '-apple-system',
-      'Segoe UI',
-      'sans-serif',
-    ].join(','),
+    fontFamily: ['ui-sans-serif', 'system-ui', '-apple-system', 'Segoe UI', 'sans-serif'].join(','),
   },
   components: {
     MuiCard: {

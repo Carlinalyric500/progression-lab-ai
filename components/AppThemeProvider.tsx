@@ -31,10 +31,7 @@ export default function AppThemeProvider({ children }: Props) {
 
   const theme = useMemo(() => createAppTheme(mode), [mode]);
 
-  const contextValue = useMemo(
-    () => ({ mode, toggleMode }),
-    [mode]
-  );
+  const contextValue = useMemo(() => ({ mode, toggleMode }), [mode]);
 
   return (
     <ThemeModeContext.Provider value={contextValue}>

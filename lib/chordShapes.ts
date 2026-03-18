@@ -16,7 +16,7 @@ export const GUITAR_SHAPES: Record<string, GuitarShape> = {
   Em7: { chord: 'Em7', frets: [0, 2, 2, 0, 3, 0], baseFret: 1 },
   Am7: { chord: 'Am7', frets: ['x', 0, 2, 0, 1, 0], baseFret: 1 },
   Cmaj7: { chord: 'Cmaj7', frets: ['x', 3, 2, 0, 0, 0], baseFret: 1 },
-  Dm7: { chord: 'Dm7', frets: ['x', 'x', 0, 2, 1, 1], baseFret: 1 }
+  Dm7: { chord: 'Dm7', frets: ['x', 'x', 0, 2, 1, 1], baseFret: 1 },
 };
 
 export const PIANO_SHAPES: Record<string, PianoShape> = {
@@ -26,5 +26,5 @@ export const PIANO_SHAPES: Record<string, PianoShape> = {
   Em7: { chord: 'Em7', notes: ['E', 'G', 'B', 'D'] },
   Am7: { chord: 'Am7', notes: ['A', 'C', 'E', 'G'] },
   Cmaj7: { chord: 'Cmaj7', notes: ['C', 'E', 'G', 'B'] },
-  Dm7: { chord: 'Dm7', notes: ['D', 'F', 'A', 'C'] }
+  Dm7: { chord: 'Dm7', notes: ['D', 'F', 'A', 'C'] },
 };

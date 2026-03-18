@@ -2,23 +2,12 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import {
-  Alert,
-  Box,
-  Button,
-  CircularProgress,
-  Container,
-  Stack,
-  Typography,
-} from '@mui/material';
+import { Alert, Box, Button, CircularProgress, Container, Stack, Typography } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import Link from 'next/link';
 
 import ProgressionCard from '../../components/ProgressionCard';
-import {
-  deleteProgression,
-  getMyProgressions,
-} from '../../lib/api/progressions';
+import { deleteProgression, getMyProgressions } from '../../lib/api/progressions';
 import type { Progression } from '../../lib/types';
 
 export default function MyProgressionsPage() {
@@ -28,26 +17,25 @@ export default function MyProgressionsPage() {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    loadProgressions();
-  }, []);
-
-  const loadProgressions = async () => {
-    try {
-      setLoading(true);
-      setError('');
-      const data = await getMyProgressions();
-      setProgressions(data);
-    } catch (err) {
-      const message = (err as Error).message || 'Failed to load progressions';
-      if (message.toLowerCase().includes('unauthorized')) {
-        router.replace('/auth');
-        return;
+    const loadProgressions = async () => {
+      try {
+        setLoading(true);
+        setError('');
+        const data = await getMyProgressions();
+        setProgressions(data);
+      } catch (err) {
+        const message = (err as Error).message || 'Failed to load progressions';
+        if (message.toLowerCase().includes('unauthorized')) {
+          router.replace('/auth');
+          return;
+        }
+        setError(message);
+      } finally {
+        setLoading(false);
       }
-      setError(message);
-    } finally {
-      setLoading(false);
-    }
-  };
+    };
+    loadProgressions();
+  }, [router]);
 
   const handleDelete = async (id: string) => {
     if (!window.confirm('Are you sure you want to delete this progression?')) {
@@ -130,7 +118,6 @@ export default function MyProgressionsPage() {
           </Stack>
         )}
       </Stack>
-
     </Container>
   );
 }

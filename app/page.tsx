@@ -19,11 +19,12 @@ import AppCard from '../components/ui/AppCard';
 import AppSelectField from '../components/ui/AppSelectField';
 import AppTextField from '../components/ui/AppTextField';
 import SaveProgressionDialog from '../components/SaveProgressionDialog';
+import SuccessSnackbar from '../components/ui/SuccessSnackbar';
 import type {
   Adventurousness,
   ChordItem,
   ChordSuggestionResponse,
-  InstrumentPreference
+  InstrumentPreference,
 } from '../lib/types';
 import { playChordVoicing, playProgression } from '../lib/audio';
 
@@ -77,17 +78,18 @@ export default function HomePage() {
   const [genre, setGenre] = useState('piano house');
   const [customGenre, setCustomGenre] = useState('');
   const [instrument, setInstrument] = useState<InstrumentPreference>('both');
-  const [adventurousness, setAdventurousness] =
-    useState<Adventurousness>('balanced');
+  const [adventurousness, setAdventurousness] = useState<Adventurousness>('balanced');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [data, setData] = useState<ChordSuggestionResponse | null>(null);
   const [isLoadedFromSavedProgression, setIsLoadedFromSavedProgression] = useState(false);
   const [saveDialogOpen, setSaveDialogOpen] = useState(false);
   const [selectedProgressionChords, setSelectedProgressionChords] = useState<ChordItem[]>([]);
-  const [selectedProgressionVoicings, setSelectedProgressionVoicings] = useState<ChordSuggestionResponse['progressionIdeas'][number]['pianoVoicings']>([]);
+  const [selectedProgressionVoicings, setSelectedProgressionVoicings] = useState<
+    ChordSuggestionResponse['progressionIdeas'][number]['pianoVoicings']
+  >([]);
   const [selectedProgressionFeel, setSelectedProgressionFeel] = useState('');
-
+  const [successMessageOpen, setSuccessMessageOpen] = useState(false);
   useEffect(() => {
     const raw = sessionStorage.getItem('loadedProgression');
     if (!raw) {
@@ -104,9 +106,7 @@ export default function HomePage() {
       };
 
       const chordNames = (parsed.chords ?? [])
-        .map((chord) =>
-          typeof chord === 'string' ? chord : (chord.name ?? '').trim()
-        )
+        .map((chord) => (typeof chord === 'string' ? chord : (chord.name ?? '').trim()))
         .filter(Boolean);
 
       if (chordNames.length > 0) {
@@ -123,9 +123,7 @@ export default function HomePage() {
 
       if (chordNames.length > 0) {
         setIsLoadedFromSavedProgression(true);
-        const loadedVoicings = Array.isArray(parsed.pianoVoicings)
-          ? parsed.pianoVoicings
-          : [];
+        const loadedVoicings = Array.isArray(parsed.pianoVoicings) ? parsed.pianoVoicings : [];
 
         setData((prev) => ({
           inputSummary: {
@@ -212,19 +210,14 @@ export default function HomePage() {
       <Stack spacing={3}>
         <Box id="generator">
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-            <Image
-              src="/icon.png"
-              alt="ProgressionLab.AI logo"
-              width={48}
-              height={48}
-            />
+            <Image src="/icon.png" alt="ProgressionLab.AI logo" width={48} height={48} />
             <Typography variant="h3" component="h1">
               ProgressionLab
             </Typography>
           </Box>
           <Typography variant="body1" color="text.secondary">
-            Enter a few chords, a mood, and a mode. Get back progression ideas,
-            structure suggestions, and simple guitar/piano diagrams.
+            Enter a few chords, a mood, and a mode. Get back progression ideas, structure
+            suggestions, and simple guitar/piano diagrams.
           </Typography>
         </Box>
 
@@ -288,9 +281,7 @@ export default function HomePage() {
             <AppSelectField
               label="Instrument"
               value={instrument}
-              onChange={(e) =>
-                setInstrument(e.target.value as InstrumentPreference)
-              }
+              onChange={(e) => setInstrument(e.target.value as InstrumentPreference)}
               options={[
                 { value: 'both', label: 'Both' },
                 { value: 'guitar', label: 'Guitar' },
@@ -301,9 +292,7 @@ export default function HomePage() {
             <AppSelectField
               label="Adventurousness"
               value={adventurousness}
-              onChange={(e) =>
-                setAdventurousness(e.target.value as Adventurousness)
-              }
+              onChange={(e) => setAdventurousness(e.target.value as Adventurousness)}
               options={[
                 { value: 'safe', label: 'Safe' },
                 { value: 'balanced', label: 'Balanced' },
@@ -313,11 +302,7 @@ export default function HomePage() {
           </Box>
 
           <Stack spacing={2} sx={{ mt: 3 }}>
-            <Button
-              variant="contained"
-              onClick={handleSubmit}
-              disabled={loading}
-            >
+            <Button variant="contained" onClick={handleSubmit} disabled={loading}>
               {loading ? 'Generating...' : 'Generate Ideas'}
             </Button>
 
@@ -361,9 +346,7 @@ export default function HomePage() {
                   }}
                 >
                   {data.nextChordSuggestions.map((item) => (
-                    <AppCard
-                      key={`${item.chord}-${item.functionExplanation}`}
-                    >
+                    <AppCard key={`${item.chord}-${item.functionExplanation}`}>
                       <Typography variant="h6" component="h3" gutterBottom>
                         {item.chord}
                       </Typography>
@@ -442,7 +425,7 @@ export default function HomePage() {
                             fingers={item.guitarVoicing.fingers.map((finger) =>
                               finger.finger
                                 ? [finger.string, finger.fret, finger.finger]
-                                : [finger.string, finger.fret]
+                                : [finger.string, finger.fret],
                             )}
                             barres={item.guitarVoicing.barres.map((barre) => ({
                               fromString: barre.fromString,
@@ -529,7 +512,7 @@ export default function HomePage() {
                             size="small"
                             onClick={() => {
                               setSelectedProgressionChords(
-                                idea.chords.map((chord) => ({ name: chord, beats: 1 }))
+                                idea.chords.map((chord) => ({ name: chord, beats: 1 })),
                               );
                               setSelectedProgressionVoicings(idea.pianoVoicings);
                               setSelectedProgressionFeel(idea.feel);
@@ -646,8 +629,13 @@ export default function HomePage() {
               scale={mode === 'custom' ? customMode : mode}
               onSuccess={() => {
                 setSaveDialogOpen(false);
-                alert('Progression saved!');
+                setSuccessMessageOpen(true);
               }}
+            />
+            <SuccessSnackbar
+              open={successMessageOpen}
+              message="Progression saved!"
+              onClose={() => setSuccessMessageOpen(false)}
             />
           </>
         ) : null}

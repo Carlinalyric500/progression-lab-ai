@@ -1,7 +1,4 @@
-import type {
-  CreateProgressionRequest,
-  UpdateProgressionRequest,
-} from '../types';
+import type { CreateProgressionRequest, UpdateProgressionRequest } from '../types';
 
 async function readErrorMessage(response: Response, fallback: string) {
   try {
@@ -48,10 +45,7 @@ export async function getProgression(id: string) {
   return response.json();
 }
 
-export async function updateProgression(
-  id: string,
-  payload: UpdateProgressionRequest
-) {
+export async function updateProgression(id: string, payload: UpdateProgressionRequest) {
   const response = await fetch(`/api/progressions/${id}`, {
     method: 'PUT',
     headers: {

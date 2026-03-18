@@ -115,11 +115,7 @@ export default function AuthPage() {
               onClick={handleSubmit}
               disabled={loading || !email.trim() || !password.trim()}
             >
-              {loading
-                ? 'Please wait...'
-                : mode === 'login'
-                  ? 'Sign in'
-                  : 'Create account'}
+              {loading ? 'Please wait...' : mode === 'login' ? 'Sign in' : 'Create account'}
             </Button>
           </Stack>
         </CardContent>

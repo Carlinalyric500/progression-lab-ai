@@ -6,11 +6,7 @@ type AppCardProps = CardProps & {
   noPadding?: boolean;
 };
 
-export default function AppCard({
-  children,
-  noPadding = false,
-  ...props
-}: AppCardProps) {
+export default function AppCard({ children, noPadding = false, ...props }: AppCardProps) {
   return (
     <Card variant="outlined" {...props}>
       {noPadding ? children : <CardContent>{children}</CardContent>}

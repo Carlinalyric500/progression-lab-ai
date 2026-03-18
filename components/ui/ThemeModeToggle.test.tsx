@@ -92,7 +92,7 @@ describe('ThemeModeToggle', () => {
 
     render(<ThemeModeToggle />);
     const button = screen.getByRole('button');
-    
+
     // Hover to show tooltip
     await userEvent.hover(button);
     await screen.findByText('Switch to dark mode');
@@ -106,7 +106,7 @@ describe('ThemeModeToggle', () => {
 
     render(<ThemeModeToggle />);
     const button = screen.getByRole('button');
-    
+
     // Hover to show tooltip
     await userEvent.hover(button);
     await screen.findByText('Switch to light mode');
@@ -114,13 +114,13 @@ describe('ThemeModeToggle', () => {
 
   it('updates aria-label when mode changes', () => {
     const { rerender } = render(<ThemeModeToggle />);
-    
+
     mockUseThemeMode.mockReturnValue({
       mode: 'light',
       toggleMode: mockToggleMode,
     });
     rerender(<ThemeModeToggle />);
-    
+
     let button = screen.getByRole('button', {
       name: 'Switch to dark mode',
     });

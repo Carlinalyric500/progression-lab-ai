@@ -36,7 +36,7 @@ describe('PianoChordChart', () => {
         rootNote="C"
         startOctave={2}
         endOctave={6}
-      />
+      />,
     );
 
     expect(mockInstrument).toHaveBeenCalledWith(
@@ -46,7 +46,7 @@ describe('PianoChordChart', () => {
         endOctave: 6,
         highlightedNotes: ['C', 'E', 'G'],
         showNoteNames: 'onpress',
-      })
+      }),
     );
     expect(mockCreate).toHaveBeenCalledTimes(1);
     expect(mockKeyDown).toHaveBeenNthCalledWith(1, 'C4');
@@ -70,7 +70,7 @@ describe('PianoChordChart', () => {
       expect.objectContaining({
         startOctave: 3,
         endOctave: 5,
-      })
+      }),
     );
     expect(mockKeyDown).not.toHaveBeenCalled();
   });

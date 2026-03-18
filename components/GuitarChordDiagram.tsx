@@ -20,12 +20,7 @@ type Props = {
   position?: number | null;
 };
 
-export default function GuitarChordDiagram({
-  title,
-  fingers,
-  barres = [],
-  position,
-}: Props) {
+export default function GuitarChordDiagram({ title, fingers, barres = [], position }: Props) {
   const id = useId().replace(/:/g, '');
 
   useEffect(() => {

@@ -11,7 +11,7 @@ const getPolySynth = (): Tone.PolySynth => {
         attack: 0.01,
         decay: 2,
         sustain: 0.01,
-        release:0,
+        release: 0,
       },
     }).toDestination();
   }

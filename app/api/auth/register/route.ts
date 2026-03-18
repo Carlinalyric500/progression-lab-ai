@@ -1,10 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-import {
-  createSessionToken,
-  hashPassword,
-  setSessionCookie,
-} from '../../../../lib/auth';
+import { createSessionToken, hashPassword, setSessionCookie } from '../../../../lib/auth';
 import { prisma } from '../../../../lib/prisma';
 
 export async function POST(request: NextRequest) {
@@ -20,16 +16,13 @@ export async function POST(request: NextRequest) {
     const name = body.name?.trim();
 
     if (!email || !password) {
-      return NextResponse.json(
-        { message: 'Email and password are required' },
-        { status: 400 }
-      );
+      return NextResponse.json({ message: 'Email and password are required' }, { status: 400 });
     }
 
     if (password.length < 8) {
       return NextResponse.json(
         { message: 'Password must be at least 8 characters' },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -37,7 +30,7 @@ export async function POST(request: NextRequest) {
     if (existing) {
       return NextResponse.json(
         { message: 'An account with this email already exists' },
-        { status: 409 }
+        { status: 409 },
       );
     }
 
@@ -57,16 +50,13 @@ export async function POST(request: NextRequest) {
           name: user.name,
         },
       },
-      { status: 201 }
+      { status: 201 },
     );
 
     setSessionCookie(response, createSessionToken(user.id, user.email));
     return response;
   } catch (error) {
     console.error('Registration failed:', error);
-    return NextResponse.json(
-      { message: 'Registration failed' },
-      { status: 500 }
-    );
+    return NextResponse.json({ message: 'Registration failed' }, { status: 500 });
   }
 }

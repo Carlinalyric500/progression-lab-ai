@@ -29,12 +29,7 @@ describe('PianoChordDiagram', () => {
   });
 
   it('creates piano-chart instrument and presses all notes', () => {
-    render(
-      <PianoChordDiagram
-        leftHand={['F2', 'C3']}
-        rightHand={['A3', 'C4', 'E4']}
-      />
-    );
+    render(<PianoChordDiagram leftHand={['F2', 'C3']} rightHand={['A3', 'C4', 'E4']} />);
 
     expect(mockInstrument).toHaveBeenCalledTimes(1);
     expect(mockInstrument).toHaveBeenCalledWith(
@@ -43,7 +38,7 @@ describe('PianoChordDiagram', () => {
         startOctave: 2,
         endOctave: 6,
         showNoteNames: 'always',
-      })
+      }),
     );
     expect(mockCreate).toHaveBeenCalledTimes(1);
     expect(mockKeyDown).toHaveBeenNthCalledWith(1, 'F2');
@@ -54,12 +49,7 @@ describe('PianoChordDiagram', () => {
   });
 
   it('destroys instrument on unmount', () => {
-    const { unmount } = render(
-      <PianoChordDiagram
-        leftHand={['C3']}
-        rightHand={['E4', 'G4']}
-      />
-    );
+    const { unmount } = render(<PianoChordDiagram leftHand={['C3']} rightHand={['E4', 'G4']} />);
 
     unmount();
 
@@ -76,7 +66,7 @@ describe('PianoChordDiagram', () => {
 
   it('recreates instrument when props change', () => {
     const { rerender, unmount } = render(
-      <PianoChordDiagram leftHand={['C3']} rightHand={['E4']} />
+      <PianoChordDiagram leftHand={['C3']} rightHand={['E4']} />,
     );
 
     rerender(<PianoChordDiagram leftHand={['D3']} rightHand={['F4']} />);

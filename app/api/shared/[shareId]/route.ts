@@ -4,7 +4,7 @@ import { prisma } from '../../../../lib/prisma';
 
 export async function GET(
   _request: NextRequest,
-  { params }: { params: Promise<{ shareId: string }> }
+  { params }: { params: Promise<{ shareId: string }> },
 ) {
   try {
     const { shareId } = await params;
@@ -16,10 +16,7 @@ export async function GET(
     });
 
     if (!progression) {
-      return NextResponse.json(
-        { message: 'Shared progression not found' },
-        { status: 404 }
-      );
+      return NextResponse.json({ message: 'Shared progression not found' }, { status: 404 });
     }
 
     return NextResponse.json(progression);
@@ -27,7 +24,7 @@ export async function GET(
     console.error('Failed to fetch shared progression:', error);
     return NextResponse.json(
       { message: 'Failed to fetch shared progression', error },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
