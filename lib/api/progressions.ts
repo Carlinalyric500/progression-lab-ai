@@ -81,15 +81,23 @@ export async function getSharedProgression(shareId: string) {
   return response.json();
 }
 
-export async function getPublicProgressions(filters?: { tag?: string; key?: string }) {
+export async function getPublicProgressions(filters?: { tags?: string[]; keys?: string[] }) {
   const searchParams = new URLSearchParams();
 
-  if (filters?.tag?.trim()) {
-    searchParams.set('tag', filters.tag.trim());
+  const tags =
+    filters?.tags
+      ?.map((tag) => tag.trim())
+      .filter((tag, index, list) => tag.length > 0 && list.indexOf(tag) === index) ?? [];
+  if (tags.length > 0) {
+    searchParams.set('tag', tags.join(','));
   }
 
-  if (filters?.key?.trim()) {
-    searchParams.set('key', filters.key.trim());
+  const keys =
+    filters?.keys
+      ?.map((key) => key.trim())
+      .filter((key, index, list) => key.length > 0 && list.indexOf(key) === index) ?? [];
+  if (keys.length > 0) {
+    searchParams.set('key', keys.join(','));
   }
 
   const query = searchParams.toString();

@@ -1,6 +1,6 @@
 'use client';
 
-import { Box } from '@mui/material';
+import { Box, useTheme } from '@mui/material';
 import { useEffect, useId } from 'react';
 import { SVGuitarChord } from 'svguitar';
 
@@ -22,6 +22,7 @@ type Props = {
 
 export default function GuitarChordDiagram({ title, fingers, barres = [], position }: Props) {
   const id = useId().replace(/:/g, '');
+  const theme = useTheme();
 
   useEffect(() => {
     const selector = `#guitar-chart-${id}`;
@@ -57,9 +58,9 @@ export default function GuitarChordDiagram({ title, fingers, barres = [], positi
           tuning: ['E', 'A', 'D', 'G', 'B', 'E'],
           fingerSize: 1,
           backgroundColor: 'transparent',
-          color: '#fff',
-          fingerColor: '#3b82f6',
-          fingerTextColor: '#ffffff',
+          color: theme.palette.text.primary,
+          fingerColor: theme.palette.primary.main,
+          fingerTextColor: theme.palette.getContrastText(theme.palette.primary.main),
         })
         .chord({
           title,
@@ -84,7 +85,7 @@ export default function GuitarChordDiagram({ title, fingers, barres = [], positi
         error,
       });
     }
-  }, [id, title, fingers, barres, position]);
+  }, [id, title, fingers, barres, position, theme]);
 
   return (
     <Box

@@ -30,6 +30,14 @@ export async function GET(request: NextRequest) {
   try {
     const tagQuery = request.nextUrl.searchParams.get('tag')?.trim().toLowerCase() ?? '';
     const keyQuery = request.nextUrl.searchParams.get('key')?.trim().toLowerCase() ?? '';
+    const tagQueries = tagQuery
+      .split(',')
+      .map((tag) => tag.trim())
+      .filter(Boolean);
+    const keyQueries = keyQuery
+      .split(',')
+      .map((key) => key.trim())
+      .filter(Boolean);
 
     const progressions = await prisma.progression.findMany({
       where: {
@@ -43,11 +51,14 @@ export async function GET(request: NextRequest) {
 
     const filteredProgressions = progressions.filter((progression) => {
       const matchesTag =
-        tagQuery.length === 0 ||
-        progression.tags.some((tag) => tag.toLowerCase().includes(tagQuery));
+        tagQueries.length === 0 ||
+        tagQueries.some((query) =>
+          progression.tags.some((tag) => tag.toLowerCase().includes(query)),
+        );
 
       const firstChordName = getFirstChordName(progression.chords).trim().toLowerCase();
-      const matchesKey = keyQuery.length === 0 || firstChordName.startsWith(keyQuery);
+      const matchesKey =
+        keyQueries.length === 0 || keyQueries.some((query) => firstChordName.startsWith(query));
 
       return matchesTag && matchesKey;
     });

@@ -3,7 +3,17 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm, Controller } from 'react-hook-form';
-import { Alert, Box, Button, CircularProgress, Container, Stack, Typography } from '@mui/material';
+import {
+  Alert,
+  Autocomplete,
+  Box,
+  Button,
+  Chip,
+  CircularProgress,
+  Container,
+  Stack,
+  Typography,
+} from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import Link from 'next/link';
 
@@ -14,13 +24,20 @@ import {
   getMyProgressions,
   getPublicProgressions,
 } from '../../lib/api/progressions';
+import {
+  getChordChipSx,
+  getTagChipSx,
+  PRESET_TAG_OPTIONS,
+  sanitizeTags,
+} from '../../lib/tagMetadata';
+import { CHORD_OPTIONS } from '../../lib/formOptions';
 import type { Progression } from '../../lib/types';
 
 type ViewMode = 'mine' | 'public';
 
 type FilterFormData = {
-  tagQuery: string;
-  keyQuery: string;
+  tagQuery: string[];
+  keyQuery: string[];
 };
 
 function getFirstChordName(progression: Progression): string {
@@ -45,15 +62,30 @@ export default function MyProgressionsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  const { control, watch } = useForm<FilterFormData>({
+  const { control, setValue, watch } = useForm<FilterFormData>({
     defaultValues: {
-      tagQuery: '',
-      keyQuery: '',
+      tagQuery: [],
+      keyQuery: [],
     },
   });
 
   const tagQuery = watch('tagQuery');
   const keyQuery = watch('keyQuery');
+
+  const allTagOptions = useMemo(() => {
+    const savedTags = myProgressions.flatMap((progression) => progression.tags);
+    const publicTags = publicProgressions.flatMap((progression) => progression.tags);
+    return sanitizeTags([...PRESET_TAG_OPTIONS, ...savedTags, ...publicTags]);
+  }, [myProgressions, publicProgressions]);
+
+  const keyOptions = useMemo(() => {
+    const allProgressions = [...myProgressions, ...publicProgressions];
+    const observedKeys = allProgressions
+      .map((progression) => getFirstChordName(progression).trim())
+      .filter(Boolean);
+
+    return sanitizeTags([...CHORD_OPTIONS, ...observedKeys]);
+  }, [myProgressions, publicProgressions]);
 
   useEffect(() => {
     const loadMyProgressions = async () => {
@@ -86,7 +118,7 @@ export default function MyProgressionsPage() {
       try {
         setLoading(true);
         setError('');
-        const data = await getPublicProgressions({ tag: tagQuery, key: keyQuery });
+        const data = await getPublicProgressions({ tags: tagQuery, keys: keyQuery });
         setPublicProgressions(data);
       } catch (err) {
         setError((err as Error).message || 'Failed to load public progressions');
@@ -99,23 +131,34 @@ export default function MyProgressionsPage() {
   }, [viewMode, tagQuery, keyQuery]);
 
   const filteredMyProgressions = useMemo(() => {
-    const normalizedTagQuery = tagQuery.trim().toLowerCase();
-    const normalizedKeyQuery = keyQuery.trim().toLowerCase();
+    const normalizedTagQueries = sanitizeTags(tagQuery)
+      .map((tag) => tag.toLowerCase())
+      .filter(Boolean);
+    const normalizedKeyQueries = keyQuery.map((key) => key.trim().toLowerCase()).filter(Boolean);
 
     return myProgressions.filter((progression) => {
       const matchesTag =
-        normalizedTagQuery.length === 0 ||
-        progression.tags.some((tag) => tag.toLowerCase().includes(normalizedTagQuery));
+        normalizedTagQueries.length === 0 ||
+        normalizedTagQueries.some((query) =>
+          progression.tags.some((tag) => tag.toLowerCase().includes(query)),
+        );
 
       const firstChordName = getFirstChordName(progression).trim().toLowerCase();
       const matchesKey =
-        normalizedKeyQuery.length === 0 || firstChordName.startsWith(normalizedKeyQuery);
+        normalizedKeyQueries.length === 0 ||
+        normalizedKeyQueries.some((query) => firstChordName.startsWith(query));
 
       return matchesTag && matchesKey;
     });
   }, [myProgressions, tagQuery, keyQuery]);
 
   const displayedProgressions = viewMode === 'mine' ? filteredMyProgressions : publicProgressions;
+  const hasActiveFilters = tagQuery.length > 0 || keyQuery.length > 0;
+
+  const handleClearFilters = () => {
+    setValue('tagQuery', []);
+    setValue('keyQuery', []);
+  };
 
   const handleDelete = async (id: string) => {
     if (!window.confirm('Are you sure you want to delete this progression?')) {
@@ -172,6 +215,9 @@ export default function MyProgressionsPage() {
             >
               Public
             </Button>
+            <Button variant="text" onClick={handleClearFilters} disabled={!hasActiveFilters}>
+              Clear Filters
+            </Button>
           </Stack>
 
           <Box
@@ -185,21 +231,85 @@ export default function MyProgressionsPage() {
               gap: 1,
             }}
           >
-            <Controller
-              name="tagQuery"
-              control={control}
-              render={({ field }) => (
-                <TextField label="Search tags" {...field} placeholder="house, cinematic, jazz..." />
-              )}
-            />
+            <Box sx={{ mb: { xs: 1, md: 0 } }}>
+              <Controller
+                name="tagQuery"
+                control={control}
+                render={({ field: { value, onChange } }) => (
+                  <Autocomplete<string, true, false, true>
+                    multiple
+                    freeSolo
+                    options={allTagOptions}
+                    value={value ?? []}
+                    onChange={(_, newValue) => onChange(sanitizeTags(newValue))}
+                    filterSelectedOptions
+                    renderTags={(tagValue, getTagProps) =>
+                      tagValue.map((option, index) => {
+                        const { key, ...tagProps } = getTagProps({ index });
+                        return (
+                          <Chip
+                            key={key}
+                            label={option}
+                            size="small"
+                            variant="filled"
+                            sx={getTagChipSx(option)}
+                            {...tagProps}
+                          />
+                        );
+                      })
+                    }
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        label="Search tags"
+                        InputLabelProps={{ shrink: true }}
+                        placeholder={value.length === 0 ? 'house, cinematic, jazz...' : ''}
+                      />
+                    )}
+                  />
+                )}
+              />
+            </Box>
             <Controller
               name="keyQuery"
               control={control}
-              render={({ field }) => (
-                <TextField
-                  label="Search key (first chord)"
-                  {...field}
-                  placeholder="C, F#m, Bb..."
+              render={({ field: { value, onChange } }) => (
+                <Autocomplete<string, true, false, true>
+                  multiple
+                  freeSolo
+                  options={keyOptions}
+                  value={value ?? []}
+                  onChange={(_, newValue) =>
+                    onChange(
+                      sanitizeTags(
+                        newValue.map((key) => key.trim()).filter((key) => key.length > 0),
+                      ),
+                    )
+                  }
+                  filterSelectedOptions
+                  renderTags={(tagValue, getTagProps) =>
+                    tagValue.map((option, index) => {
+                      const { key, ...tagProps } = getTagProps({ index });
+                      return (
+                        <Chip
+                          key={key}
+                          label={option}
+                          size="small"
+                          variant="filled"
+                          sx={getChordChipSx(option)}
+                          {...tagProps}
+                        />
+                      );
+                    })
+                  }
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label="Search key/Chord(s)"
+                      InputLabelProps={{ shrink: true }}
+                      placeholder={value.length === 0 ? 'C, F#m, Bb...' : ''}
+                    />
+                  )}
                 />
               )}
             />

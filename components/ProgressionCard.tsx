@@ -65,7 +65,14 @@ export default function ProgressionCard({
             <Typography variant="h6" gutterBottom>
               {progression.title}
             </Typography>
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+            <Typography
+              variant="body1"
+              sx={{
+                mb: 1,
+                fontWeight: 600,
+                color: 'primary.main',
+              }}
+            >
               {progression.chords?.length > 0
                 ? (progression.chords as Array<{ name: string }>).map((c) => c.name).join(' → ')
                 : 'No chords'}
