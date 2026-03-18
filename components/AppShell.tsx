@@ -1,6 +1,7 @@
 'use client';
 
 import MenuIcon from '@mui/icons-material/Menu';
+import Link from 'next/link';
 import {
   AppBar,
   Box,
@@ -14,9 +15,10 @@ import {
   Toolbar,
   Typography,
 } from '@mui/material';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 import ThemeModeToggle from './ui/ThemeModeToggle';
+import { useAuth } from '../lib/authContext';
 
 type Props = {
   children: React.ReactNode;
@@ -31,36 +33,7 @@ const NAV_ITEMS = [
 
 export default function AppShell({ children }: Props) {
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-
-  useEffect(() => {
-    let mounted = true;
-
-    const loadAuth = async () => {
-      try {
-        const response = await fetch('/api/auth/me');
-        if (mounted) {
-          setIsAuthenticated(response.ok);
-        }
-      } catch {
-        if (mounted) {
-          setIsAuthenticated(false);
-        }
-      }
-    };
-
-    loadAuth();
-
-    return () => {
-      mounted = false;
-    };
-  }, []);
-
-  const handleLogout = async () => {
-    await fetch('/api/auth/logout', { method: 'POST' });
-    setIsAuthenticated(false);
-    window.location.href = '/auth';
-  };
+  const { isAuthenticated, isLoading, logout } = useAuth();
 
   return (
     <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>
@@ -83,7 +56,7 @@ export default function AppShell({ children }: Props) {
           >
             <Typography
               variant="h6"
-              component="a"
+              component={Link}
               href="/"
               sx={{ textDecoration: 'none', color: 'text.primary' }}
             >
@@ -92,19 +65,23 @@ export default function AppShell({ children }: Props) {
 
             <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 1, alignItems: 'center' }}>
               {NAV_ITEMS.map((item) => (
-                <Button key={item.label} href={item.href} color="inherit">
+                <Button key={item.label} component={Link} href={item.href} color="inherit">
                   {item.label}
                 </Button>
               ))}
-              <Button href="/progressions" color="inherit">
+              <Button component={Link} href="/progressions" color="inherit">
                 My Progressions
               </Button>
-              {isAuthenticated ? (
-                <Button onClick={handleLogout} color="inherit">
+              {isLoading ? (
+                <Button color="inherit" disabled sx={{ minWidth: 80 }}>
+                  ...
+                </Button>
+              ) : isAuthenticated ? (
+                <Button onClick={logout} color="inherit">
                   Logout
                 </Button>
               ) : (
-                <Button href="/auth" color="inherit">
+                <Button component={Link} href="/auth" color="inherit">
                   Login
                 </Button>
               )}
@@ -131,27 +108,35 @@ export default function AppShell({ children }: Props) {
             {NAV_ITEMS.map((item) => (
               <ListItemButton
                 key={item.label}
-                component="a"
+                component={Link}
                 href={item.href}
                 onClick={() => setMobileOpen(false)}
               >
                 <ListItemText primary={item.label} />
               </ListItemButton>
             ))}
-            <ListItemButton component="a" href="/progressions" onClick={() => setMobileOpen(false)}>
+            <ListItemButton
+              component={Link}
+              href="/progressions"
+              onClick={() => setMobileOpen(false)}
+            >
               <ListItemText primary="My Progressions" />
             </ListItemButton>
-            {isAuthenticated ? (
+            {isLoading ? (
+              <ListItemButton disabled>
+                <ListItemText primary="..." />
+              </ListItemButton>
+            ) : isAuthenticated ? (
               <ListItemButton
                 onClick={() => {
                   setMobileOpen(false);
-                  handleLogout();
+                  void logout();
                 }}
               >
                 <ListItemText primary="Logout" />
               </ListItemButton>
             ) : (
-              <ListItemButton component="a" href="/auth" onClick={() => setMobileOpen(false)}>
+              <ListItemButton component={Link} href="/auth" onClick={() => setMobileOpen(false)}>
                 <ListItemText primary="Login" />
               </ListItemButton>
             )}

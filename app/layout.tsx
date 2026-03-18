@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 
 import AppShell from '../components/AppShell';
 import AppThemeProvider from '../components/AppThemeProvider';
+import { AuthProvider } from '../lib/authContext';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -56,7 +57,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     <html lang="en">
       <body>
         <AppThemeProvider>
-          <AppShell>{children}</AppShell>
+          <AuthProvider>
+            <AppShell>{children}</AppShell>
+          </AuthProvider>
         </AppThemeProvider>
       </body>
     </html>

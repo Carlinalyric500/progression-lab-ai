@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import {
   Alert,
   Box,
@@ -14,10 +15,13 @@ import {
   ToggleButtonGroup,
   Typography,
 } from '@mui/material';
+import { useAuth } from '../../lib/authContext';
 
 type AuthMode = 'login' | 'register';
 
 export default function AuthPage() {
+  const router = useRouter();
+  const { refresh } = useAuth();
   const [mode, setMode] = useState<AuthMode>('login');
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -45,7 +49,9 @@ export default function AuthPage() {
         throw new Error(body.message ?? 'Authentication failed');
       }
 
-      window.location.href = '/progressions';
+      // Refresh auth context with new user data
+      await refresh();
+      router.push('/progressions');
     } catch (err) {
       setError((err as Error).message || 'Authentication failed');
     } finally {
