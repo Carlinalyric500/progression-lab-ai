@@ -862,6 +862,26 @@ export default function HomePage() {
                     });
                   }
                 }}
+                sx={{
+                  backdropFilter: 'blur(10px)',
+                  backgroundColor: 'rgba(0, 0, 0, 0.25)',
+                  border: 'none',
+                  borderRadius: '4px',
+                  boxShadow: '0 2px 12px rgba(0,0,0,0.2)',
+                  '& .MuiToggleButton-root': {
+                    border: 'none',
+                    color: 'rgba(255, 255, 255, 0.7)',
+                    '&.Mui-selected': {
+                      backgroundColor: 'rgba(255, 255, 255, 0.25)',
+                      color: '#fff',
+                      fontWeight: 700,
+                    },
+                    '&:hover': {
+                      backgroundColor: 'rgba(255, 255, 255, 0.12)',
+                      color: '#fff',
+                    },
+                  },
+                }}
               >
                 <ToggleButton value="piano">Piano diagrams</ToggleButton>
                 <ToggleButton value="guitar">Guitar diagrams</ToggleButton>
