@@ -844,7 +844,7 @@ export default function HomePage() {
               sx={{
                 position: 'sticky',
                 top: { xs: 68, md: 72 },
-                zIndex: 10,
+                zIndex: 1100,
                 display: 'flex',
                 justifyContent: 'flex-end',
               }}
