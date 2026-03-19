@@ -176,13 +176,11 @@ export default function AppWrapper({ children }: Props) {
           sx={{
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'space-between',
+            justifyContent: 'center',
             gap: 2,
             px: { xs: 0, sm: 2 },
           }}
         >
-          <Typography variant="body2" color="text.secondary"></Typography>
-
           <Stack direction="row" spacing={1}>
             <IconButton
               component="a"
