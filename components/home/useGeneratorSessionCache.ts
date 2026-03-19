@@ -28,6 +28,7 @@ type UseGeneratorSessionCacheParams = {
 
 type UseGeneratorSessionCacheResult = {
   isRestoringState: boolean;
+  hasRestoredSessionData: boolean;
   cacheGeneratorResult: (formData: GeneratorFormData, data: ChordSuggestionResponse) => void;
 };
 
@@ -37,6 +38,7 @@ export default function useGeneratorSessionCache({
   setIsLoadedFromSavedProgression,
 }: UseGeneratorSessionCacheParams): UseGeneratorSessionCacheResult {
   const [isRestoringState, setIsRestoringState] = useState(true);
+  const [hasRestoredSessionData, setHasRestoredSessionData] = useState(false);
 
   useEffect(() => {
     try {
@@ -82,6 +84,7 @@ export default function useGeneratorSessionCache({
           }
 
           if (chordNames.length > 0) {
+            setHasRestoredSessionData(true);
             setIsLoadedFromSavedProgression(true);
             const loadedVoicings = Array.isArray(parsed.pianoVoicings) ? parsed.pianoVoicings : [];
 
@@ -137,6 +140,7 @@ export default function useGeneratorSessionCache({
         });
 
         setIsLoadedFromSavedProgression(false);
+        setHasRestoredSessionData(true);
         setData(parsedCache.data);
       } catch (err) {
         console.error('Failed to restore generator cache from session storage:', err);
@@ -165,6 +169,7 @@ export default function useGeneratorSessionCache({
 
   return {
     isRestoringState,
+    hasRestoredSessionData,
     cacheGeneratorResult,
   };
 }

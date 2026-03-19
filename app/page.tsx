@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import {
@@ -94,11 +94,14 @@ export default function HomePage() {
     useState<ProgressionDiagramInstrument>('piano');
   const [successMessageOpen, setSuccessMessageOpen] = useState(false);
   const [isNextSectionExpanded, setIsNextSectionExpanded] = useState(true);
-  const { isRestoringState, cacheGeneratorResult } = useGeneratorSessionCache({
-    reset,
-    setData,
-    setIsLoadedFromSavedProgression,
-  });
+  const autoRandomizedOnFirstLoad = useRef(false);
+
+  const { isRestoringState, hasRestoredSessionData, cacheGeneratorResult } =
+    useGeneratorSessionCache({
+      reset,
+      setData,
+      setIsLoadedFromSavedProgression,
+    });
 
   const onSubmit = async (formData: GeneratorFormData) => {
     setError('');
@@ -152,7 +155,7 @@ export default function HomePage() {
     }
   };
 
-  const handleRandomize = () => {
+  const handleRandomize = useCallback(() => {
     const uniqueChordOptions = Array.from(new Set(CHORD_OPTIONS));
     const uniqueMoodOptions = Array.from(
       new Set(MOOD_OPTIONS.map((option) => option.trim()).filter((option) => option.length > 0)),
@@ -178,7 +181,30 @@ export default function HomePage() {
       tempoBpm,
     });
     setError('');
-  };
+  }, [reset, tempoBpm]);
+
+  useEffect(() => {
+    if (isRestoringState) {
+      return;
+    }
+
+    if (autoRandomizedOnFirstLoad.current) {
+      return;
+    }
+
+    if (hasRestoredSessionData) {
+      autoRandomizedOnFirstLoad.current = true;
+      return;
+    }
+
+    if (data) {
+      autoRandomizedOnFirstLoad.current = true;
+      return;
+    }
+
+    autoRandomizedOnFirstLoad.current = true;
+    handleRandomize();
+  }, [data, handleRandomize, hasRestoredSessionData, isRestoringState]);
 
   const handleProgressionDiagramInstrumentChange = (value: ProgressionDiagramInstrument) => {
     const scrollY = window.scrollY;
