@@ -1,6 +1,8 @@
 'use client';
 
 import MenuIcon from '@mui/icons-material/Menu';
+import GitHubIcon from '@mui/icons-material/GitHub';
+import LinkedInIcon from '@mui/icons-material/LinkedIn';
 import Link from 'next/link';
 import {
   AppBar,
@@ -12,6 +14,7 @@ import {
   List,
   ListItemButton,
   ListItemText,
+  Stack,
   Toolbar,
   Typography,
 } from '@mui/material';
@@ -36,7 +39,14 @@ export default function AppWrapper({ children }: Props) {
   const { isAuthenticated, isLoading, logout } = useAuth();
 
   return (
-    <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>
+    <Box
+      sx={{
+        minHeight: '100vh',
+        bgcolor: 'background.default',
+        display: 'flex',
+        flexDirection: 'column',
+      }}
+    >
       <AppBar position="fixed" color="transparent" elevation={0}>
         <Toolbar
           sx={{
@@ -144,7 +154,53 @@ export default function AppWrapper({ children }: Props) {
         </Box>
       </Drawer>
 
-      <Box sx={{ pt: { xs: 8, md: 9 } }}>{children}</Box>
+      <Box sx={{ pt: { xs: 8, md: 9 }, flex: 1 }}>{children}</Box>
+
+      <Box
+        component="footer"
+        sx={{
+          borderTop: 1,
+          borderColor: 'divider',
+          py: 2,
+        }}
+      >
+        <Container
+          maxWidth="lg"
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: 2,
+            px: { xs: 0, sm: 2 },
+          }}
+        >
+          <Typography variant="body2" color="text.secondary"></Typography>
+
+          <Stack direction="row" spacing={1}>
+            <IconButton
+              component="a"
+              href="https://github.com/carlwelchdesign/progression-lab-ai"
+              target="_blank"
+              rel="noreferrer noopener"
+              aria-label="Open Progression Lab AI GitHub repository"
+              color="inherit"
+            >
+              <GitHubIcon />
+            </IconButton>
+
+            <IconButton
+              component="a"
+              href="https://www.linkedin.com/in/carlwelch/"
+              target="_blank"
+              rel="noreferrer noopener"
+              aria-label="Open Carl Welch LinkedIn profile"
+              color="inherit"
+            >
+              <LinkedInIcon />
+            </IconButton>
+          </Stack>
+        </Container>
+      </Box>
     </Box>
   );
 }

@@ -17,6 +17,10 @@ ProgressionLab is an AI-assisted harmony and songwriting workspace built with Ne
 - Playable voicings:
 	- Play single chord voicings
 	- Play full progression voicings
+	- Stop currently playing audio before new playback starts
+	- Global BPM-driven playback timing
+	- Piano sampler playback via Tone.js Salamander samples
+	- Slight strum timing for more humanized chord playback
 - Visual diagrams:
 	- Piano chord diagrams
 	- Guitar chord diagrams (theme-aware in light/dark mode)
@@ -36,6 +40,15 @@ ProgressionLab is an AI-assisted harmony and songwriting workspace built with Ne
 	- Semi-transparent frosted-glass background with gradient selected state
 	- Smooth scroll position restoration when switching diagrams
 	- Available in both generator and loaded progression views
+- MIDI export:
+	- Download single chord voicings as .mid
+	- Download full progression voicings as .mid
+	- Generator BPM is applied to both playback and MIDI export
+	- Reusable icon-based MIDI action button across sections
+- Link preview/metadata:
+	- Open Graph and Twitter image routes for richer link previews in sharing apps
+- Footer links:
+	- Site-wide footer with icon links to GitHub repository and LinkedIn profile
 - Access control:
 	- Unauthenticated users can browse public progressions
 	- In-page "My Progressions" button routes unauth users to registration flow
@@ -307,9 +320,18 @@ yarn build
 - Jest + React Testing Library are configured.
 - Primary coverage includes generator behavior and API route validation patterns.
 
-## Roadmap Ideas
+## TODO / Roadmap
 
-- Saved progression edit flow
-- Pagination for large progression libraries
-- Expanded playback controls (tempo/loop/stop)
-- Export options (MIDI/DAW-friendly formats)
+Completed recently:
+
+- [x] Expanded playback controls (tempo-aware playback + stop behavior)
+- [x] Export options (MIDI download for chords/progressions)
+- [x] Rich social previews (Open Graph + Twitter images)
+- [x] Footer social links with icon actions
+
+Next up:
+
+- [ ] Saved progression edit flow
+- [ ] Pagination for large progression libraries
+- [ ] Additional playback controls (loop toggle / dedicated stop UI)
+- [ ] Optional DAW workflow improvements (for example drag/drop helpers where supported)
