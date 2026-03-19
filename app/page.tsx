@@ -35,6 +35,30 @@ import type {
 import { playChordVoicing, playProgression } from '../lib/audio';
 
 const GENERATOR_CACHE_KEY = 'generatorCache';
+const MAX_RANDOM_SELECTIONS = 7;
+const INSTRUMENT_OPTIONS: InstrumentPreference[] = ['both', 'guitar', 'piano'];
+const ADVENTUROUSNESS_OPTIONS: Adventurousness[] = ['safe', 'balanced', 'surprising'];
+const RANDOM_MODE_OPTIONS = MODE_OPTIONS.filter((option) => option.value !== 'custom').map(
+  (option) => option.value,
+);
+const RANDOM_GENRE_OPTIONS = GENRE_OPTIONS.filter((option) => option.value !== 'custom').map(
+  (option) => option.value,
+);
+
+function getRandomInt(min: number, max: number): number {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function pickRandomUnique<T>(items: T[], count: number): T[] {
+  const pool = [...items];
+
+  for (let i = pool.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [pool[i], pool[j]] = [pool[j], pool[i]];
+  }
+
+  return pool.slice(0, count);
+}
 
 type GeneratorCache = {
   seedChords: string;
@@ -265,6 +289,35 @@ export default function HomePage() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleRandomize = () => {
+    const uniqueChordOptions = Array.from(new Set(CHORD_OPTIONS));
+    const uniqueMoodOptions = Array.from(
+      new Set(MOOD_OPTIONS.map((option) => option.trim()).filter((option) => option.length > 0)),
+    );
+
+    const randomSeedChordCount = getRandomInt(
+      1,
+      Math.min(MAX_RANDOM_SELECTIONS, uniqueChordOptions.length),
+    );
+    const randomMoodCount = getRandomInt(
+      1,
+      Math.min(MAX_RANDOM_SELECTIONS, uniqueMoodOptions.length),
+    );
+
+    reset({
+      seedChords: pickRandomUnique(uniqueChordOptions, randomSeedChordCount).join(', '),
+      mood: pickRandomUnique(uniqueMoodOptions, randomMoodCount).join(', '),
+      mode: pickRandomUnique(RANDOM_MODE_OPTIONS, 1)[0] ?? '',
+      customMode: '',
+      genre: pickRandomUnique(RANDOM_GENRE_OPTIONS, 1)[0] ?? '',
+      customGenre: '',
+      instrument: pickRandomUnique(INSTRUMENT_OPTIONS, 1)[0] ?? 'both',
+      adventurousness: pickRandomUnique(ADVENTUROUSNESS_OPTIONS, 1)[0] ?? 'balanced',
+    });
+    setError('');
+    setIsLoadedFromSavedProgression(false);
   };
 
   if (isRestoringState) {
@@ -549,14 +602,26 @@ export default function HomePage() {
           </Box>
 
           <Stack spacing={2} sx={{ mt: 3 }}>
-            <Button
-              variant="contained"
-              type="submit"
-              form="generator-form"
-              disabled={isSubmitting || loading || Object.keys(errors).length > 0}
-            >
-              {loading ? 'Generating...' : 'Generate Ideas'}
-            </Button>
+            <Stack direction={{ xs: 'column', md: 'row' }} spacing={2}>
+              <Button
+                variant="outlined"
+                type="button"
+                onClick={handleRandomize}
+                disabled={isSubmitting || loading}
+                fullWidth
+              >
+                Randomize Inputs
+              </Button>
+              <Button
+                variant="contained"
+                type="submit"
+                form="generator-form"
+                disabled={isSubmitting || loading || Object.keys(errors).length > 0}
+                fullWidth
+              >
+                {loading ? 'Generating...' : 'Generate Ideas'}
+              </Button>
+            </Stack>
 
             {error ? <Alert severity="error">{error}</Alert> : null}
           </Stack>
