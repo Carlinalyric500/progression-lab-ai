@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useForm, Controller } from 'react-hook-form';
 import {
   Alert,
@@ -29,8 +29,11 @@ type AuthFormData = {
 
 export default function AuthPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const initialMode = searchParams.get('mode') === 'register' ? 'register' : 'login';
+  const reason = searchParams.get('reason');
   const { refresh } = useAuth();
-  const [mode, setMode] = useState<AuthMode>('login');
+  const [mode, setMode] = useState<AuthMode>(initialMode);
   const [apiError, setApiError] = useState('');
   const {
     control,
@@ -86,6 +89,12 @@ export default function AuthPage() {
                 Register or sign in to access your saved progressions.
               </Typography>
             </Box>
+
+            {reason === 'my-progressions' ? (
+              <Alert severity="info">
+                Create an account to access your personal saved progressions.
+              </Alert>
+            ) : null}
 
             <ToggleButtonGroup
               exclusive

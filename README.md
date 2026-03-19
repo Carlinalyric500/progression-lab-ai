@@ -24,12 +24,22 @@ ProgressionLab is an AI-assisted harmony and songwriting workspace built with Ne
 	- Register, login, logout, session-based auth
 - Progression persistence:
 	- Save progressions with chords, voicings, feel, scale, genre, notes, tags, and visibility
-	- My Progressions page with filters and chip-based autocomplete
+	- Authenticated "My Progressions" page with filters and chip-based autocomplete
+	- Public progressions browser accessible from nav bar (no login required)
 	- Clear Filters action
 	- Per-card delete loading state
 - Sharing:
 	- Public share links
 	- Public progression browsing with tag/key filters
+- Diagram instrument selector:
+	- Sticky theme-aware selector for piano/guitar diagram modes
+	- Semi-transparent frosted-glass background with gradient selected state
+	- Smooth scroll position restoration when switching diagrams
+	- Available in both generator and loaded progression views
+- Access control:
+	- Unauthenticated users can browse public progressions
+	- In-page "My Progressions" button routes unauth users to registration flow
+	- Pre-populated register mode with contextual prompt
 - Restore flow:
 	- Open saved/shared progression back into generator with form values restored
 

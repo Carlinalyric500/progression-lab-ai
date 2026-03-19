@@ -69,7 +69,7 @@ export default function AppWrapper({ children }: Props) {
                   {item.label}
                 </Button>
               ))}
-              <Button component={Link} href="/progressions" color="inherit">
+              <Button component={Link} href="/progressions?view=public" color="inherit">
                 My Progressions
               </Button>
               {isLoading ? (
@@ -117,7 +117,7 @@ export default function AppWrapper({ children }: Props) {
             ))}
             <ListItemButton
               component={Link}
-              href="/progressions"
+              href="/progressions?view=public"
               onClick={() => setMobileOpen(false)}
             >
               <ListItemText primary="My Progressions" />

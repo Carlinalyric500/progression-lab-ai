@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useForm, Controller } from 'react-hook-form';
 import {
   Alert,
@@ -32,6 +32,7 @@ import {
 } from '../../lib/tagMetadata';
 import { CHORD_OPTIONS } from '../../lib/formOptions';
 import type { Progression } from '../../lib/types';
+import { useAuth } from '../../lib/authContext';
 
 type ViewMode = 'mine' | 'public';
 
@@ -56,7 +57,11 @@ function getFirstChordName(progression: Progression): string {
 
 export default function MyProgressionsPage() {
   const router = useRouter();
-  const [viewMode, setViewMode] = useState<ViewMode>('mine');
+  const searchParams = useSearchParams();
+  const { isAuthenticated, isLoading: isAuthLoading } = useAuth();
+  const initialViewParam = searchParams.get('view');
+  const initialViewMode: ViewMode = initialViewParam === 'public' ? 'public' : 'mine';
+  const [viewMode, setViewMode] = useState<ViewMode>(initialViewMode);
   const [myProgressions, setMyProgressions] = useState<Progression[]>([]);
   const [publicProgressions, setPublicProgressions] = useState<Progression[]>([]);
   const [loading, setLoading] = useState(true);
@@ -89,6 +94,21 @@ export default function MyProgressionsPage() {
   }, [myProgressions, publicProgressions]);
 
   useEffect(() => {
+    if (isAuthLoading) {
+      return;
+    }
+
+    if (!isAuthenticated && viewMode === 'mine') {
+      setViewMode('public');
+    }
+  }, [isAuthLoading, isAuthenticated, viewMode]);
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      setMyProgressions([]);
+      return;
+    }
+
     const loadMyProgressions = async () => {
       try {
         setLoading(true);
@@ -96,19 +116,14 @@ export default function MyProgressionsPage() {
         const data = await getMyProgressions();
         setMyProgressions(data);
       } catch (err) {
-        const message = (err as Error).message || 'Failed to load progressions';
-        if (message.toLowerCase().includes('unauthorized')) {
-          router.replace('/auth');
-          return;
-        }
-        setError(message);
+        setError((err as Error).message || 'Failed to load progressions');
       } finally {
         setLoading(false);
       }
     };
 
     loadMyProgressions();
-  }, [router]);
+  }, [isAuthenticated]);
 
   useEffect(() => {
     if (viewMode !== 'public') {
@@ -209,7 +224,14 @@ export default function MyProgressionsPage() {
           <Stack direction="row" spacing={1}>
             <Button
               variant={viewMode === 'mine' ? 'contained' : 'outlined'}
-              onClick={() => setViewMode('mine')}
+              onClick={() => {
+                if (!isAuthenticated) {
+                  router.push('/auth?mode=register&reason=my-progressions');
+                  return;
+                }
+
+                setViewMode('mine');
+              }}
             >
               My Progressions
             </Button>
