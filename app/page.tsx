@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { useForm, Controller } from 'react-hook-form';
 import {
+  alpha,
   Alert,
   Autocomplete,
   Box,
@@ -862,29 +863,46 @@ export default function HomePage() {
                     });
                   }
                 }}
-                sx={{
-                  backdropFilter: 'blur(10px)',
-                  backgroundColor: 'rgba(0, 0, 0, 0.25)',
-                  border: 'none',
-                  borderRadius: '4px',
-                  boxShadow: '0 2px 12px rgba(0,0,0,0.2)',
-                  '& .MuiToggleButton-root': {
+                sx={(theme) => {
+                  const isLight = theme.palette.mode === 'light';
+                  const selectedGradient = isLight
+                    ? `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.86)} 0%, ${alpha(theme.palette.info.main, 0.8)} 100%)`
+                    : `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.7)} 0%, ${alpha(theme.palette.info.main, 0.62)} 100%)`;
+
+                  return {
+                    mr: '16px',
+                    backdropFilter: 'blur(10px)',
+                    backgroundColor: isLight
+                      ? alpha(theme.palette.common.black, 0.24)
+                      : alpha(theme.palette.background.paper, 0.48),
                     border: 'none',
-                    color: 'rgba(255, 255, 255, 0.7)',
-                    '&.Mui-selected': {
-                      backgroundColor: 'rgba(255, 255, 255, 0.25)',
-                      color: '#fff',
-                      fontWeight: 700,
+                    borderRadius: '4px',
+                    boxShadow: isLight
+                      ? `0 2px 12px ${alpha(theme.palette.common.black, 0.2)}`
+                      : `0 2px 12px ${alpha(theme.palette.common.black, 0.45)}`,
+                    '& .MuiToggleButton-root': {
+                      border: 'none',
+                      color: alpha(theme.palette.common.white, isLight ? 0.88 : 0.78),
+                      '&.Mui-selected': {
+                        backgroundImage: selectedGradient,
+                        color: theme.palette.common.white,
+                        fontWeight: 700,
+                        boxShadow: `inset 0 0 0 1px ${alpha(theme.palette.common.white, isLight ? 0.24 : 0.16)}`,
+                      },
+                      '&:hover': {
+                        backgroundColor: alpha(theme.palette.primary.main, isLight ? 0.22 : 0.24),
+                        color: theme.palette.common.white,
+                      },
+                      '&.Mui-selected:hover': {
+                        backgroundImage: selectedGradient,
+                        filter: 'brightness(1.05)',
+                      },
                     },
-                    '&:hover': {
-                      backgroundColor: 'rgba(255, 255, 255, 0.12)',
-                      color: '#fff',
-                    },
-                  },
+                  };
                 }}
               >
-                <ToggleButton value="piano">Piano diagrams</ToggleButton>
-                <ToggleButton value="guitar">Guitar diagrams</ToggleButton>
+                <ToggleButton value="piano">Piano Charts</ToggleButton>
+                <ToggleButton value="guitar">Guitar Charts</ToggleButton>
               </ToggleButtonGroup>
             </Box>
 
