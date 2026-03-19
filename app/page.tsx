@@ -528,7 +528,6 @@ export default function HomePage() {
       adventurousness: pickRandomUnique(ADVENTUROUSNESS_OPTIONS, 1)[0] ?? 'balanced',
     });
     setError('');
-    setIsLoadedFromSavedProgression(false);
   };
 
   if (isRestoringState) {
@@ -1155,6 +1154,22 @@ export default function HomePage() {
                                         fingers={guitarDiagram.fingers}
                                       />
                                     </Box>
+                                    {voicing ? (
+                                      <Stack direction="row" spacing={1}>
+                                        <Button
+                                          variant="outlined"
+                                          size="small"
+                                          onClick={() =>
+                                            playChordVoicing({
+                                              leftHand: voicing.leftHand,
+                                              rightHand: voicing.rightHand,
+                                            })
+                                          }
+                                        >
+                                          Play chord
+                                        </Button>
+                                      </Stack>
+                                    ) : null}
                                   </Stack>
                                 ) : (
                                   <Typography variant="body2" color="text.secondary">
