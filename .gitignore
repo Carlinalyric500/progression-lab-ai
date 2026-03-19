@@ -3,8 +3,10 @@
 node_modules
 .next
 npm-debug.log
-.env.local
 .DS_Store
 package-lock.json
 .vercel
 .env*.local
+.swc
+*.tsbuildinfo
+*.bak
