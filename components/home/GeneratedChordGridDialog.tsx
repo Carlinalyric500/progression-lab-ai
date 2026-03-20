@@ -4,7 +4,7 @@ import { Box, Button, Dialog, DialogActions, DialogContent, Typography } from '@
 import { useEffect, useRef, useState } from 'react';
 
 import { playChordVoicing, stopAllAudio } from '../../lib/audio';
-import type { PlaybackStyle } from '../../lib/audio';
+import type { PlaybackRegister, PlaybackStyle } from '../../lib/audio';
 import PlaybackSettingsButton from './PlaybackSettingsButton';
 
 type ChordGridEntry = {
@@ -31,6 +31,12 @@ type GeneratedChordGridDialogProps = {
   onPadSwingChange: (value: number) => void;
   padLatchMode: boolean;
   onPadLatchModeChange: (value: boolean) => void;
+  humanize: number;
+  onHumanizeChange: (value: number) => void;
+  gate: number;
+  onGateChange: (value: number) => void;
+  inversionRegister: PlaybackRegister;
+  onInversionRegisterChange: (value: PlaybackRegister) => void;
   chords: ChordGridEntry[];
 };
 
@@ -81,6 +87,12 @@ export default function GeneratedChordGridDialog({
   onPadSwingChange,
   padLatchMode,
   onPadLatchModeChange,
+  humanize,
+  onHumanizeChange,
+  gate,
+  onGateChange,
+  inversionRegister,
+  onInversionRegisterChange,
   chords,
 }: GeneratedChordGridDialogProps) {
   const [activePadKey, setActivePadKey] = useState<string | null>(null);
@@ -123,6 +135,9 @@ export default function GeneratedChordGridDialog({
       attack,
       decay,
       velocity: padVelocity,
+      humanize,
+      gate,
+      inversionRegister,
     });
   };
 
@@ -175,6 +190,12 @@ export default function GeneratedChordGridDialog({
             onPadSwingChange={onPadSwingChange}
             padLatchMode={padLatchMode}
             onPadLatchModeChange={onPadLatchModeChange}
+            humanize={humanize}
+            onHumanizeChange={onHumanizeChange}
+            gate={gate}
+            onGateChange={onGateChange}
+            inversionRegister={inversionRegister}
+            onInversionRegisterChange={onInversionRegisterChange}
             tempoBpm={tempoBpm}
             previewVoicing={previewEntry}
             position="modal"

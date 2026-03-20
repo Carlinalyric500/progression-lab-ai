@@ -21,7 +21,7 @@ import {
 import { useState } from 'react';
 
 import { playChordVoicing } from '../../lib/audio';
-import type { PlaybackStyle } from '../../lib/audio';
+import type { PlaybackRegister, PlaybackStyle } from '../../lib/audio';
 import EnvelopeControls from './EnvelopeControls';
 
 type PreviewVoicing = {
@@ -42,6 +42,12 @@ type PlaybackSettingsButtonProps = {
   onPadSwingChange: (value: number) => void;
   padLatchMode: boolean;
   onPadLatchModeChange: (value: boolean) => void;
+  humanize: number;
+  onHumanizeChange: (value: number) => void;
+  gate: number;
+  onGateChange: (value: number) => void;
+  inversionRegister: PlaybackRegister;
+  onInversionRegisterChange: (value: PlaybackRegister) => void;
   tempoBpm: number;
   previewVoicing?: PreviewVoicing;
   position?: 'inline' | 'modal';
@@ -60,6 +66,12 @@ export default function PlaybackSettingsButton({
   onPadSwingChange,
   padLatchMode,
   onPadLatchModeChange,
+  humanize,
+  onHumanizeChange,
+  gate,
+  onGateChange,
+  inversionRegister,
+  onInversionRegisterChange,
   tempoBpm,
   previewVoicing,
   position = 'inline',
@@ -82,6 +94,9 @@ export default function PlaybackSettingsButton({
       attack,
       decay,
       velocity: padVelocity,
+      humanize,
+      gate,
+      inversionRegister,
     });
   };
 
@@ -163,6 +178,20 @@ export default function PlaybackSettingsButton({
                     onDecayChange={onDecayChange}
                     direction="column"
                   />
+                  <Box sx={{ mt: 2 }}>
+                    <Typography variant="caption" color="text.secondary" display="block" mb={0.5}>
+                      Gate: {gate === 0 ? 'staccato' : gate === 1 ? 'sustained' : `${Math.round(gate * 100)}%`}
+                    </Typography>
+                    <Slider
+                      size="small"
+                      value={gate}
+                      onChange={(_, value) => onGateChange(value as number)}
+                      min={0}
+                      max={1}
+                      step={0.01}
+                      aria-label="Gate (note length)"
+                    />
+                  </Box>
                 </CardContent>
               </Card>
 
@@ -183,6 +212,21 @@ export default function PlaybackSettingsButton({
                         max={127}
                         step={1}
                         aria-label="Pad velocity"
+                      />
+                    </Box>
+
+                    <Box>
+                      <Typography variant="caption" color="text.secondary" display="block" mb={0.5}>
+                        Humanize: {Math.round(humanize * 100)}%
+                      </Typography>
+                      <Slider
+                        size="small"
+                        value={humanize}
+                        onChange={(_, value) => onHumanizeChange(value as number)}
+                        min={0}
+                        max={1}
+                        step={0.01}
+                        aria-label="Humanize amount"
                       />
                     </Box>
 
@@ -213,6 +257,41 @@ export default function PlaybackSettingsButton({
                   </Stack>
                 </CardContent>
               </Card>
+            </Box>
+
+            <Box>
+              <Typography variant="subtitle2" sx={{ mb: 1 }}>
+                Inversion lock
+              </Typography>
+              <ToggleButtonGroup
+                size="small"
+                color="primary"
+                exclusive
+                value={inversionRegister}
+                onChange={(_, nextValue: PlaybackRegister | null) => {
+                  if (nextValue) {
+                    onInversionRegisterChange(nextValue);
+                  }
+                }}
+                aria-label="Inversion register"
+                fullWidth
+              >
+                <ToggleButton value="off" aria-label="Off">
+                  Off
+                </ToggleButton>
+                <ToggleButton value="low" aria-label="Low register (C2–B3)">
+                  Low
+                </ToggleButton>
+                <ToggleButton value="mid" aria-label="Mid register (C3–B4)">
+                  Mid
+                </ToggleButton>
+                <ToggleButton value="high" aria-label="High register (C4–B5)">
+                  High
+                </ToggleButton>
+              </ToggleButtonGroup>
+              <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
+                Shifts chord notes to stay in the chosen register using nearest-octave voice leading.
+              </Typography>
             </Box>
           </Stack>
         </DialogContent>
