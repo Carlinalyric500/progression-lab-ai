@@ -1,13 +1,15 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import GridViewIcon from '@mui/icons-material/GridView';
 import {
   Accordion,
   AccordionDetails,
   AccordionSummary,
   Box,
+  Button,
   CircularProgress,
   Container,
   Stack,
@@ -17,6 +19,7 @@ import {
 import SaveProgressionDialog from '../components/SaveProgressionDialog';
 import SuccessSnackbar from '../components/ui/SuccessSnackbar';
 import GeneratorFormCard from '../components/home/GeneratorFormCard';
+import GeneratedChordGridDialog from '../components/home/GeneratedChordGridDialog';
 import GeneratorHeader from '../components/home/GeneratorHeader';
 import InstrumentToggle from '../components/home/InstrumentToggle';
 import NextChordSuggestionsSection from '../components/home/NextChordSuggestionsSection';
@@ -92,6 +95,7 @@ export default function HomePage() {
   const [selectedProgressionGenre, setSelectedProgressionGenre] = useState('');
   const [progressionDiagramInstrument, setProgressionDiagramInstrument] =
     useState<ProgressionDiagramInstrument>('piano');
+  const [isGeneratedChordGridOpen, setIsGeneratedChordGridOpen] = useState(false);
   const [successMessageOpen, setSuccessMessageOpen] = useState(false);
   const [isNextSectionExpanded, setIsNextSectionExpanded] = useState(true);
   const autoRandomizedOnFirstLoad = useRef(false);
@@ -103,9 +107,76 @@ export default function HomePage() {
       setIsLoadedFromSavedProgression,
     });
 
+  const generatedChordGridEntries = useMemo(() => {
+    if (!data) {
+      return [] as Array<{
+        key: string;
+        chord: string;
+        source: string;
+        leftHand: string[];
+        rightHand: string[];
+      }>;
+    }
+
+    const entries: Array<{
+      key: string;
+      chord: string;
+      source: string;
+      leftHand: string[];
+      rightHand: string[];
+    }> = [];
+    const seenKeys = new Set<string>();
+
+    data.nextChordSuggestions.forEach((suggestion, index) => {
+      if (!suggestion.pianoVoicing) {
+        return;
+      }
+
+      const key = `${suggestion.chord}|${suggestion.pianoVoicing.leftHand.join(',')}|${suggestion.pianoVoicing.rightHand.join(',')}`;
+      if (seenKeys.has(key)) {
+        return;
+      }
+
+      seenKeys.add(key);
+      entries.push({
+        key,
+        chord: suggestion.chord,
+        source: `Next suggestion ${index + 1}`,
+        leftHand: suggestion.pianoVoicing.leftHand,
+        rightHand: suggestion.pianoVoicing.rightHand,
+      });
+    });
+
+    data.progressionIdeas.forEach((idea) => {
+      idea.chords.forEach((chord, index) => {
+        const voicing = idea.pianoVoicings[index];
+        if (!voicing) {
+          return;
+        }
+
+        const key = `${chord}|${voicing.leftHand.join(',')}|${voicing.rightHand.join(',')}`;
+        if (seenKeys.has(key)) {
+          return;
+        }
+
+        seenKeys.add(key);
+        entries.push({
+          key,
+          chord,
+          source: idea.label,
+          leftHand: voicing.leftHand,
+          rightHand: voicing.rightHand,
+        });
+      });
+    });
+
+    return entries;
+  }, [data]);
+
   const onSubmit = async (formData: GeneratorFormData) => {
     setError('');
     setIsLoadedFromSavedProgression(false);
+    setIsGeneratedChordGridOpen(false);
 
     const resolvedMode = formData.mode === 'custom' ? formData.customMode.trim() : formData.mode;
     const resolvedGenre =
@@ -280,10 +351,22 @@ export default function HomePage() {
                       justifyContent: 'flex-end',
                     }}
                   >
-                    <InstrumentToggle
-                      value={progressionDiagramInstrument}
-                      onChange={handleProgressionDiagramInstrumentChange}
-                    />
+                    <Stack direction="row" spacing={1} alignItems="center">
+                      {generatedChordGridEntries.length > 0 ? (
+                        <Button
+                          variant="outlined"
+                          size="small"
+                          startIcon={<GridViewIcon />}
+                          onClick={() => setIsGeneratedChordGridOpen(true)}
+                        >
+                          Open chord grid
+                        </Button>
+                      ) : null}
+                      <InstrumentToggle
+                        value={progressionDiagramInstrument}
+                        onChange={handleProgressionDiagramInstrumentChange}
+                      />
+                    </Stack>
                   </Box>
 
                   {useCollapsibleSections ? (
@@ -391,6 +474,12 @@ export default function HomePage() {
                     open={successMessageOpen}
                     message="Progression saved!"
                     onClose={() => setSuccessMessageOpen(false)}
+                  />
+                  <GeneratedChordGridDialog
+                    open={isGeneratedChordGridOpen}
+                    onClose={() => setIsGeneratedChordGridOpen(false)}
+                    tempoBpm={tempoBpm}
+                    chords={generatedChordGridEntries}
                   />
                 </>
               );
