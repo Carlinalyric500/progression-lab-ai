@@ -9,6 +9,16 @@ const MAX_TEMPO_BPM = 240;
 const CHORD_BEATS = 2;
 const STRUM_STEP_SECONDS = 0.025;
 
+export type PlaybackStyle = 'strum' | 'block';
+
+const normalizeVelocity = (velocity?: number): number | undefined => {
+  if (!Number.isFinite(velocity)) {
+    return undefined;
+  }
+
+  return Math.min(1, Math.max(0.1, (velocity ?? 96) / 127));
+};
+
 const normalizeTempoBpm = (tempoBpm?: number): number => {
   if (!Number.isFinite(tempoBpm)) {
     return DEFAULT_TEMPO_BPM;
@@ -93,23 +103,93 @@ const triggerStrummedChord = ({
   notes,
   duration,
   startTime,
+  velocity,
 }: {
   sampler: Tone.Sampler;
   notes: string[];
   duration: Tone.Unit.Time;
   startTime?: Tone.Unit.Time;
+  velocity?: number;
 }): void => {
   const orderedNotes = sortNotesLowToHigh(notes);
+  const normalizedVelocity = normalizeVelocity(velocity);
 
   orderedNotes.forEach((note, index) => {
     if (startTime !== undefined) {
       const noteTime = Tone.Time(startTime).toSeconds() + index * STRUM_STEP_SECONDS;
-      sampler.triggerAttackRelease(note, duration, noteTime);
+      sampler.triggerAttackRelease(note, duration, noteTime, normalizedVelocity);
       return;
     }
 
-    sampler.triggerAttackRelease(note, duration, `+${index * STRUM_STEP_SECONDS}`);
+    sampler.triggerAttackRelease(
+      note,
+      duration,
+      `+${index * STRUM_STEP_SECONDS}`,
+      normalizedVelocity,
+    );
   });
+};
+
+const triggerBlockChord = ({
+  sampler,
+  notes,
+  duration,
+  startTime,
+  velocity,
+}: {
+  sampler: Tone.Sampler;
+  notes: string[];
+  duration: Tone.Unit.Time;
+  startTime?: Tone.Unit.Time;
+  velocity?: number;
+}): void => {
+  const orderedNotes = sortNotesLowToHigh(notes);
+  const normalizedVelocity = normalizeVelocity(velocity);
+
+  if (orderedNotes.length === 0) {
+    return;
+  }
+
+  if (startTime !== undefined) {
+    sampler.triggerAttackRelease(orderedNotes, duration, startTime, normalizedVelocity);
+    return;
+  }
+
+  sampler.triggerAttackRelease(orderedNotes, duration, undefined, normalizedVelocity);
+};
+
+const triggerChordByStyle = ({
+  style,
+  sampler,
+  notes,
+  duration,
+  startTime,
+  attack,
+  decay,
+  velocity,
+}: {
+  style: PlaybackStyle;
+  sampler: Tone.Sampler;
+  notes: string[];
+  duration: Tone.Unit.Time;
+  startTime?: Tone.Unit.Time;
+  attack?: number;
+  decay?: number;
+  velocity?: number;
+}): void => {
+  if (attack !== undefined) {
+    sampler.attack = attack;
+  }
+  if (decay !== undefined) {
+    sampler.release = decay;
+  }
+
+  if (style === 'block') {
+    triggerBlockChord({ sampler, notes, duration, startTime, velocity });
+    return;
+  }
+
+  triggerStrummedChord({ sampler, notes, duration, startTime, velocity });
 };
 
 export const startAudio = async (): Promise<void> => {
@@ -135,11 +215,19 @@ export const playChordVoicing = async ({
   rightHand,
   duration,
   tempoBpm,
+  playbackStyle = 'strum',
+  attack,
+  decay,
+  velocity,
 }: {
   leftHand: string[];
   rightHand: string[];
   duration?: Tone.Unit.Time;
   tempoBpm?: number;
+  playbackStyle?: PlaybackStyle;
+  attack?: number;
+  decay?: number;
+  velocity?: number;
 }): Promise<void> => {
   await startAudio();
   stopAllAudio();
@@ -148,7 +236,15 @@ export const playChordVoicing = async ({
   const resolvedDuration = duration ?? getChordDurationSeconds(tempoBpm);
 
   if (notes.length > 0) {
-    triggerStrummedChord({ sampler, notes, duration: resolvedDuration });
+    triggerChordByStyle({
+      style: playbackStyle,
+      sampler,
+      notes,
+      duration: resolvedDuration,
+      attack,
+      decay,
+      velocity,
+    });
   }
 };
 
@@ -158,6 +254,9 @@ export const playProgression = async (
     rightHand: string[];
   }>,
   tempoBpm?: number,
+  playbackStyle: PlaybackStyle = 'strum',
+  attack?: number,
+  decay?: number,
 ): Promise<void> => {
   await startAudio();
   stopAllAudio();
@@ -171,10 +270,13 @@ export const playProgression = async (
     if (notes.length > 0) {
       const timeoutId = setTimeout(
         () => {
-          triggerStrummedChord({
+          triggerChordByStyle({
+            style: playbackStyle,
             sampler,
             notes,
             duration: chordDurationSeconds,
+            attack,
+            decay,
           });
         },
         index * chordDurationSeconds * 1000,

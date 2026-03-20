@@ -1,13 +1,15 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import GridViewIcon from '@mui/icons-material/GridView';
 import {
   Accordion,
   AccordionDetails,
   AccordionSummary,
   Box,
+  Button,
   CircularProgress,
   Container,
   Stack,
@@ -17,14 +19,17 @@ import {
 import SaveProgressionDialog from '../components/SaveProgressionDialog';
 import SuccessSnackbar from '../components/ui/SuccessSnackbar';
 import GeneratorFormCard from '../components/home/GeneratorFormCard';
+import GeneratedChordGridDialog from '../components/home/GeneratedChordGridDialog';
 import GeneratorHeader from '../components/home/GeneratorHeader';
 import InstrumentToggle from '../components/home/InstrumentToggle';
 import NextChordSuggestionsSection from '../components/home/NextChordSuggestionsSection';
+import PlaybackSettingsSpeedDial from '../components/home/PlaybackSettingsSpeedDial';
 import ProgressionIdeasSection from '../components/home/ProgressionIdeasSection';
 import RestoringState from '../components/home/RestoringState';
 import StructureSuggestionsSection from '../components/home/StructureSuggestionsSection';
 import useGeneratorSessionCache from '../components/home/useGeneratorSessionCache';
 import type { GeneratorFormData, ProgressionDiagramInstrument } from '../components/home/types';
+import type { PlaybackStyle } from '../lib/audio';
 import { CHORD_OPTIONS, GENRE_OPTIONS, MODE_OPTIONS, MOOD_OPTIONS } from '../lib/formOptions';
 import type { Adventurousness, ChordItem, ChordSuggestionResponse } from '../lib/types';
 
@@ -92,6 +97,13 @@ export default function HomePage() {
   const [selectedProgressionGenre, setSelectedProgressionGenre] = useState('');
   const [progressionDiagramInstrument, setProgressionDiagramInstrument] =
     useState<ProgressionDiagramInstrument>('piano');
+  const [playbackStyle, setPlaybackStyle] = useState<PlaybackStyle>('strum');
+  const [attack, setAttack] = useState<number>(0.01);
+  const [decay, setDecay] = useState<number>(0.5);
+  const [padVelocity, setPadVelocity] = useState<number>(96);
+  const [padSwing, setPadSwing] = useState<number>(0);
+  const [padLatchMode, setPadLatchMode] = useState(false);
+  const [isGeneratedChordGridOpen, setIsGeneratedChordGridOpen] = useState(false);
   const [successMessageOpen, setSuccessMessageOpen] = useState(false);
   const [isNextSectionExpanded, setIsNextSectionExpanded] = useState(true);
   const autoRandomizedOnFirstLoad = useRef(false);
@@ -103,9 +115,83 @@ export default function HomePage() {
       setIsLoadedFromSavedProgression,
     });
 
+  const generatedChordGridEntries = useMemo(() => {
+    if (!data) {
+      return [] as Array<{
+        key: string;
+        chord: string;
+        source: string;
+        leftHand: string[];
+        rightHand: string[];
+      }>;
+    }
+
+    const entries: Array<{
+      key: string;
+      chord: string;
+      source: string;
+      leftHand: string[];
+      rightHand: string[];
+    }> = [];
+    const seenKeys = new Set<string>();
+
+    data.nextChordSuggestions.forEach((suggestion, index) => {
+      if (!suggestion.pianoVoicing) {
+        return;
+      }
+
+      const key = `${suggestion.chord}|${suggestion.pianoVoicing.leftHand.join(',')}|${suggestion.pianoVoicing.rightHand.join(',')}`;
+      if (seenKeys.has(key)) {
+        return;
+      }
+
+      seenKeys.add(key);
+      entries.push({
+        key,
+        chord: suggestion.chord,
+        source: `Next suggestion ${index + 1}`,
+        leftHand: suggestion.pianoVoicing.leftHand,
+        rightHand: suggestion.pianoVoicing.rightHand,
+      });
+    });
+
+    data.progressionIdeas.forEach((idea) => {
+      idea.chords.forEach((chord, index) => {
+        const voicing = idea.pianoVoicings[index];
+        if (!voicing) {
+          return;
+        }
+
+        const key = `${chord}|${voicing.leftHand.join(',')}|${voicing.rightHand.join(',')}`;
+        if (seenKeys.has(key)) {
+          return;
+        }
+
+        seenKeys.add(key);
+        entries.push({
+          key,
+          chord,
+          source: idea.label,
+          leftHand: voicing.leftHand,
+          rightHand: voicing.rightHand,
+        });
+      });
+    });
+
+    return entries;
+  }, [data]);
+
+  const previewVoicing = generatedChordGridEntries[0]
+    ? {
+        leftHand: generatedChordGridEntries[0].leftHand,
+        rightHand: generatedChordGridEntries[0].rightHand,
+      }
+    : undefined;
+
   const onSubmit = async (formData: GeneratorFormData) => {
     setError('');
     setIsLoadedFromSavedProgression(false);
+    setIsGeneratedChordGridOpen(false);
 
     const resolvedMode = formData.mode === 'custom' ? formData.customMode.trim() : formData.mode;
     const resolvedGenre =
@@ -280,10 +366,38 @@ export default function HomePage() {
                       justifyContent: 'flex-end',
                     }}
                   >
-                    <InstrumentToggle
-                      value={progressionDiagramInstrument}
-                      onChange={handleProgressionDiagramInstrumentChange}
-                    />
+                    <Stack direction="row" spacing={1} alignItems="center">
+                      <PlaybackSettingsSpeedDial
+                        playbackStyle={playbackStyle}
+                        onPlaybackStyleChange={setPlaybackStyle}
+                        attack={attack}
+                        onAttackChange={setAttack}
+                        decay={decay}
+                        onDecayChange={setDecay}
+                        padVelocity={padVelocity}
+                        onPadVelocityChange={setPadVelocity}
+                        padSwing={padSwing}
+                        onPadSwingChange={setPadSwing}
+                        padLatchMode={padLatchMode}
+                        onPadLatchModeChange={setPadLatchMode}
+                        tempoBpm={tempoBpm}
+                        previewVoicing={previewVoicing}
+                      />
+                      {generatedChordGridEntries.length > 0 ? (
+                        <Button
+                          variant="outlined"
+                          size="small"
+                          startIcon={<GridViewIcon />}
+                          onClick={() => setIsGeneratedChordGridOpen(true)}
+                        >
+                          pads
+                        </Button>
+                      ) : null}
+                      <InstrumentToggle
+                        value={progressionDiagramInstrument}
+                        onChange={handleProgressionDiagramInstrumentChange}
+                      />
+                    </Stack>
                   </Box>
 
                   {useCollapsibleSections ? (
@@ -306,6 +420,9 @@ export default function HomePage() {
                               suggestions={data.nextChordSuggestions}
                               progressionDiagramInstrument={progressionDiagramInstrument}
                               tempoBpm={tempoBpm}
+                              playbackStyle={playbackStyle}
+                              attack={attack}
+                              decay={decay}
                               showTitle={false}
                             />
                           </AccordionDetails>
@@ -317,6 +434,9 @@ export default function HomePage() {
                         isLoadedFromSavedProgression={isLoadedFromSavedProgression}
                         progressionDiagramInstrument={progressionDiagramInstrument}
                         tempoBpm={tempoBpm}
+                        playbackStyle={playbackStyle}
+                        attack={attack}
+                        decay={decay}
                         resolvedGenreForSave={genre === 'custom' ? customGenre.trim() : genre}
                         onRequestSaveProgression={({
                           chords,
@@ -343,6 +463,9 @@ export default function HomePage() {
                           suggestions={data.nextChordSuggestions}
                           progressionDiagramInstrument={progressionDiagramInstrument}
                           tempoBpm={tempoBpm}
+                          playbackStyle={playbackStyle}
+                          attack={attack}
+                          decay={decay}
                         />
                       ) : null}
 
@@ -351,6 +474,9 @@ export default function HomePage() {
                         isLoadedFromSavedProgression={isLoadedFromSavedProgression}
                         progressionDiagramInstrument={progressionDiagramInstrument}
                         tempoBpm={tempoBpm}
+                        playbackStyle={playbackStyle}
+                        attack={attack}
+                        decay={decay}
                         resolvedGenreForSave={genre === 'custom' ? customGenre.trim() : genre}
                         onRequestSaveProgression={({
                           chords,
@@ -391,6 +517,24 @@ export default function HomePage() {
                     open={successMessageOpen}
                     message="Progression saved!"
                     onClose={() => setSuccessMessageOpen(false)}
+                  />
+                  <GeneratedChordGridDialog
+                    open={isGeneratedChordGridOpen}
+                    onClose={() => setIsGeneratedChordGridOpen(false)}
+                    tempoBpm={tempoBpm}
+                    playbackStyle={playbackStyle}
+                    onPlaybackStyleChange={setPlaybackStyle}
+                    attack={attack}
+                    onAttackChange={setAttack}
+                    decay={decay}
+                    onDecayChange={setDecay}
+                    padVelocity={padVelocity}
+                    onPadVelocityChange={setPadVelocity}
+                    padSwing={padSwing}
+                    onPadSwingChange={setPadSwing}
+                    padLatchMode={padLatchMode}
+                    onPadLatchModeChange={setPadLatchMode}
+                    chords={generatedChordGridEntries}
                   />
                 </>
               );

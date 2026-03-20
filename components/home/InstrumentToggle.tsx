@@ -58,8 +58,8 @@ export default function InstrumentToggle({ value, onChange }: InstrumentTogglePr
         };
       }}
     >
-      <ToggleButton value="piano">Piano Charts</ToggleButton>
-      <ToggleButton value="guitar">Guitar Charts</ToggleButton>
+      <ToggleButton value="piano">Piano</ToggleButton>
+      <ToggleButton value="guitar">Guitar</ToggleButton>
     </ToggleButtonGroup>
   );
 }
