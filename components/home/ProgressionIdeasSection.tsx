@@ -22,6 +22,8 @@ type ProgressionIdeasSectionProps = {
   progressionDiagramInstrument: ProgressionDiagramInstrument;
   tempoBpm: number;
   playbackStyle: PlaybackStyle;
+  attack?: number;
+  decay?: number;
   showTitle?: boolean;
   resolvedGenreForSave: string;
   onRequestSaveProgression: (payload: {
@@ -38,6 +40,8 @@ export default function ProgressionIdeasSection({
   progressionDiagramInstrument,
   tempoBpm,
   playbackStyle,
+  attack,
+  decay,
   showTitle = true,
   resolvedGenreForSave,
   onRequestSaveProgression,
@@ -101,7 +105,9 @@ export default function ProgressionIdeasSection({
                     <Button
                       variant="contained"
                       size="small"
-                      onClick={() => playProgression(idea.pianoVoicings, tempoBpm, playbackStyle)}
+                      onClick={() =>
+                        playProgression(idea.pianoVoicings, tempoBpm, playbackStyle, attack, decay)
+                      }
                     >
                       Play progression
                     </Button>
@@ -196,6 +202,8 @@ export default function ProgressionIdeasSection({
                                     rightHand: voicing.rightHand,
                                     tempoBpm,
                                     playbackStyle,
+                                    attack,
+                                    decay,
                                   })
                                 }
                               >
@@ -234,6 +242,8 @@ export default function ProgressionIdeasSection({
                                       rightHand: voicing.rightHand,
                                       tempoBpm,
                                       playbackStyle,
+                                      attack,
+                                      decay,
                                     })
                                   }
                                 >

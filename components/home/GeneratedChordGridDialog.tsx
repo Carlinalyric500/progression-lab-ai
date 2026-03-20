@@ -1,21 +1,11 @@
 'use client';
 
-import {
-  Box,
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  Slider,
-  Stack,
-  ToggleButton,
-  ToggleButtonGroup,
-  Typography,
-} from '@mui/material';
+import { Box, Button, Dialog, DialogActions, DialogContent, Typography } from '@mui/material';
 import { useEffect, useRef, useState } from 'react';
 
 import { playChordVoicing, stopAllAudio } from '../../lib/audio';
 import type { PlaybackStyle } from '../../lib/audio';
+import PlaybackSettingsSpeedDial from './PlaybackSettingsSpeedDial';
 
 type ChordGridEntry = {
   key: string;
@@ -30,6 +20,17 @@ type GeneratedChordGridDialogProps = {
   onClose: () => void;
   tempoBpm: number;
   playbackStyle: PlaybackStyle;
+  onPlaybackStyleChange: (value: PlaybackStyle) => void;
+  attack?: number;
+  onAttackChange: (value: number) => void;
+  decay?: number;
+  onDecayChange: (value: number) => void;
+  padVelocity: number;
+  onPadVelocityChange: (value: number) => void;
+  padSwing: number;
+  onPadSwingChange: (value: number) => void;
+  padLatchMode: boolean;
+  onPadLatchModeChange: (value: boolean) => void;
   chords: ChordGridEntry[];
 };
 
@@ -69,12 +70,20 @@ export default function GeneratedChordGridDialog({
   onClose,
   tempoBpm,
   playbackStyle,
+  onPlaybackStyleChange,
+  attack = 0.01,
+  onAttackChange,
+  decay = 0.5,
+  onDecayChange,
+  padVelocity,
+  onPadVelocityChange,
+  padSwing,
+  onPadSwingChange,
+  padLatchMode,
+  onPadLatchModeChange,
   chords,
 }: GeneratedChordGridDialogProps) {
   const [activePadKey, setActivePadKey] = useState<string | null>(null);
-  const [selectedPlaybackStyle, setSelectedPlaybackStyle] = useState<PlaybackStyle>(playbackStyle);
-  const [attack, setAttack] = useState<number>(0.01);
-  const [decay, setDecay] = useState<number>(0.5);
   const activePadTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
   const padStyles = {
     body: {
@@ -95,10 +104,6 @@ export default function GeneratedChordGridDialog({
     };
   }, []);
 
-  useEffect(() => {
-    setSelectedPlaybackStyle(playbackStyle);
-  }, [playbackStyle, open]);
-
   const triggerPad = (entry: ChordGridEntry) => {
     if (activePadTimeout.current) {
       clearTimeout(activePadTimeout.current);
@@ -114,11 +119,21 @@ export default function GeneratedChordGridDialog({
       leftHand: entry.leftHand,
       rightHand: entry.rightHand,
       tempoBpm,
-      playbackStyle: selectedPlaybackStyle,
+      playbackStyle,
       attack,
       decay,
+      velocity: padVelocity,
     });
   };
+
+  const previewEntry =
+    chords.find((entry) => entry.key === activePadKey) ??
+    (chords.length > 0
+      ? {
+          leftHand: chords[0].leftHand,
+          rightHand: chords[0].rightHand,
+        }
+      : undefined);
 
   return (
     <Dialog
@@ -146,66 +161,24 @@ export default function GeneratedChordGridDialog({
       }}
     >
       <DialogContent dividers>
-        <Box
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: 2,
-            mb: 2,
-            flexWrap: 'wrap',
-          }}
-        >
-          <ToggleButtonGroup
-            size="small"
-            color="primary"
-            exclusive
-            value={selectedPlaybackStyle}
-            onChange={(_, nextValue: PlaybackStyle | null) => {
-              if (nextValue) {
-                setSelectedPlaybackStyle(nextValue);
-              }
-            }}
-            aria-label="Chord pad playback style"
-          >
-            <ToggleButton value="strum" aria-label="Strum playback">
-              Strum
-            </ToggleButton>
-            <ToggleButton value="block" aria-label="Block playback">
-              Block
-            </ToggleButton>
-          </ToggleButtonGroup>
-
-          <Box sx={{ display: 'flex', gap: 2, alignItems: 'center'}}>
-            <Box sx={{ minWidth: 120 }}>
-              <Typography variant="caption" color="text.secondary" display="block" mb={0.5}>
-                Attack: {attack.toFixed(2)}s
-              </Typography>
-              <Slider
-                size="small"
-                value={attack}
-                onChange={(_, value) => setAttack(value as number)}
-                min={0}
-                max={0.5}
-                step={0.01}
-                aria-label="Attack time"
-              />
-            </Box>
-            <Box sx={{ minWidth: 120 }}>
-              <Typography variant="caption" color="text.secondary" display="block" mb={0.5}>
-                Decay: {decay.toFixed(2)}s
-              </Typography>
-              <Slider
-                size="small"
-                value={decay}
-                onChange={(_, value) => setDecay(value as number)}
-                min={0.1}
-                max={3}
-                step={0.1}
-                aria-label="Decay time"
-              />
-            </Box>
-          </Box>
+        <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 1.5 }}>
+          <PlaybackSettingsSpeedDial
+            playbackStyle={playbackStyle}
+            onPlaybackStyleChange={onPlaybackStyleChange}
+            attack={attack}
+            onAttackChange={onAttackChange}
+            decay={decay}
+            onDecayChange={onDecayChange}
+            padVelocity={padVelocity}
+            onPadVelocityChange={onPadVelocityChange}
+            padSwing={padSwing}
+            onPadSwingChange={onPadSwingChange}
+            padLatchMode={padLatchMode}
+            onPadLatchModeChange={onPadLatchModeChange}
+            tempoBpm={tempoBpm}
+            previewVoicing={previewEntry}
+            position="modal"
+          />
         </Box>
 
         <Box

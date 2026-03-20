@@ -18,6 +18,8 @@ type NextChordSuggestionsSectionProps = {
   progressionDiagramInstrument: ProgressionDiagramInstrument;
   tempoBpm: number;
   playbackStyle: PlaybackStyle;
+  attack?: number;
+  decay?: number;
   showTitle?: boolean;
 };
 
@@ -26,6 +28,8 @@ export default function NextChordSuggestionsSection({
   progressionDiagramInstrument,
   tempoBpm,
   playbackStyle,
+  attack,
+  decay,
   showTitle = true,
 }: NextChordSuggestionsSectionProps) {
   return (
@@ -85,6 +89,8 @@ export default function NextChordSuggestionsSection({
                             rightHand: pianoVoicing.rightHand,
                             tempoBpm,
                             playbackStyle,
+                            attack,
+                            decay,
                           })
                         }
                       >

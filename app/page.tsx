@@ -13,8 +13,6 @@ import {
   CircularProgress,
   Container,
   Stack,
-  ToggleButton,
-  ToggleButtonGroup,
   Typography,
 } from '@mui/material';
 
@@ -25,6 +23,7 @@ import GeneratedChordGridDialog from '../components/home/GeneratedChordGridDialo
 import GeneratorHeader from '../components/home/GeneratorHeader';
 import InstrumentToggle from '../components/home/InstrumentToggle';
 import NextChordSuggestionsSection from '../components/home/NextChordSuggestionsSection';
+import PlaybackSettingsSpeedDial from '../components/home/PlaybackSettingsSpeedDial';
 import ProgressionIdeasSection from '../components/home/ProgressionIdeasSection';
 import RestoringState from '../components/home/RestoringState';
 import StructureSuggestionsSection from '../components/home/StructureSuggestionsSection';
@@ -99,6 +98,11 @@ export default function HomePage() {
   const [progressionDiagramInstrument, setProgressionDiagramInstrument] =
     useState<ProgressionDiagramInstrument>('piano');
   const [playbackStyle, setPlaybackStyle] = useState<PlaybackStyle>('strum');
+  const [attack, setAttack] = useState<number>(0.01);
+  const [decay, setDecay] = useState<number>(0.5);
+  const [padVelocity, setPadVelocity] = useState<number>(96);
+  const [padSwing, setPadSwing] = useState<number>(0);
+  const [padLatchMode, setPadLatchMode] = useState(false);
   const [isGeneratedChordGridOpen, setIsGeneratedChordGridOpen] = useState(false);
   const [successMessageOpen, setSuccessMessageOpen] = useState(false);
   const [isNextSectionExpanded, setIsNextSectionExpanded] = useState(true);
@@ -176,6 +180,13 @@ export default function HomePage() {
 
     return entries;
   }, [data]);
+
+  const previewVoicing = generatedChordGridEntries[0]
+    ? {
+        leftHand: generatedChordGridEntries[0].leftHand,
+        rightHand: generatedChordGridEntries[0].rightHand,
+      }
+    : undefined;
 
   const onSubmit = async (formData: GeneratorFormData) => {
     setError('');
@@ -356,25 +367,22 @@ export default function HomePage() {
                     }}
                   >
                     <Stack direction="row" spacing={1} alignItems="center">
-                      <ToggleButtonGroup
-                        size="small"
-                        color="primary"
-                        exclusive
-                        value={playbackStyle}
-                        onChange={(_, nextValue: PlaybackStyle | null) => {
-                          if (nextValue) {
-                            setPlaybackStyle(nextValue);
-                          }
-                        }}
-                        aria-label="Playback style"
-                      >
-                        <ToggleButton value="strum" aria-label="Strum playback">
-                          Strum
-                        </ToggleButton>
-                        <ToggleButton value="block" aria-label="Block playback">
-                          Block
-                        </ToggleButton>
-                      </ToggleButtonGroup>
+                      <PlaybackSettingsSpeedDial
+                        playbackStyle={playbackStyle}
+                        onPlaybackStyleChange={setPlaybackStyle}
+                        attack={attack}
+                        onAttackChange={setAttack}
+                        decay={decay}
+                        onDecayChange={setDecay}
+                        padVelocity={padVelocity}
+                        onPadVelocityChange={setPadVelocity}
+                        padSwing={padSwing}
+                        onPadSwingChange={setPadSwing}
+                        padLatchMode={padLatchMode}
+                        onPadLatchModeChange={setPadLatchMode}
+                        tempoBpm={tempoBpm}
+                        previewVoicing={previewVoicing}
+                      />
                       {generatedChordGridEntries.length > 0 ? (
                         <Button
                           variant="outlined"
@@ -413,6 +421,8 @@ export default function HomePage() {
                               progressionDiagramInstrument={progressionDiagramInstrument}
                               tempoBpm={tempoBpm}
                               playbackStyle={playbackStyle}
+                              attack={attack}
+                              decay={decay}
                               showTitle={false}
                             />
                           </AccordionDetails>
@@ -425,6 +435,8 @@ export default function HomePage() {
                         progressionDiagramInstrument={progressionDiagramInstrument}
                         tempoBpm={tempoBpm}
                         playbackStyle={playbackStyle}
+                        attack={attack}
+                        decay={decay}
                         resolvedGenreForSave={genre === 'custom' ? customGenre.trim() : genre}
                         onRequestSaveProgression={({
                           chords,
@@ -452,6 +464,8 @@ export default function HomePage() {
                           progressionDiagramInstrument={progressionDiagramInstrument}
                           tempoBpm={tempoBpm}
                           playbackStyle={playbackStyle}
+                          attack={attack}
+                          decay={decay}
                         />
                       ) : null}
 
@@ -461,6 +475,8 @@ export default function HomePage() {
                         progressionDiagramInstrument={progressionDiagramInstrument}
                         tempoBpm={tempoBpm}
                         playbackStyle={playbackStyle}
+                        attack={attack}
+                        decay={decay}
                         resolvedGenreForSave={genre === 'custom' ? customGenre.trim() : genre}
                         onRequestSaveProgression={({
                           chords,
@@ -507,6 +523,17 @@ export default function HomePage() {
                     onClose={() => setIsGeneratedChordGridOpen(false)}
                     tempoBpm={tempoBpm}
                     playbackStyle={playbackStyle}
+                    onPlaybackStyleChange={setPlaybackStyle}
+                    attack={attack}
+                    onAttackChange={setAttack}
+                    decay={decay}
+                    onDecayChange={setDecay}
+                    padVelocity={padVelocity}
+                    onPadVelocityChange={setPadVelocity}
+                    padSwing={padSwing}
+                    onPadSwingChange={setPadSwing}
+                    padLatchMode={padLatchMode}
+                    onPadLatchModeChange={setPadLatchMode}
                     chords={generatedChordGridEntries}
                   />
                 </>
