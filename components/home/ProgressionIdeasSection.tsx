@@ -7,7 +7,7 @@ import PianoChordDiagram from '../PianoChordDiagram';
 import Card from '../ui/Card';
 import MidiDownloadButton from '../ui/MidiDownloadButton';
 import { playChordVoicing, playProgression } from '../../lib/audio';
-import type { PlaybackStyle } from '../../lib/audio';
+import type { PlaybackRegister, PlaybackStyle } from '../../lib/audio';
 import {
   getGuitarDiagramFromChord,
   getGuitarShapeTextFromDiagram,
@@ -24,6 +24,9 @@ type ProgressionIdeasSectionProps = {
   playbackStyle: PlaybackStyle;
   attack?: number;
   decay?: number;
+  humanize?: number;
+  gate?: number;
+  inversionRegister?: PlaybackRegister;
   showTitle?: boolean;
   resolvedGenreForSave: string;
   onRequestSaveProgression: (payload: {
@@ -42,6 +45,9 @@ export default function ProgressionIdeasSection({
   playbackStyle,
   attack,
   decay,
+  humanize,
+  gate,
+  inversionRegister,
   showTitle = true,
   resolvedGenreForSave,
   onRequestSaveProgression,
@@ -106,7 +112,11 @@ export default function ProgressionIdeasSection({
                       variant="contained"
                       size="small"
                       onClick={() =>
-                        playProgression(idea.pianoVoicings, tempoBpm, playbackStyle, attack, decay)
+                        playProgression(idea.pianoVoicings, tempoBpm, playbackStyle, attack, decay, {
+                          humanize,
+                          gate,
+                          inversionRegister,
+                        })
                       }
                     >
                       Play progression
@@ -204,6 +214,9 @@ export default function ProgressionIdeasSection({
                                     playbackStyle,
                                     attack,
                                     decay,
+                                    humanize,
+                                    gate,
+                                    inversionRegister,
                                   })
                                 }
                               >
@@ -244,6 +257,9 @@ export default function ProgressionIdeasSection({
                                       playbackStyle,
                                       attack,
                                       decay,
+                                      humanize,
+                                      gate,
+                                      inversionRegister,
                                     })
                                   }
                                 >

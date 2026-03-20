@@ -10,6 +10,59 @@ const CHORD_BEATS = 2;
 const STRUM_STEP_SECONDS = 0.025;
 
 export type PlaybackStyle = 'strum' | 'block';
+export type PlaybackRegister = 'off' | 'low' | 'mid' | 'high';
+
+const REGISTER_MIDI_RANGES: Record<Exclude<PlaybackRegister, 'off'>, { min: number; max: number }> = {
+  low:  { min: 36, max: 59 }, // C2–B3
+  mid:  { min: 48, max: 71 }, // C3–B4
+  high: { min: 60, max: 83 }, // C4–B5
+};
+
+const MAX_HUMANIZE_TIMING_S = 0.05; // 50 ms at 100%
+const MAX_HUMANIZE_VELOCITY = 12;   // ±12 MIDI velocity units at 100%
+
+const applyInversionLock = (notes: string[], register: PlaybackRegister): string[] => {
+  if (register === 'off') return notes;
+  const range = REGISTER_MIDI_RANGES[register];
+  const center = (range.min + range.max) / 2;
+
+  return notes.map((note) => {
+    const baseMidi = Tone.Frequency(note).toMidi();
+    let bestMidi: number = baseMidi;
+    let bestDist = Infinity;
+
+    for (let shift = -4; shift <= 4; shift++) {
+      const candidate = baseMidi + shift * 12;
+      if (candidate >= range.min && candidate <= range.max) {
+        const dist = Math.abs(candidate - center);
+        if (dist < bestDist) {
+          bestDist = dist;
+          bestMidi = candidate;
+        }
+      }
+    }
+
+    // If no octave shift placed this note in range, pick the nearest boundary
+    if (bestDist === Infinity) {
+      for (let shift = -4; shift <= 4; shift++) {
+        const candidate = baseMidi + shift * 12;
+        const clampDist = Math.abs(Math.max(range.min, Math.min(range.max, candidate)) - center);
+        if (clampDist < bestDist) {
+          bestDist = clampDist;
+          bestMidi = candidate;
+        }
+      }
+    }
+
+    return Tone.Frequency(bestMidi, 'midi').toNote() as string;
+  });
+};
+
+/**
+ * gate: 0 = staccato (~10% of chord duration), 1 = sustained (~95%)
+ */
+const applyGate = (chordDurationSeconds: number, gate: number): number =>
+  chordDurationSeconds * (0.1 + gate * 0.85);
 
 const normalizeVelocity = (velocity?: number): number | undefined => {
   if (!Number.isFinite(velocity)) {
@@ -219,6 +272,9 @@ export const playChordVoicing = async ({
   attack,
   decay,
   velocity,
+  humanize = 0,
+  gate = 1,
+  inversionRegister = 'off',
 }: {
   leftHand: string[];
   rightHand: string[];
@@ -228,22 +284,37 @@ export const playChordVoicing = async ({
   attack?: number;
   decay?: number;
   velocity?: number;
+  humanize?: number;
+  gate?: number;
+  inversionRegister?: PlaybackRegister;
 }): Promise<void> => {
   await startAudio();
   stopAllAudio();
   const sampler = await ensurePianoSamplerLoaded();
-  const notes = [...leftHand, ...rightHand];
-  const resolvedDuration = duration ?? getChordDurationSeconds(tempoBpm);
+  const chordDurSeconds = getChordDurationSeconds(tempoBpm);
+  const noteDuration = gate !== 1 ? applyGate(chordDurSeconds, gate) : (duration ?? chordDurSeconds);
 
-  if (notes.length > 0) {
+  const lockedNotes = applyInversionLock([...leftHand, ...rightHand], inversionRegister);
+
+  if (lockedNotes.length > 0) {
+    const timingDelay =
+      humanize > 0 ? Math.random() * humanize * MAX_HUMANIZE_TIMING_S : 0;
+    const velJitter =
+      humanize > 0 ? (Math.random() * 2 - 1) * humanize * MAX_HUMANIZE_VELOCITY : 0;
+    const effectiveVelocity =
+      velocity !== undefined
+        ? Math.round(Math.max(20, Math.min(127, velocity + velJitter)))
+        : undefined;
+
     triggerChordByStyle({
       style: playbackStyle,
       sampler,
-      notes,
-      duration: resolvedDuration,
+      notes: lockedNotes,
+      duration: noteDuration,
+      startTime: timingDelay > 0 ? `+${timingDelay}` : undefined,
       attack,
       decay,
-      velocity,
+      velocity: effectiveVelocity,
     });
   }
 };
@@ -257,29 +328,50 @@ export const playProgression = async (
   playbackStyle: PlaybackStyle = 'strum',
   attack?: number,
   decay?: number,
+  opts?: {
+    velocity?: number;
+    humanize?: number;
+    gate?: number;
+    inversionRegister?: PlaybackRegister;
+  },
 ): Promise<void> => {
   await startAudio();
   stopAllAudio();
 
   const sampler = await ensurePianoSamplerLoaded();
+  const { velocity, humanize = 0, gate = 1, inversionRegister = 'off' } = opts ?? {};
   const chordDurationSeconds = getChordDurationSeconds(tempoBpm);
+  const noteDuration = applyGate(chordDurationSeconds, gate);
 
   voicings.forEach((voicing, index) => {
-    const notes = [...voicing.leftHand, ...voicing.rightHand];
+    const lockedNotes = applyInversionLock(
+      [...voicing.leftHand, ...voicing.rightHand],
+      inversionRegister,
+    );
 
-    if (notes.length > 0) {
+    if (lockedNotes.length > 0) {
+      const timingJitter =
+        humanize > 0 ? (Math.random() * 2 - 1) * humanize * MAX_HUMANIZE_TIMING_S : 0;
+      const velJitter =
+        humanize > 0 ? (Math.random() * 2 - 1) * humanize * MAX_HUMANIZE_VELOCITY : 0;
+      const effectiveVelocity =
+        velocity !== undefined
+          ? Math.round(Math.max(20, Math.min(127, velocity + velJitter)))
+          : undefined;
+
       const timeoutId = setTimeout(
         () => {
           triggerChordByStyle({
             style: playbackStyle,
             sampler,
-            notes,
-            duration: chordDurationSeconds,
+            notes: lockedNotes,
+            duration: noteDuration,
             attack,
             decay,
+            velocity: effectiveVelocity,
           });
         },
-        index * chordDurationSeconds * 1000,
+        Math.max(0, (index * chordDurationSeconds + timingJitter) * 1000),
       );
 
       scheduledPlaybackTimeouts.push(timeoutId);

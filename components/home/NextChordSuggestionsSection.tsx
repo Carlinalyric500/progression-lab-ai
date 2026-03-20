@@ -7,7 +7,7 @@ import PianoChordDiagram from '../PianoChordDiagram';
 import Card from '../ui/Card';
 import MidiDownloadButton from '../ui/MidiDownloadButton';
 import { playChordVoicing } from '../../lib/audio';
-import type { PlaybackStyle } from '../../lib/audio';
+import type { PlaybackRegister, PlaybackStyle } from '../../lib/audio';
 import { getGuitarShapeTextFromVoicing } from '../../lib/guitarDiagramUtils';
 import { downloadChordMidi } from '../../lib/midi';
 import type { ChordSuggestionResponse } from '../../lib/types';
@@ -20,6 +20,9 @@ type NextChordSuggestionsSectionProps = {
   playbackStyle: PlaybackStyle;
   attack?: number;
   decay?: number;
+  humanize?: number;
+  gate?: number;
+  inversionRegister?: PlaybackRegister;
   showTitle?: boolean;
 };
 
@@ -30,6 +33,9 @@ export default function NextChordSuggestionsSection({
   playbackStyle,
   attack,
   decay,
+  humanize,
+  gate,
+  inversionRegister,
   showTitle = true,
 }: NextChordSuggestionsSectionProps) {
   return (
@@ -91,6 +97,9 @@ export default function NextChordSuggestionsSection({
                             playbackStyle,
                             attack,
                             decay,
+                            humanize,
+                            gate,
+                            inversionRegister,
                           })
                         }
                       >
