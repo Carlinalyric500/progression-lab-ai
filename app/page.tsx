@@ -13,6 +13,8 @@ import {
   CircularProgress,
   Container,
   Stack,
+  ToggleButton,
+  ToggleButtonGroup,
   Typography,
 } from '@mui/material';
 
@@ -28,6 +30,7 @@ import RestoringState from '../components/home/RestoringState';
 import StructureSuggestionsSection from '../components/home/StructureSuggestionsSection';
 import useGeneratorSessionCache from '../components/home/useGeneratorSessionCache';
 import type { GeneratorFormData, ProgressionDiagramInstrument } from '../components/home/types';
+import type { PlaybackStyle } from '../lib/audio';
 import { CHORD_OPTIONS, GENRE_OPTIONS, MODE_OPTIONS, MOOD_OPTIONS } from '../lib/formOptions';
 import type { Adventurousness, ChordItem, ChordSuggestionResponse } from '../lib/types';
 
@@ -95,6 +98,7 @@ export default function HomePage() {
   const [selectedProgressionGenre, setSelectedProgressionGenre] = useState('');
   const [progressionDiagramInstrument, setProgressionDiagramInstrument] =
     useState<ProgressionDiagramInstrument>('piano');
+  const [playbackStyle, setPlaybackStyle] = useState<PlaybackStyle>('strum');
   const [isGeneratedChordGridOpen, setIsGeneratedChordGridOpen] = useState(false);
   const [successMessageOpen, setSuccessMessageOpen] = useState(false);
   const [isNextSectionExpanded, setIsNextSectionExpanded] = useState(true);
@@ -352,6 +356,25 @@ export default function HomePage() {
                     }}
                   >
                     <Stack direction="row" spacing={1} alignItems="center">
+                      <ToggleButtonGroup
+                        size="small"
+                        color="primary"
+                        exclusive
+                        value={playbackStyle}
+                        onChange={(_, nextValue: PlaybackStyle | null) => {
+                          if (nextValue) {
+                            setPlaybackStyle(nextValue);
+                          }
+                        }}
+                        aria-label="Playback style"
+                      >
+                        <ToggleButton value="strum" aria-label="Strum playback">
+                          Strum
+                        </ToggleButton>
+                        <ToggleButton value="block" aria-label="Block playback">
+                          Block
+                        </ToggleButton>
+                      </ToggleButtonGroup>
                       {generatedChordGridEntries.length > 0 ? (
                         <Button
                           variant="outlined"
@@ -359,7 +382,7 @@ export default function HomePage() {
                           startIcon={<GridViewIcon />}
                           onClick={() => setIsGeneratedChordGridOpen(true)}
                         >
-                          Open chord grid
+                          pads
                         </Button>
                       ) : null}
                       <InstrumentToggle
@@ -389,6 +412,7 @@ export default function HomePage() {
                               suggestions={data.nextChordSuggestions}
                               progressionDiagramInstrument={progressionDiagramInstrument}
                               tempoBpm={tempoBpm}
+                              playbackStyle={playbackStyle}
                               showTitle={false}
                             />
                           </AccordionDetails>
@@ -400,6 +424,7 @@ export default function HomePage() {
                         isLoadedFromSavedProgression={isLoadedFromSavedProgression}
                         progressionDiagramInstrument={progressionDiagramInstrument}
                         tempoBpm={tempoBpm}
+                        playbackStyle={playbackStyle}
                         resolvedGenreForSave={genre === 'custom' ? customGenre.trim() : genre}
                         onRequestSaveProgression={({
                           chords,
@@ -426,6 +451,7 @@ export default function HomePage() {
                           suggestions={data.nextChordSuggestions}
                           progressionDiagramInstrument={progressionDiagramInstrument}
                           tempoBpm={tempoBpm}
+                          playbackStyle={playbackStyle}
                         />
                       ) : null}
 
@@ -434,6 +460,7 @@ export default function HomePage() {
                         isLoadedFromSavedProgression={isLoadedFromSavedProgression}
                         progressionDiagramInstrument={progressionDiagramInstrument}
                         tempoBpm={tempoBpm}
+                        playbackStyle={playbackStyle}
                         resolvedGenreForSave={genre === 'custom' ? customGenre.trim() : genre}
                         onRequestSaveProgression={({
                           chords,
@@ -479,6 +506,7 @@ export default function HomePage() {
                     open={isGeneratedChordGridOpen}
                     onClose={() => setIsGeneratedChordGridOpen(false)}
                     tempoBpm={tempoBpm}
+                    playbackStyle={playbackStyle}
                     chords={generatedChordGridEntries}
                   />
                 </>

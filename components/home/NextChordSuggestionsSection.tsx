@@ -7,6 +7,7 @@ import PianoChordDiagram from '../PianoChordDiagram';
 import Card from '../ui/Card';
 import MidiDownloadButton from '../ui/MidiDownloadButton';
 import { playChordVoicing } from '../../lib/audio';
+import type { PlaybackStyle } from '../../lib/audio';
 import { getGuitarShapeTextFromVoicing } from '../../lib/guitarDiagramUtils';
 import { downloadChordMidi } from '../../lib/midi';
 import type { ChordSuggestionResponse } from '../../lib/types';
@@ -16,6 +17,7 @@ type NextChordSuggestionsSectionProps = {
   suggestions: ChordSuggestionResponse['nextChordSuggestions'];
   progressionDiagramInstrument: ProgressionDiagramInstrument;
   tempoBpm: number;
+  playbackStyle: PlaybackStyle;
   showTitle?: boolean;
 };
 
@@ -23,6 +25,7 @@ export default function NextChordSuggestionsSection({
   suggestions,
   progressionDiagramInstrument,
   tempoBpm,
+  playbackStyle,
   showTitle = true,
 }: NextChordSuggestionsSectionProps) {
   return (
@@ -81,6 +84,7 @@ export default function NextChordSuggestionsSection({
                             leftHand: pianoVoicing.leftHand,
                             rightHand: pianoVoicing.rightHand,
                             tempoBpm,
+                            playbackStyle,
                           })
                         }
                       >

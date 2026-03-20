@@ -9,6 +9,8 @@ const MAX_TEMPO_BPM = 240;
 const CHORD_BEATS = 2;
 const STRUM_STEP_SECONDS = 0.025;
 
+export type PlaybackStyle = 'strum' | 'block';
+
 const normalizeTempoBpm = (tempoBpm?: number): number => {
   if (!Number.isFinite(tempoBpm)) {
     return DEFAULT_TEMPO_BPM;
@@ -112,6 +114,52 @@ const triggerStrummedChord = ({
   });
 };
 
+const triggerBlockChord = ({
+  sampler,
+  notes,
+  duration,
+  startTime,
+}: {
+  sampler: Tone.Sampler;
+  notes: string[];
+  duration: Tone.Unit.Time;
+  startTime?: Tone.Unit.Time;
+}): void => {
+  const orderedNotes = sortNotesLowToHigh(notes);
+
+  if (orderedNotes.length === 0) {
+    return;
+  }
+
+  if (startTime !== undefined) {
+    sampler.triggerAttackRelease(orderedNotes, duration, startTime);
+    return;
+  }
+
+  sampler.triggerAttackRelease(orderedNotes, duration);
+};
+
+const triggerChordByStyle = ({
+  style,
+  sampler,
+  notes,
+  duration,
+  startTime,
+}: {
+  style: PlaybackStyle;
+  sampler: Tone.Sampler;
+  notes: string[];
+  duration: Tone.Unit.Time;
+  startTime?: Tone.Unit.Time;
+}): void => {
+  if (style === 'block') {
+    triggerBlockChord({ sampler, notes, duration, startTime });
+    return;
+  }
+
+  triggerStrummedChord({ sampler, notes, duration, startTime });
+};
+
 export const startAudio = async (): Promise<void> => {
   if (Tone.context.state !== 'running') {
     await Tone.start();
@@ -135,11 +183,13 @@ export const playChordVoicing = async ({
   rightHand,
   duration,
   tempoBpm,
+  playbackStyle = 'strum',
 }: {
   leftHand: string[];
   rightHand: string[];
   duration?: Tone.Unit.Time;
   tempoBpm?: number;
+  playbackStyle?: PlaybackStyle;
 }): Promise<void> => {
   await startAudio();
   stopAllAudio();
@@ -148,7 +198,12 @@ export const playChordVoicing = async ({
   const resolvedDuration = duration ?? getChordDurationSeconds(tempoBpm);
 
   if (notes.length > 0) {
-    triggerStrummedChord({ sampler, notes, duration: resolvedDuration });
+    triggerChordByStyle({
+      style: playbackStyle,
+      sampler,
+      notes,
+      duration: resolvedDuration,
+    });
   }
 };
 
@@ -158,6 +213,7 @@ export const playProgression = async (
     rightHand: string[];
   }>,
   tempoBpm?: number,
+  playbackStyle: PlaybackStyle = 'strum',
 ): Promise<void> => {
   await startAudio();
   stopAllAudio();
@@ -171,7 +227,8 @@ export const playProgression = async (
     if (notes.length > 0) {
       const timeoutId = setTimeout(
         () => {
-          triggerStrummedChord({
+          triggerChordByStyle({
+            style: playbackStyle,
             sampler,
             notes,
             duration: chordDurationSeconds,

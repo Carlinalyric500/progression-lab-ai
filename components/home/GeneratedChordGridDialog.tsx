@@ -1,16 +1,10 @@
 'use client';
 
-import {
-  Box,
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  Typography,
-} from '@mui/material';
+import { Box, Button, Dialog, DialogActions, DialogContent, Typography } from '@mui/material';
+import { useEffect, useRef, useState } from 'react';
 
 import { playChordVoicing, stopAllAudio } from '../../lib/audio';
+import type { PlaybackStyle } from '../../lib/audio';
 
 type ChordGridEntry = {
   key: string;
@@ -24,53 +18,167 @@ type GeneratedChordGridDialogProps = {
   open: boolean;
   onClose: () => void;
   tempoBpm: number;
+  playbackStyle: PlaybackStyle;
   chords: ChordGridEntry[];
 };
+
+const HAPPY_FALLBACK_BORDERS = ['#f97316', '#22d3ee', '#a3e635', '#f43f5e', '#f59e0b', '#60a5fa'];
+
+function getChordBorderColor(chordName: string): string {
+  if (/sus/i.test(chordName)) {
+    return '#22d3ee';
+  }
+
+  if (/(?:maj9|add9|\b9\b|\b7\b|11|13)/i.test(chordName)) {
+    return '#c084fc';
+  }
+
+  if (/(?:^|[^A-Za-z])m(?!aj)|min/i.test(chordName)) {
+    return '#34d399';
+  }
+
+  if (/dim|o/i.test(chordName)) {
+    return '#f87171';
+  }
+
+  if (/aug|\+/i.test(chordName)) {
+    return '#f59e0b';
+  }
+
+  let hash = 0;
+  for (const char of chordName) {
+    hash = (hash * 31 + char.charCodeAt(0)) % 2147483647;
+  }
+
+  return HAPPY_FALLBACK_BORDERS[Math.abs(hash) % HAPPY_FALLBACK_BORDERS.length];
+}
 
 export default function GeneratedChordGridDialog({
   open,
   onClose,
   tempoBpm,
+  playbackStyle,
   chords,
 }: GeneratedChordGridDialogProps) {
+  const [activePadKey, setActivePadKey] = useState<string | null>(null);
+  const activePadTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const padStyles = {
+    body: {
+      bg: 'linear-gradient(180deg, rgba(84, 84, 87, 0.97) 0%, rgba(44, 45, 49, 0.99) 100%)',
+      bgHover: 'linear-gradient(180deg, rgba(98, 98, 102, 0.98) 0%, rgba(52, 53, 58, 0.99) 100%)',
+    },
+    active: {
+      bg: 'linear-gradient(180deg, rgba(116, 117, 121, 0.99) 0%, rgba(63, 64, 69, 0.99) 100%)',
+      border: '#facc15',
+    },
+  } as const;
+
+  useEffect(() => {
+    return () => {
+      if (activePadTimeout.current) {
+        clearTimeout(activePadTimeout.current);
+      }
+    };
+  }, []);
+
+  const triggerPad = (entry: ChordGridEntry) => {
+    if (activePadTimeout.current) {
+      clearTimeout(activePadTimeout.current);
+    }
+
+    setActivePadKey(entry.key);
+    activePadTimeout.current = setTimeout(() => {
+      setActivePadKey(null);
+      activePadTimeout.current = null;
+    }, 180);
+
+    void playChordVoicing({
+      leftHand: entry.leftHand,
+      rightHand: entry.rightHand,
+      tempoBpm,
+      playbackStyle,
+    });
+  };
+
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="lg" fullWidth>
-      <DialogTitle>Generated chord grid</DialogTitle>
+    <Dialog
+      open={open}
+      onClose={onClose}
+      maxWidth="lg"
+      fullWidth
+      PaperProps={{
+        sx: {
+          paddingTop: 2,
+          borderRadius: 2,
+          color: 'common.white',
+          background:
+            'linear-gradient(160deg, rgba(95, 101, 109, 0.96) 0%, rgba(49, 54, 61, 0.98) 52%, rgba(32, 36, 42, 0.98) 100%)',
+          border: '1px solid rgba(190, 196, 204, 0.28)',
+        },
+      }}
+    >
       <DialogContent dividers>
         <Box
           sx={{
             display: 'grid',
             gridTemplateColumns: {
-              xs: 'repeat(2, minmax(0, 1fr))',
-              sm: 'repeat(3, minmax(0, 1fr))',
+              xs: 'repeat(3, minmax(0, 1fr))',
+              sm: 'repeat(4, minmax(0, 1fr))',
               lg: 'repeat(4, minmax(0, 1fr))',
             },
-            gap: 1.5,
+            gap: { xs: 1, sm: 1.5 },
+            p: { xs: 0.5, sm: 1 },
+            borderRadius: 2,
+            bgcolor: 'rgba(23, 27, 32, 0.5)',
+            border: '1px solid rgba(188, 194, 201, 0.2)',
           }}
         >
-          {chords.map((entry) => (
-            <Button
-              key={entry.key}
-              variant="outlined"
-              onClick={() =>
-                playChordVoicing({
-                  leftHand: entry.leftHand,
-                  rightHand: entry.rightHand,
-                  tempoBpm,
-                })
-              }
-              sx={{
-                aspectRatio: '1 / 1',
-                minHeight: { xs: 84, sm: 96 },
-                borderRadius: 2,
-                fontWeight: 700,
-                fontSize: { xs: '0.95rem', sm: '1rem' },
-                textTransform: 'none',
-              }}
-            >
-              {entry.chord}
-            </Button>
-          ))}
+          {chords.map((entry) => {
+            const isActive = activePadKey === entry.key;
+            const borderColor = getChordBorderColor(entry.chord);
+
+            return (
+              <Button
+                key={entry.key}
+                variant="contained"
+                onClick={() => triggerPad(entry)}
+                sx={{
+                  aspectRatio: '1 / 1',
+                  minHeight: { xs: 82, sm: 108 },
+                  borderRadius: 1.5,
+                  fontWeight: 700,
+                  fontSize: { xs: '0.88rem', sm: '1.02rem' },
+                  letterSpacing: 0.2,
+                  textTransform: 'none',
+                  color: 'common.white',
+                  background: isActive ? padStyles.active.bg : padStyles.body.bg,
+                  backgroundColor: '#2e3136',
+                  border: '2px solid',
+                  borderColor: isActive ? padStyles.active.border : borderColor,
+                  boxShadow: isActive
+                    ? '0 3px 0 rgba(20, 23, 28, 0.92)'
+                    : '0 8px 0 rgba(20, 23, 28, 0.82)',
+                  transform: isActive ? 'translateY(5px)' : 'translateY(0)',
+                  transition:
+                    'transform 90ms ease, box-shadow 90ms ease, background 120ms, border-color 120ms',
+                  '&:hover': {
+                    background: isActive ? padStyles.active.bg : padStyles.body.bgHover,
+                    boxShadow: isActive
+                      ? '0 3px 0 rgba(20, 23, 28, 0.92)'
+                      : '0 8px 0 rgba(20, 23, 28, 0.82)',
+                    borderColor: isActive ? padStyles.active.border : borderColor,
+                  },
+                  '&:active': {
+                    transform: 'translateY(5px)',
+                    background: isActive ? padStyles.active.bg : padStyles.body.bgHover,
+                    boxShadow: '0 3px 0 rgba(20, 23, 28, 0.92)',
+                  },
+                }}
+              >
+                {entry.chord}
+              </Button>
+            );
+          })}
         </Box>
 
         {chords.length === 0 ? (
