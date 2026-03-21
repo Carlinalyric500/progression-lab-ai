@@ -114,14 +114,24 @@ export default function PlaybackSettingsButton({
           startIcon={<SettingsIcon />}
           onClick={() => setIsSettingsOpen(true)}
           sx={{
+            borderWidth: 1.5,
             color: '#60a5fa',
             borderColor: 'rgba(96, 165, 250, 0.9)',
-            backgroundColor: 'transparent',
+            backgroundColor:
+              position === 'inline'
+                ? (theme) =>
+                    theme.palette.mode === 'dark'
+                      ? 'rgba(15, 23, 42, 0.35)'
+                      : 'rgba(255, 255, 255, 0.5)'
+                : 'transparent',
             textTransform: 'none',
             fontWeight: 600,
+            backdropFilter: position === 'inline' ? 'blur(10px)' : 'none',
+            WebkitBackdropFilter: position === 'inline' ? 'blur(10px)' : 'none',
             '&:hover': {
               borderColor: 'rgba(147, 197, 253, 1)',
               backgroundColor: 'rgba(96, 165, 250, 0.08)',
+              borderWidth: 1.5,
             },
           }}
         >
