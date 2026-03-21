@@ -22,37 +22,30 @@ export default function InstrumentToggle({ value, onChange }: InstrumentTogglePr
       }}
       sx={(theme) => {
         const isLight = theme.palette.mode === 'light';
-        const selectedGradient = isLight
-          ? `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.86)} 0%, ${alpha(theme.palette.info.main, 0.8)} 100%)`
-          : `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.7)} 0%, ${alpha(theme.palette.info.main, 0.62)} 100%)`;
 
         return {
-          mr: '16px',
+          mr: 0,
           backdropFilter: 'blur(10px)',
-          backgroundColor: isLight
-            ? alpha(theme.palette.common.black, 0.24)
-            : alpha(theme.palette.background.paper, 0.48),
-          border: 'none',
-          borderRadius: '4px',
-          boxShadow: isLight
-            ? `0 2px 12px ${alpha(theme.palette.common.black, 0.2)}`
-            : `0 2px 12px ${alpha(theme.palette.common.black, 0.45)}`,
+          WebkitBackdropFilter: 'blur(10px)',
+          backgroundColor: 'transparent',
+          border: '1.5px solid rgba(96, 165, 250, 0.9)',
+          height: 32,
+          borderRadius: 1,
           '& .MuiToggleButton-root': {
-            border: 'none',
-            color: alpha(theme.palette.common.white, isLight ? 0.88 : 0.78),
+            border: 0,
+            minHeight: 31,
+            px: 1.5,
+            textTransform: 'none',
+            fontWeight: 600,
+            color: '#60a5fa',
             '&.Mui-selected': {
-              backgroundImage: selectedGradient,
+              backgroundColor: alpha(theme.palette.primary.main, isLight ? 0.28 : 0.34),
               color: theme.palette.common.white,
               fontWeight: 700,
-              boxShadow: `inset 0 0 0 1px ${alpha(theme.palette.common.white, isLight ? 0.24 : 0.16)}`,
             },
             '&:hover': {
-              backgroundColor: alpha(theme.palette.primary.main, isLight ? 0.22 : 0.24),
-              color: theme.palette.common.white,
-            },
-            '&.Mui-selected:hover': {
-              backgroundImage: selectedGradient,
-              filter: 'brightness(1.05)',
+              backgroundColor: alpha(theme.palette.primary.main, isLight ? 0.12 : 0.2),
+              color: '#93c5fd',
             },
           },
         };

@@ -367,6 +367,9 @@ export default function HomePage() {
                       zIndex: 1100,
                       display: 'flex',
                       justifyContent: 'flex-end',
+                      py: 0.5,
+                      px: 1,
+                      WebkitBackdropFilter: 'blur(10px)',
                     }}
                   >
                     <Stack direction="row" spacing={1} alignItems="center">
@@ -398,6 +401,21 @@ export default function HomePage() {
                           size="small"
                           startIcon={<GridViewIcon />}
                           onClick={() => setIsGeneratedChordGridOpen(true)}
+                          sx={{
+                            borderWidth: 1.5,
+                            color: '#60a5fa',
+                            borderColor: 'rgba(96, 165, 250, 0.9)',
+                            backgroundColor: 'transparent',
+                            textTransform: 'none',
+                            fontWeight: 600,
+                            backdropFilter: 'blur(10px)',
+                            WebkitBackdropFilter: 'blur(10px)',
+                            '&:hover': {
+                              borderColor: 'rgba(147, 197, 253, 1)',
+                              backgroundColor: 'rgba(96, 165, 250, 0.08)',
+                              borderWidth: 1.5,
+                            },
+                          }}
                         >
                           pads
                         </Button>
