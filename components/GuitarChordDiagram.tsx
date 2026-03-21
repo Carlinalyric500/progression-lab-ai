@@ -24,6 +24,7 @@ export default function GuitarChordDiagram({ title, fingers, barres = [], positi
   const id = useId().replace(/:/g, '');
   const theme = useTheme();
   const visibleFrets = 4;
+  const fullBarreSpan = 6;
 
   useEffect(() => {
     const selector = `#guitar-chart-${id}`;
@@ -79,8 +80,14 @@ export default function GuitarChordDiagram({ title, fingers, barres = [], positi
 
         const fromString = Math.max(1, Math.min(6, start));
         const toString = Math.max(1, Math.min(6, end));
+        const barreSpan = toString - fromString + 1;
 
         if (toString <= fromString) {
+          return null;
+        }
+
+        // Hide mini/partial barres; keep only full barres across all strings.
+        if (barreSpan < fullBarreSpan) {
           return null;
         }
 
@@ -106,12 +113,15 @@ export default function GuitarChordDiagram({ title, fingers, barres = [], positi
           return null;
         }
 
-        return {
+        const sanitizedBarre = {
           ...barre,
           fromString,
           toString,
           fret,
         };
+        delete sanitizedBarre.text;
+
+        return sanitizedBarre;
       })
       .filter((barre): barre is Barre => barre !== null);
 
