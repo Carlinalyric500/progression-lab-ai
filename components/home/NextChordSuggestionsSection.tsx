@@ -63,11 +63,18 @@ export default function NextChordSuggestionsSection({
                 chords: suggestions.map((s) => ({
                   chord: s.chord,
                   romanNumeral: s.romanNumeral,
-                  functionExplanation: s.functionExplanation,
                   voicingHint: s.voicingHint,
                   pianoVoicing: s.pianoVoicing,
                   guitarVoicingText: getGuitarShapeTextFromVoicing(s.guitarVoicing),
-                  tensionLevel: s.tensionLevel,
+                  guitarDiagram: s.guitarVoicing
+                    ? {
+                        position: s.guitarVoicing.position,
+                        fingers: s.guitarVoicing.fingers.map((finger) => [
+                          finger.string,
+                          finger.fret,
+                        ]),
+                      }
+                    : null,
                 })),
               }}
             />
@@ -151,11 +158,18 @@ export default function NextChordSuggestionsSection({
                             {
                               chord: item.chord,
                               romanNumeral: item.romanNumeral,
-                              functionExplanation: item.functionExplanation,
                               voicingHint: item.voicingHint,
                               pianoVoicing: item.pianoVoicing,
                               guitarVoicingText: getGuitarShapeTextFromVoicing(item.guitarVoicing),
-                              tensionLevel: item.tensionLevel,
+                              guitarDiagram: item.guitarVoicing
+                                ? {
+                                    position: item.guitarVoicing.position,
+                                    fingers: item.guitarVoicing.fingers.map((finger) => [
+                                      finger.string,
+                                      finger.fret,
+                                    ]),
+                                  }
+                                : null,
                             },
                           ],
                         }}

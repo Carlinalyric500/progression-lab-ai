@@ -151,6 +151,10 @@ export default function ProgressionIdeasSection({
                         chords: idea.chords.map((chord, i) => ({
                           chord,
                           pianoVoicing: idea.pianoVoicings[i] ?? null,
+                          guitarVoicingText: getGuitarShapeTextFromDiagram(
+                            getGuitarDiagramFromChord(chord),
+                          ),
+                          guitarDiagram: getGuitarDiagramFromChord(chord),
                         })),
                       }}
                     />
