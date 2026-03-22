@@ -29,7 +29,8 @@ import RestoringState from '../components/home/RestoringState';
 import StructureSuggestionsSection from '../components/home/StructureSuggestionsSection';
 import useGeneratorSessionCache from '../components/home/useGeneratorSessionCache';
 import type { GeneratorFormData, ProgressionDiagramInstrument } from '../components/home/types';
-import type { PlaybackRegister, PlaybackStyle } from '../lib/audio';
+import type { AudioInstrument, PlaybackRegister, PlaybackStyle } from '../lib/audio';
+import { setReverbWet } from '../lib/audio';
 import { CHORD_OPTIONS, GENRE_OPTIONS, MODE_OPTIONS, MOOD_OPTIONS } from '../lib/formOptions';
 import type { Adventurousness, ChordItem, ChordSuggestionResponse } from '../lib/types';
 
@@ -98,6 +99,7 @@ export default function HomePage() {
   const [progressionDiagramInstrument, setProgressionDiagramInstrument] =
     useState<ProgressionDiagramInstrument>('piano');
   const [playbackStyle, setPlaybackStyle] = useState<PlaybackStyle>('strum');
+  const [instrument, setInstrument] = useState<AudioInstrument>('piano');
   const [attack, setAttack] = useState<number>(0.01);
   const [decay, setDecay] = useState<number>(0.5);
   const [padVelocity, setPadVelocity] = useState<number>(96);
@@ -106,6 +108,14 @@ export default function HomePage() {
   const [humanize, setHumanize] = useState<number>(0);
   const [gate, setGate] = useState<number>(1);
   const [inversionRegister, setInversionRegister] = useState<PlaybackRegister>('off');
+  const [octaveShift, setOctaveShift] = useState<number>(0);
+  const [reverb, setReverb] = useState<number>(0);
+
+  const handleReverbChange = (value: number) => {
+    setReverb(value);
+    setReverbWet(value);
+  };
+
   const [isGeneratedChordGridOpen, setIsGeneratedChordGridOpen] = useState(false);
   const [successMessageOpen, setSuccessMessageOpen] = useState(false);
   const [isNextSectionExpanded, setIsNextSectionExpanded] = useState(true);
@@ -392,6 +402,12 @@ export default function HomePage() {
                         onGateChange={setGate}
                         inversionRegister={inversionRegister}
                         onInversionRegisterChange={setInversionRegister}
+                        instrument={instrument}
+                        onInstrumentChange={setInstrument}
+                        octaveShift={octaveShift}
+                        onOctaveShiftChange={setOctaveShift}
+                        reverb={reverb}
+                        onReverbChange={handleReverbChange}
                         tempoBpm={tempoBpm}
                         previewVoicing={previewVoicing}
                       />
@@ -453,6 +469,7 @@ export default function HomePage() {
                               humanize={humanize}
                               gate={gate}
                               inversionRegister={inversionRegister}
+                              instrument={instrument}
                               scale={mode === 'custom' ? customMode.trim() : mode}
                               genre={genre === 'custom' ? customGenre.trim() : genre}
                               showTitle={false}
@@ -472,6 +489,8 @@ export default function HomePage() {
                         humanize={humanize}
                         gate={gate}
                         inversionRegister={inversionRegister}
+                        instrument={instrument}
+                        octaveShift={octaveShift}
                         scale={mode === 'custom' ? customMode.trim() : mode}
                         resolvedGenreForSave={genre === 'custom' ? customGenre.trim() : genre}
                         onRequestSaveProgression={({
@@ -505,6 +524,7 @@ export default function HomePage() {
                           humanize={humanize}
                           gate={gate}
                           inversionRegister={inversionRegister}
+                          instrument={instrument}
                           scale={mode === 'custom' ? customMode.trim() : mode}
                           genre={genre === 'custom' ? customGenre.trim() : genre}
                         />
@@ -521,6 +541,8 @@ export default function HomePage() {
                         humanize={humanize}
                         gate={gate}
                         inversionRegister={inversionRegister}
+                        instrument={instrument}
+                        octaveShift={octaveShift}
                         scale={mode === 'custom' ? customMode.trim() : mode}
                         resolvedGenreForSave={genre === 'custom' ? customGenre.trim() : genre}
                         onRequestSaveProgression={({
@@ -585,6 +607,12 @@ export default function HomePage() {
                     onGateChange={setGate}
                     inversionRegister={inversionRegister}
                     onInversionRegisterChange={setInversionRegister}
+                    instrument={instrument}
+                    onInstrumentChange={setInstrument}
+                    octaveShift={octaveShift}
+                    onOctaveShiftChange={setOctaveShift}
+                    reverb={reverb}
+                    onReverbChange={handleReverbChange}
                     chords={generatedChordGridEntries}
                   />
                 </>

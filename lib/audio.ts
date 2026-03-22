@@ -2,6 +2,10 @@ import * as Tone from 'tone';
 
 let pianoSampler: Tone.Sampler | null = null;
 let pianoSamplerLoaded: Promise<void> | null = null;
+let rhodesSampler: Tone.Sampler | null = null;
+let rhodesSamplerLoaded: Promise<void> | null = null;
+let reverbNode: Tone.Reverb | null = null;
+let reverbNodeReady: Promise<void> | null = null;
 let scheduledPlaybackTimeouts: ReturnType<typeof setTimeout>[] = [];
 const DEFAULT_TEMPO_BPM = 100;
 const MIN_TEMPO_BPM = 40;
@@ -11,6 +15,7 @@ const STRUM_STEP_SECONDS = 0.025;
 
 export type PlaybackStyle = 'strum' | 'block';
 export type PlaybackRegister = 'off' | 'low' | 'mid' | 'high';
+export type AudioInstrument = 'piano' | 'rhodes';
 
 const REGISTER_MIDI_RANGES: Record<
   Exclude<PlaybackRegister, 'off'>,
@@ -91,6 +96,35 @@ const getChordDurationSeconds = (tempoBpm?: number): number => {
   return (60 / normalizedTempo) * CHORD_BEATS;
 };
 
+const getReverbNode = (): Tone.Reverb => {
+  if (!reverbNode) {
+    reverbNode = new Tone.Reverb({ decay: 2.5, wet: 0 }).toDestination();
+    reverbNodeReady = reverbNode.ready;
+  }
+  return reverbNode;
+};
+
+const ensureReverbReady = async (): Promise<void> => {
+  getReverbNode();
+  if (reverbNodeReady) {
+    await reverbNodeReady;
+  }
+};
+
+export const setReverbWet = (wet: number): void => {
+  getReverbNode().wet.value = Math.min(1, Math.max(0, wet));
+};
+
+const shiftNotesByOctaves = (notes: string[], octaveShift: number): string[] => {
+  if (octaveShift === 0) return notes;
+
+  return notes.map((note) => {
+    const baseMidi = Tone.Frequency(note).toMidi();
+    const shiftedMidi = baseMidi + octaveShift * 12;
+    return Tone.Frequency(shiftedMidi, 'midi').toNote() as string;
+  });
+};
+
 const getPianoSampler = (): Tone.Sampler => {
   if (!pianoSampler) {
     pianoSampler = new Tone.Sampler({
@@ -128,7 +162,7 @@ const getPianoSampler = (): Tone.Sampler => {
       },
       release: 1,
       baseUrl: 'https://tonejs.github.io/audio/salamander/',
-    }).toDestination();
+    }).connect(getReverbNode());
 
     pianoSamplerLoaded = Tone.loaded();
   }
@@ -139,8 +173,122 @@ const getPianoSampler = (): Tone.Sampler => {
 const ensurePianoSamplerLoaded = async (): Promise<Tone.Sampler> => {
   const sampler = getPianoSampler();
 
+  await ensureReverbReady();
+
   if (pianoSamplerLoaded) {
     await pianoSamplerLoaded;
+  }
+
+  return sampler;
+};
+
+const getRhodesSampler = (): Tone.Sampler => {
+  if (!rhodesSampler) {
+    rhodesSampler = new Tone.Sampler({
+      urls: {
+        'A#1': 'a%231.mp3',
+        'A#2': 'a%232.mp3',
+        'A#3': 'a%233.mp3',
+        'A#4': 'a%234.mp3',
+        'A#5': 'a%235.mp3',
+        'A#6': 'a%236.mp3',
+        'A#7': 'a%237.mp3',
+        A1: 'a1.mp3',
+        A2: 'a2.mp3',
+        A3: 'a3.mp3',
+        A4: 'a4.mp3',
+        A5: 'a5.mp3',
+        A6: 'a6.mp3',
+        A7: 'a7.mp3',
+        B1: 'b1.mp3',
+        B2: 'b2.mp3',
+        B3: 'b3.mp3',
+        B4: 'b4.mp3',
+        B5: 'b5.mp3',
+        B6: 'b6.mp3',
+        B7: 'b7.mp3',
+        'C#1': 'c%231.mp3',
+        'C#2': 'c%232.mp3',
+        'C#3': 'c%233.mp3',
+        'C#4': 'c%234.mp3',
+        'C#5': 'c%235.mp3',
+        'C#6': 'c%236.mp3',
+        'C#7': 'c%237.mp3',
+        C1: 'c1.mp3',
+        C2: 'c2.mp3',
+        C3: 'c3.mp3',
+        C4: 'c4.mp3',
+        C5: 'c5.mp3',
+        C6: 'c6.mp3',
+        C7: 'c7.mp3',
+        C8: 'c8.mp3',
+        'D#1': 'd%231.mp3',
+        'D#2': 'd%232.mp3',
+        'D#3': 'd%233.mp3',
+        'D#4': 'd%234.mp3',
+        'D#5': 'd%235.mp3',
+        'D#6': 'd%236.mp3',
+        'D#7': 'd%237.mp3',
+        D1: 'd1.mp3',
+        D2: 'd2.mp3',
+        D3: 'd3.mp3',
+        D4: 'd4.mp3',
+        D5: 'd5.mp3',
+        D6: 'd6.mp3',
+        D7: 'd7.mp3',
+        E1: 'e1.mp3',
+        E2: 'e2.mp3',
+        E3: 'e3.mp3',
+        E4: 'e4.mp3',
+        E5: 'e5.mp3',
+        E6: 'e6.mp3',
+        E7: 'e7.mp3',
+        'F#1': 'f%231.mp3',
+        'F#2': 'f%232.mp3',
+        'F#3': 'f%233.mp3',
+        'F#4': 'f%234.mp3',
+        'F#5': 'f%235.mp3',
+        'F#6': 'f%236.mp3',
+        'F#7': 'f%237.mp3',
+        F1: 'f1.mp3',
+        F2: 'f2.mp3',
+        F3: 'f3.mp3',
+        F4: 'f4.mp3',
+        F5: 'f5.mp3',
+        F6: 'f6.mp3',
+        F7: 'f7.mp3',
+        'G#1': 'g%231.mp3',
+        'G#2': 'g%232.mp3',
+        'G#3': 'g%233.mp3',
+        'G#4': 'g%234.mp3',
+        'G#5': 'g%235.mp3',
+        'G#6': 'g%236.mp3',
+        'G#7': 'g%237.mp3',
+        G1: 'g1.mp3',
+        G2: 'g2.mp3',
+        G3: 'g3.mp3',
+        G4: 'g4.mp3',
+        G5: 'g5.mp3',
+        G6: 'g6.mp3',
+        G7: 'g7.mp3',
+      },
+      release: 0.8,
+      baseUrl: '/audio/rhodes/',
+    }).connect(getReverbNode());
+
+    rhodesSamplerLoaded = Tone.loaded();
+  }
+
+  return rhodesSampler;
+};
+
+const ensureRhodesSamplerLoaded = async (): Promise<Tone.Sampler> => {
+  const sampler = getRhodesSampler();
+
+  await ensureReverbReady();
+
+  if (rhodesSamplerLoaded) {
+    await rhodesSamplerLoaded;
   }
 
   return sampler;
@@ -155,13 +303,13 @@ const sortNotesLowToHigh = (notes: string[]): string[] => {
 };
 
 const triggerStrummedChord = ({
-  sampler,
+  instrument,
   notes,
   duration,
   startTime,
   velocity,
 }: {
-  sampler: Tone.Sampler;
+  instrument: Tone.Sampler;
   notes: string[];
   duration: Tone.Unit.Time;
   startTime?: Tone.Unit.Time;
@@ -173,11 +321,11 @@ const triggerStrummedChord = ({
   orderedNotes.forEach((note, index) => {
     if (startTime !== undefined) {
       const noteTime = Tone.Time(startTime).toSeconds() + index * STRUM_STEP_SECONDS;
-      sampler.triggerAttackRelease(note, duration, noteTime, normalizedVelocity);
+      instrument.triggerAttackRelease(note, duration, noteTime, normalizedVelocity);
       return;
     }
 
-    sampler.triggerAttackRelease(
+    instrument.triggerAttackRelease(
       note,
       duration,
       `+${index * STRUM_STEP_SECONDS}`,
@@ -187,13 +335,13 @@ const triggerStrummedChord = ({
 };
 
 const triggerBlockChord = ({
-  sampler,
+  instrument,
   notes,
   duration,
   startTime,
   velocity,
 }: {
-  sampler: Tone.Sampler;
+  instrument: Tone.Sampler;
   notes: string[];
   duration: Tone.Unit.Time;
   startTime?: Tone.Unit.Time;
@@ -207,16 +355,16 @@ const triggerBlockChord = ({
   }
 
   if (startTime !== undefined) {
-    sampler.triggerAttackRelease(orderedNotes, duration, startTime, normalizedVelocity);
+    instrument.triggerAttackRelease(orderedNotes, duration, startTime, normalizedVelocity);
     return;
   }
 
-  sampler.triggerAttackRelease(orderedNotes, duration, undefined, normalizedVelocity);
+  instrument.triggerAttackRelease(orderedNotes, duration, undefined, normalizedVelocity);
 };
 
 const triggerChordByStyle = ({
   style,
-  sampler,
+  instrument,
   notes,
   duration,
   startTime,
@@ -225,7 +373,7 @@ const triggerChordByStyle = ({
   velocity,
 }: {
   style: PlaybackStyle;
-  sampler: Tone.Sampler;
+  instrument: Tone.Sampler;
   notes: string[];
   duration: Tone.Unit.Time;
   startTime?: Tone.Unit.Time;
@@ -234,18 +382,18 @@ const triggerChordByStyle = ({
   velocity?: number;
 }): void => {
   if (attack !== undefined) {
-    sampler.attack = attack;
+    instrument.attack = attack;
   }
   if (decay !== undefined) {
-    sampler.release = decay;
+    instrument.release = decay;
   }
 
   if (style === 'block') {
-    triggerBlockChord({ sampler, notes, duration, startTime, velocity });
+    triggerBlockChord({ instrument, notes, duration, startTime, velocity });
     return;
   }
 
-  triggerStrummedChord({ sampler, notes, duration, startTime, velocity });
+  triggerStrummedChord({ instrument, notes, duration, startTime, velocity });
 };
 
 export const startAudio = async (): Promise<void> => {
@@ -260,6 +408,10 @@ export const stopAllAudio = (): void => {
 
   if (pianoSampler) {
     pianoSampler.releaseAll();
+  }
+
+  if (rhodesSampler) {
+    rhodesSampler.releaseAll();
   }
 
   Tone.Transport.stop();
@@ -278,6 +430,8 @@ export const playChordVoicing = async ({
   humanize = 0,
   gate = 1,
   inversionRegister = 'off',
+  instrument = 'piano',
+  octaveShift = 0,
 }: {
   leftHand: string[];
   rightHand: string[];
@@ -290,15 +444,29 @@ export const playChordVoicing = async ({
   humanize?: number;
   gate?: number;
   inversionRegister?: PlaybackRegister;
+  instrument?: AudioInstrument;
+  octaveShift?: number;
 }): Promise<void> => {
   await startAudio();
   stopAllAudio();
-  const sampler = await ensurePianoSamplerLoaded();
+
+  let audioInstrument: Tone.Sampler;
+  if (instrument === 'rhodes') {
+    audioInstrument = await ensureRhodesSamplerLoaded();
+  } else {
+    audioInstrument = await ensurePianoSamplerLoaded();
+  }
+
   const chordDurSeconds = getChordDurationSeconds(tempoBpm);
   const noteDuration =
     gate !== 1 ? applyGate(chordDurSeconds, gate) : (duration ?? chordDurSeconds);
 
-  const lockedNotes = applyInversionLock([...leftHand, ...rightHand], inversionRegister);
+  const shiftedLeftHand = shiftNotesByOctaves(leftHand, octaveShift);
+  const shiftedRightHand = shiftNotesByOctaves(rightHand, octaveShift);
+  const lockedNotes = applyInversionLock(
+    [...shiftedLeftHand, ...shiftedRightHand],
+    inversionRegister,
+  );
 
   if (lockedNotes.length > 0) {
     const timingDelay = humanize > 0 ? Math.random() * humanize * MAX_HUMANIZE_TIMING_S : 0;
@@ -310,7 +478,7 @@ export const playChordVoicing = async ({
 
     triggerChordByStyle({
       style: playbackStyle,
-      sampler,
+      instrument: audioInstrument,
       notes: lockedNotes,
       duration: noteDuration,
       startTime: timingDelay > 0 ? `+${timingDelay}` : undefined,
@@ -335,19 +503,37 @@ export const playProgression = async (
     humanize?: number;
     gate?: number;
     inversionRegister?: PlaybackRegister;
+    instrument?: AudioInstrument;
+    octaveShift?: number;
   },
 ): Promise<void> => {
   await startAudio();
   stopAllAudio();
 
-  const sampler = await ensurePianoSamplerLoaded();
-  const { velocity, humanize = 0, gate = 1, inversionRegister = 'off' } = opts ?? {};
+  const {
+    velocity,
+    humanize = 0,
+    gate = 1,
+    inversionRegister = 'off',
+    instrument = 'piano',
+    octaveShift = 0,
+  } = opts ?? {};
+
+  let audioInstrument: Tone.Sampler;
+  if (instrument === 'rhodes') {
+    audioInstrument = await ensureRhodesSamplerLoaded();
+  } else {
+    audioInstrument = await ensurePianoSamplerLoaded();
+  }
+
   const chordDurationSeconds = getChordDurationSeconds(tempoBpm);
   const noteDuration = applyGate(chordDurationSeconds, gate);
 
   voicings.forEach((voicing, index) => {
+    const shiftedLeftHand = shiftNotesByOctaves(voicing.leftHand, octaveShift);
+    const shiftedRightHand = shiftNotesByOctaves(voicing.rightHand, octaveShift);
     const lockedNotes = applyInversionLock(
-      [...voicing.leftHand, ...voicing.rightHand],
+      [...shiftedLeftHand, ...shiftedRightHand],
       inversionRegister,
     );
 
@@ -365,7 +551,7 @@ export const playProgression = async (
         () => {
           triggerChordByStyle({
             style: playbackStyle,
-            sampler,
+            instrument: audioInstrument,
             notes: lockedNotes,
             duration: noteDuration,
             attack,

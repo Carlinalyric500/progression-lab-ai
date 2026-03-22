@@ -10,6 +10,7 @@ import Link from 'next/link';
 import ProgressionCard from '../../../components/ProgressionCard';
 import { getSharedProgression } from '../../../lib/api/progressions';
 import { playProgression } from '../../../lib/audio';
+import type { AudioInstrument } from '../../../lib/audio';
 import type { Progression } from '../../../lib/types';
 
 export default function SharedProgressionPage() {
@@ -20,6 +21,7 @@ export default function SharedProgressionPage() {
   const [progression, setProgression] = useState<Progression | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [instrument] = useState<AudioInstrument>('piano');
 
   const loadProgression = useCallback(async () => {
     try {
@@ -86,6 +88,7 @@ export default function SharedProgressionPage() {
               canEdit={false}
               canDelete={false}
               onOpen={handleOpen}
+              instrument={instrument}
             />
 
             {progression.pianoVoicings && progression.pianoVoicings.length > 0 ? (
@@ -93,7 +96,16 @@ export default function SharedProgressionPage() {
                 variant="outlined"
                 size="large"
                 startIcon={<PlayArrowIcon />}
-                onClick={() => playProgression(progression.pianoVoicings ?? [])}
+                onClick={() =>
+                  playProgression(
+                    progression.pianoVoicings ?? [],
+                    undefined,
+                    undefined,
+                    undefined,
+                    undefined,
+                    { instrument },
+                  )
+                }
                 fullWidth
                 sx={{ py: 2 }}
               >

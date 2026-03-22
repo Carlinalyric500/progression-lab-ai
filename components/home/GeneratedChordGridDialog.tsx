@@ -4,7 +4,7 @@ import { Box, Button, Dialog, DialogActions, DialogContent, Typography } from '@
 import { useEffect, useRef, useState } from 'react';
 
 import { playChordVoicing, stopAllAudio } from '../../lib/audio';
-import type { PlaybackRegister, PlaybackStyle } from '../../lib/audio';
+import type { AudioInstrument, PlaybackRegister, PlaybackStyle } from '../../lib/audio';
 import PlaybackSettingsButton from './PlaybackSettingsButton';
 
 type ChordGridEntry = {
@@ -37,6 +37,12 @@ type GeneratedChordGridDialogProps = {
   onGateChange: (value: number) => void;
   inversionRegister: PlaybackRegister;
   onInversionRegisterChange: (value: PlaybackRegister) => void;
+  instrument: AudioInstrument;
+  onInstrumentChange: (value: AudioInstrument) => void;
+  octaveShift: number;
+  onOctaveShiftChange: (value: number) => void;
+  reverb: number;
+  onReverbChange: (value: number) => void;
   chords: ChordGridEntry[];
 };
 
@@ -93,6 +99,12 @@ export default function GeneratedChordGridDialog({
   onGateChange,
   inversionRegister,
   onInversionRegisterChange,
+  instrument,
+  onInstrumentChange,
+  octaveShift,
+  onOctaveShiftChange,
+  reverb,
+  onReverbChange,
   chords,
 }: GeneratedChordGridDialogProps) {
   const [activePadKey, setActivePadKey] = useState<string | null>(null);
@@ -138,6 +150,8 @@ export default function GeneratedChordGridDialog({
       humanize,
       gate,
       inversionRegister,
+      instrument,
+      octaveShift,
     });
   };
 
@@ -196,6 +210,12 @@ export default function GeneratedChordGridDialog({
             onGateChange={onGateChange}
             inversionRegister={inversionRegister}
             onInversionRegisterChange={onInversionRegisterChange}
+            instrument={instrument}
+            onInstrumentChange={onInstrumentChange}
+            octaveShift={octaveShift}
+            onOctaveShiftChange={onOctaveShiftChange}
+            reverb={reverb}
+            onReverbChange={onReverbChange}
             tempoBpm={tempoBpm}
             previewVoicing={previewEntry}
             position="modal"
@@ -225,7 +245,7 @@ export default function GeneratedChordGridDialog({
               <Button
                 key={entry.key}
                 variant="contained"
-                onClick={() => triggerPad(entry)}
+                onMouseDown={() => triggerPad(entry)}
                 sx={{
                   aspectRatio: '1 / 1',
                   minHeight: { xs: 82, sm: 108 },

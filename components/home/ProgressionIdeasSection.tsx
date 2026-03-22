@@ -8,7 +8,7 @@ import Card from '../ui/Card';
 import MidiDownloadButton from '../ui/MidiDownloadButton';
 import PdfDownloadButton from '../ui/PdfDownloadButton';
 import { playChordVoicing, playProgression } from '../../lib/audio';
-import type { PlaybackRegister, PlaybackStyle } from '../../lib/audio';
+import type { AudioInstrument, PlaybackRegister, PlaybackStyle } from '../../lib/audio';
 import {
   getGuitarDiagramFromChord,
   getGuitarShapeTextFromDiagram,
@@ -28,6 +28,8 @@ type ProgressionIdeasSectionProps = {
   humanize?: number;
   gate?: number;
   inversionRegister?: PlaybackRegister;
+  instrument: AudioInstrument;
+  octaveShift?: number;
   showTitle?: boolean;
   resolvedGenreForSave: string;
   scale?: string;
@@ -50,6 +52,8 @@ export default function ProgressionIdeasSection({
   humanize,
   gate,
   inversionRegister,
+  instrument,
+  octaveShift = 0,
   showTitle = true,
   resolvedGenreForSave,
   scale,
@@ -125,6 +129,8 @@ export default function ProgressionIdeasSection({
                             humanize,
                             gate,
                             inversionRegister,
+                            instrument,
+                            octaveShift,
                           },
                         )
                       }
@@ -247,6 +253,8 @@ export default function ProgressionIdeasSection({
                                     humanize,
                                     gate,
                                     inversionRegister,
+                                    instrument,
+                                    octaveShift,
                                   })
                                 }
                               >
