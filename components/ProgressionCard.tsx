@@ -19,6 +19,7 @@ import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 
 import type { Progression } from '../lib/types';
 import { playProgression } from '../lib/audio';
+import type { AudioInstrument } from '../lib/audio';
 import { getTagChipSx } from '../lib/tagMetadata';
 
 type ProgressionCardProps = {
@@ -29,6 +30,7 @@ type ProgressionCardProps = {
   canDelete?: boolean;
   canEdit?: boolean;
   isDeleting?: boolean;
+  instrument: AudioInstrument;
 };
 
 export default function ProgressionCard({
@@ -39,6 +41,7 @@ export default function ProgressionCard({
   canDelete = true,
   canEdit = true,
   isDeleting = false,
+  instrument,
 }: ProgressionCardProps) {
   const [copied, setCopied] = useState(false);
 
@@ -61,7 +64,9 @@ export default function ProgressionCard({
     }
 
     try {
-      await playProgression(progression.pianoVoicings!);
+      await playProgression(progression.pianoVoicings!, undefined, undefined, undefined, undefined, {
+        instrument,
+      });
     } catch (error) {
       console.error('Failed to play progression:', error);
     }

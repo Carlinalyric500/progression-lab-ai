@@ -24,6 +24,7 @@ import {
   getMyProgressions,
   getPublicProgressions,
 } from '../../lib/api/progressions';
+import type { AudioInstrument } from '../../lib/audio';
 import {
   getChordChipSx,
   getTagChipSx,
@@ -67,6 +68,7 @@ export default function ProgressionsPageContent() {
   const [loading, setLoading] = useState(true);
   const [deletingProgressionId, setDeletingProgressionId] = useState<string | null>(null);
   const [error, setError] = useState('');
+  const [instrument, setInstrument] = useState<AudioInstrument>('piano');
 
   const { control, setValue, watch } = useForm<FilterFormData>({
     defaultValues: {
@@ -394,6 +396,7 @@ export default function ProgressionsPageContent() {
                 canEdit={false}
                 canDelete={viewMode === 'mine'}
                 isDeleting={deletingProgressionId === progression.id}
+                instrument={instrument}
               />
             ))}
           </Box>

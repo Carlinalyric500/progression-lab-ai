@@ -21,7 +21,8 @@ import {
 import { useState } from 'react';
 
 import { playChordVoicing } from '../../lib/audio';
-import type { PlaybackRegister, PlaybackStyle } from '../../lib/audio';
+import type { AudioInstrument, PlaybackRegister, PlaybackStyle } from '../../lib/audio';
+import SelectField from '../ui/SelectField';
 import EnvelopeControls from './EnvelopeControls';
 
 type PreviewVoicing = {
@@ -48,6 +49,12 @@ type PlaybackSettingsButtonProps = {
   onGateChange: (value: number) => void;
   inversionRegister: PlaybackRegister;
   onInversionRegisterChange: (value: PlaybackRegister) => void;
+  instrument: AudioInstrument;
+  onInstrumentChange: (value: AudioInstrument) => void;
+  octaveShift: number;
+  onOctaveShiftChange: (value: number) => void;
+  reverb: number;
+  onReverbChange: (value: number) => void;
   tempoBpm: number;
   previewVoicing?: PreviewVoicing;
   position?: 'inline' | 'modal';
@@ -72,6 +79,12 @@ export default function PlaybackSettingsButton({
   onGateChange,
   inversionRegister,
   onInversionRegisterChange,
+  instrument,
+  onInstrumentChange,
+  octaveShift,
+  onOctaveShiftChange,
+  reverb,
+  onReverbChange,
   tempoBpm,
   previewVoicing,
   position = 'inline',
@@ -97,6 +110,8 @@ export default function PlaybackSettingsButton({
       humanize,
       gate,
       inversionRegister,
+      instrument,
+      octaveShift,
     });
   };
 
@@ -169,6 +184,25 @@ export default function PlaybackSettingsButton({
               </ToggleButtonGroup>
             </Box>
 
+            <Box>
+              <Typography variant="subtitle2" sx={{ mb: 1 }}>
+                Instrument
+              </Typography>
+              <SelectField
+                select
+                value={instrument}
+                onChange={(e) => {
+                  onInstrumentChange(e.target.value as AudioInstrument);
+                }}
+                options={[
+                  { value: 'piano', label: 'Piano' },
+                  { value: 'rhodes', label: 'Rhodes' },
+                ]}
+                size="small"
+                fullWidth
+              />
+            </Box>
+
             <Box
               sx={{
                 display: 'grid',
@@ -205,6 +239,20 @@ export default function PlaybackSettingsButton({
                       max={1}
                       step={0.01}
                       aria-label="Gate (note length)"
+                    />
+                  </Box>
+                  <Box sx={{ mt: 2 }}>
+                    <Typography variant="caption" color="text.secondary" display="block" mb={0.5}>
+                      Reverb: {Math.round(reverb * 100)}%
+                    </Typography>
+                    <Slider
+                      size="small"
+                      value={reverb}
+                      onChange={(_, value) => onReverbChange(value as number)}
+                      min={0}
+                      max={1}
+                      step={0.01}
+                      aria-label="Reverb amount"
                     />
                   </Box>
                 </CardContent>
@@ -272,6 +320,36 @@ export default function PlaybackSettingsButton({
                   </Stack>
                 </CardContent>
               </Card>
+            </Box>
+
+            <Box>
+              <Typography variant="subtitle2" sx={{ mb: 1 }}>
+                Octave shift
+              </Typography>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                <Slider
+                  value={octaveShift}
+                  onChange={(_, value) => onOctaveShiftChange(value as number)}
+                  min={-3}
+                  max={3}
+                  step={1}
+                  marks={[
+                    { value: -3, label: '-3' },
+                    { value: 0, label: '0' },
+                    { value: 3, label: '+3' },
+                  ]}
+                  valueLabelDisplay="auto"
+                  aria-label="Octave shift"
+                  sx={{ flex: 1 }}
+                />
+              </Box>
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                sx={{ mt: 0.5, display: 'block' }}
+              >
+                Transposes all notes by octaves. Positive values shift higher, negative values shift lower.
+              </Typography>
             </Box>
 
             <Box>

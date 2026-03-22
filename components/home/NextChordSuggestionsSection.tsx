@@ -8,7 +8,7 @@ import Card from '../ui/Card';
 import MidiDownloadButton from '../ui/MidiDownloadButton';
 import PdfDownloadButton from '../ui/PdfDownloadButton';
 import { playChordVoicing } from '../../lib/audio';
-import type { PlaybackRegister, PlaybackStyle } from '../../lib/audio';
+import type { AudioInstrument, PlaybackRegister, PlaybackStyle } from '../../lib/audio';
 import { getGuitarShapeTextFromVoicing } from '../../lib/guitarDiagramUtils';
 import { downloadChordMidi } from '../../lib/midi';
 import type { ChordSuggestionResponse } from '../../lib/types';
@@ -24,6 +24,7 @@ type NextChordSuggestionsSectionProps = {
   humanize?: number;
   gate?: number;
   inversionRegister?: PlaybackRegister;
+  instrument: AudioInstrument;
   showTitle?: boolean;
   scale?: string;
   genre?: string;
@@ -39,6 +40,7 @@ export default function NextChordSuggestionsSection({
   humanize,
   gate,
   inversionRegister,
+  instrument,
   showTitle = true,
   scale,
   genre,
@@ -136,6 +138,7 @@ export default function NextChordSuggestionsSection({
                             humanize,
                             gate,
                             inversionRegister,
+                            instrument,
                           })
                         }
                       >
