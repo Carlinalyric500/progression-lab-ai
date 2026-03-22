@@ -117,7 +117,7 @@ export const setReverbWet = (wet: number): void => {
 
 const shiftNotesByOctaves = (notes: string[], octaveShift: number): string[] => {
   if (octaveShift === 0) return notes;
-  
+
   return notes.map((note) => {
     const baseMidi = Tone.Frequency(note).toMidi();
     const shiftedMidi = baseMidi + octaveShift * 12;
@@ -463,7 +463,10 @@ export const playChordVoicing = async ({
 
   const shiftedLeftHand = shiftNotesByOctaves(leftHand, octaveShift);
   const shiftedRightHand = shiftNotesByOctaves(rightHand, octaveShift);
-  const lockedNotes = applyInversionLock([...shiftedLeftHand, ...shiftedRightHand], inversionRegister);
+  const lockedNotes = applyInversionLock(
+    [...shiftedLeftHand, ...shiftedRightHand],
+    inversionRegister,
+  );
 
   if (lockedNotes.length > 0) {
     const timingDelay = humanize > 0 ? Math.random() * humanize * MAX_HUMANIZE_TIMING_S : 0;
@@ -507,8 +510,15 @@ export const playProgression = async (
   await startAudio();
   stopAllAudio();
 
-  const { velocity, humanize = 0, gate = 1, inversionRegister = 'off', instrument = 'piano', octaveShift = 0 } = opts ?? {};
-  
+  const {
+    velocity,
+    humanize = 0,
+    gate = 1,
+    inversionRegister = 'off',
+    instrument = 'piano',
+    octaveShift = 0,
+  } = opts ?? {};
+
   let audioInstrument: Tone.Sampler;
   if (instrument === 'rhodes') {
     audioInstrument = await ensureRhodesSamplerLoaded();

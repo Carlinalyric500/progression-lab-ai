@@ -64,9 +64,14 @@ export default function ProgressionCard({
     }
 
     try {
-      await playProgression(progression.pianoVoicings!, undefined, undefined, undefined, undefined, {
-        instrument,
-      });
+      await playProgression(
+        progression.pianoVoicings!,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        { instrument },
+      );
     } catch (error) {
       console.error('Failed to play progression:', error);
     }

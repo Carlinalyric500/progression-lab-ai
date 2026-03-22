@@ -348,7 +348,8 @@ export default function PlaybackSettingsButton({
                 color="text.secondary"
                 sx={{ mt: 0.5, display: 'block' }}
               >
-                Transposes all notes by octaves. Positive values shift higher, negative values shift lower.
+                Transposes all notes by octaves. Positive values shift higher, negative values shift
+                lower.
               </Typography>
             </Box>
 

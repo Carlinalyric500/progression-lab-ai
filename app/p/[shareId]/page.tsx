@@ -21,7 +21,7 @@ export default function SharedProgressionPage() {
   const [progression, setProgression] = useState<Progression | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [instrument, setInstrument] = useState<AudioInstrument>('piano');
+  const [instrument] = useState<AudioInstrument>('piano');
 
   const loadProgression = useCallback(async () => {
     try {
@@ -96,7 +96,16 @@ export default function SharedProgressionPage() {
                 variant="outlined"
                 size="large"
                 startIcon={<PlayArrowIcon />}
-                onClick={() => playProgression(progression.pianoVoicings ?? [], undefined, undefined, undefined, undefined, { instrument })}
+                onClick={() =>
+                  playProgression(
+                    progression.pianoVoicings ?? [],
+                    undefined,
+                    undefined,
+                    undefined,
+                    undefined,
+                    { instrument },
+                  )
+                }
                 fullWidth
                 sx={{ py: 2 }}
               >

@@ -68,7 +68,7 @@ export default function ProgressionsPageContent() {
   const [loading, setLoading] = useState(true);
   const [deletingProgressionId, setDeletingProgressionId] = useState<string | null>(null);
   const [error, setError] = useState('');
-  const [instrument, setInstrument] = useState<AudioInstrument>('piano');
+  const [instrument] = useState<AudioInstrument>('piano');
 
   const { control, setValue, watch } = useForm<FilterFormData>({
     defaultValues: {
