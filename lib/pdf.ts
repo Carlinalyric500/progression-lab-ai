@@ -369,7 +369,7 @@ function drawPianoChart(
     whiteXByMidi.set(midi, keyX);
 
     if (highlightedMidis.has(midi)) {
-      doc.setFillColor(191, 219, 254);
+      doc.setFillColor(208, 230, 253);
       doc.rect(keyX, keyboardY, whiteKeyW, keyboardH, 'F');
     }
 
@@ -414,7 +414,7 @@ function drawPianoChart(
     const keyX = keyCenterX - blackKeyW / 2;
 
     if (highlightedMidis.has(midi)) {
-      doc.setFillColor(59, 130, 246);
+      doc.setFillColor(96, 165, 250);
       doc.rect(keyX, keyboardY, blackKeyW, blackKeyH, 'F');
     } else {
       doc.setFillColor(31, 41, 55);
@@ -517,7 +517,7 @@ function drawGuitarChart(
     }
 
     if (fret === 0 && baseFret === 1) {
-      doc.setDrawColor(59, 130, 246);
+      doc.setDrawColor(96, 165, 250);
       doc.circle(xPos, gridY - 1.2, 0.9, 'S');
       return;
     }
@@ -528,7 +528,7 @@ function drawGuitarChart(
     }
 
     const yPos = gridY + (relativeFret - 0.5) * fretGap;
-    doc.setFillColor(59, 130, 246);
+    doc.setFillColor(96, 165, 250);
     doc.circle(xPos, yPos, width < 26 ? 0.8 : 1.2, 'F');
   });
 }

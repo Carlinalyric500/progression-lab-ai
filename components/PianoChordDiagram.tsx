@@ -22,7 +22,7 @@ export default function PianoChordDiagram({ leftHand, rightHand }: Props) {
       endOctave: 6,
       showNoteNames: 'always',
       keyPressStyle: 'vivid',
-      vividKeyPressColor: '#2563eb',
+      vividKeyPressColor: '#60a5fa',
     });
 
     piano.create();
