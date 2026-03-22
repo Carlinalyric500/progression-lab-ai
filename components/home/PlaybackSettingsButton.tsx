@@ -189,7 +189,6 @@ export default function PlaybackSettingsButton({
                 Instrument
               </Typography>
               <SelectField
-                select
                 value={instrument}
                 onChange={(e) => {
                   onInstrumentChange(e.target.value as AudioInstrument);
