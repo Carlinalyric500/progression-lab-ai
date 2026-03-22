@@ -449,7 +449,7 @@ export const playChordVoicing = async ({
 }): Promise<void> => {
   await startAudio();
   stopAllAudio();
-  
+
   let audioInstrument: Tone.Sampler;
   if (instrument === 'rhodes') {
     audioInstrument = await ensureRhodesSamplerLoaded();
