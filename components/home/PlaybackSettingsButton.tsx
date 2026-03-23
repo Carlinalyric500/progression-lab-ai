@@ -266,6 +266,24 @@ export default function PlaybackSettingsButton({
           <Stack spacing={2.5}>
             <Box>
               <Typography variant="subtitle2" sx={{ mb: 1 }}>
+                Instrument
+              </Typography>
+              <SelectField
+                value={instrument}
+                onChange={(e) => {
+                  onInstrumentChange(e.target.value as AudioInstrument);
+                }}
+                options={[
+                  { value: 'piano', label: 'Piano' },
+                  { value: 'rhodes', label: 'Rhodes' },
+                ]}
+                size="small"
+                fullWidth
+              />
+            </Box>
+
+            <Box>
+              <Typography variant="subtitle2" sx={{ mb: 1 }}>
                 Octave shift
               </Typography>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
@@ -385,24 +403,6 @@ export default function PlaybackSettingsButton({
                   </Typography>
                 </Box>
               </Stack>
-            </Box>
-
-            <Box>
-              <Typography variant="subtitle2" sx={{ mb: 1 }}>
-                Instrument
-              </Typography>
-              <SelectField
-                value={instrument}
-                onChange={(e) => {
-                  onInstrumentChange(e.target.value as AudioInstrument);
-                }}
-                options={[
-                  { value: 'piano', label: 'Piano' },
-                  { value: 'rhodes', label: 'Rhodes' },
-                ]}
-                size="small"
-                fullWidth
-              />
             </Box>
 
             <Box

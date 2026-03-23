@@ -227,6 +227,16 @@ const connectSamplers = (target: Tone.ToneAudioNode | Tone.BaseContext['destinat
   }
 };
 
+const connectSamplerToCurrentOutput = (sampler: Tone.Sampler): Tone.Sampler => {
+  sampler.disconnect();
+
+  const enabledEffects = getEnabledEffectsInOrder();
+  const target = enabledEffects[0] ?? Tone.getDestination();
+  sampler.connect(target);
+
+  return sampler;
+};
+
 const getEnabledEffectsInOrder = (): Tone.ToneAudioNode[] => {
   const effects: Tone.ToneAudioNode[] = [];
 
@@ -612,7 +622,9 @@ const getPianoSampler = (): Tone.Sampler => {
       },
       release: 1,
       baseUrl: 'https://tonejs.github.io/audio/salamander/',
-    }).connect(getChorusNode());
+    });
+
+    connectSamplerToCurrentOutput(pianoSampler);
 
     pianoSamplerLoaded = Tone.loaded();
   }
@@ -724,7 +736,9 @@ const getRhodesSampler = (): Tone.Sampler => {
       },
       release: 0.8,
       baseUrl: '/audio/rhodes/',
-    }).connect(getChorusNode());
+    });
+
+    connectSamplerToCurrentOutput(rhodesSampler);
 
     rhodesSamplerLoaded = Tone.loaded();
   }
