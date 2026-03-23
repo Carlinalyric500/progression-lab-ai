@@ -1,6 +1,7 @@
 jest.mock('tone', () => ({}));
 
 import {
+  createAudioEngineScope,
   getAudioEngine,
   playChordVoicing,
   playProgression,
@@ -91,5 +92,43 @@ describe('audio engine abstraction', () => {
     const secondEngine = getAudioEngine();
 
     expect(firstEngine).toBe(secondEngine);
+  });
+
+  it('supports scoped engine attachment and detach semantics', () => {
+    const defaultEngine = createMockAudioEngine();
+    setAudioEngine(defaultEngine);
+
+    const scopedEngine = createMockAudioEngine();
+    const scope = createAudioEngineScope(scopedEngine);
+
+    scope.attach();
+    setReverbWet(0.3);
+    expect(scopedEngine.setReverbWet).toHaveBeenCalledWith(0.3);
+
+    scope.detach();
+    setReverbWet(0.7);
+    expect(defaultEngine.setReverbWet).toHaveBeenCalledWith(0.7);
+  });
+
+  it('runs scoped work and restores previous global engine', async () => {
+    const defaultEngine = createMockAudioEngine();
+    setAudioEngine(defaultEngine);
+
+    const scopedEngine = createMockAudioEngine();
+    const scope = createAudioEngineScope(scopedEngine);
+
+    scope.run(() => {
+      setReverbWet(0.11);
+    });
+
+    await scope.runAsync(async () => {
+      await playChordVoicing({ leftHand: ['C3'], rightHand: ['E4', 'G4'] });
+    });
+
+    setReverbWet(0.22);
+
+    expect(scopedEngine.setReverbWet).toHaveBeenCalledWith(0.11);
+    expect(scopedEngine.playChordVoicing).toHaveBeenCalledTimes(1);
+    expect(defaultEngine.setReverbWet).toHaveBeenCalledWith(0.22);
   });
 });
