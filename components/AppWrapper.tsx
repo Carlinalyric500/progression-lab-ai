@@ -31,7 +31,7 @@ type Props = {
 type NavItem = {
   label: string;
   href: string;
-  sectionId?: string;
+  sectionId?: ResultSectionId;
 };
 
 const NAV_ITEMS = [
@@ -42,10 +42,25 @@ const NAV_ITEMS = [
 ] satisfies NavItem[];
 
 const RESULT_SECTION_IDS = ['suggestions', 'progressions', 'structure'] as const;
+type ResultSectionId = (typeof RESULT_SECTION_IDS)[number];
+
+const getAvailableSections = (): ResultSectionId[] => {
+  return RESULT_SECTION_IDS.filter((sectionId) => Boolean(document.getElementById(sectionId)));
+};
+
+const areSectionsEqual = (
+  previousSections: ResultSectionId[],
+  nextSections: ResultSectionId[],
+): boolean => {
+  return (
+    previousSections.length === nextSections.length &&
+    previousSections.every((sectionId, index) => sectionId === nextSections[index])
+  );
+};
 
 export default function AppWrapper({ children }: Props) {
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [availableSections, setAvailableSections] = useState<string[]>([]);
+  const [availableSections, setAvailableSections] = useState<ResultSectionId[]>([]);
   const { isAuthenticated, isLoading, logout } = useAuth();
   const pathname = usePathname();
 
@@ -56,15 +71,9 @@ export default function AppWrapper({ children }: Props) {
     }
 
     const syncAvailableSections = () => {
-      const nextSections = RESULT_SECTION_IDS.filter((sectionId) =>
-        Boolean(document.getElementById(sectionId)),
-      );
-
+      const nextSections = getAvailableSections();
       setAvailableSections((previousSections) => {
-        if (
-          previousSections.length === nextSections.length &&
-          previousSections.every((sectionId, index) => sectionId === nextSections[index])
-        ) {
+        if (areSectionsEqual(previousSections, nextSections)) {
           return previousSections;
         }
 
@@ -74,8 +83,17 @@ export default function AppWrapper({ children }: Props) {
 
     syncAvailableSections();
 
+    let frameId: number | null = null;
+
     const observer = new MutationObserver(() => {
-      syncAvailableSections();
+      if (frameId !== null) {
+        return;
+      }
+
+      frameId = window.requestAnimationFrame(() => {
+        frameId = null;
+        syncAvailableSections();
+      });
     });
 
     observer.observe(document.body, {
@@ -84,9 +102,12 @@ export default function AppWrapper({ children }: Props) {
     });
 
     return () => {
+      if (frameId !== null) {
+        window.cancelAnimationFrame(frameId);
+      }
       observer.disconnect();
     };
-  }, [pathname, children]);
+  }, [pathname]);
 
   const visibleNavItems = useMemo(() => {
     return NAV_ITEMS.filter(
