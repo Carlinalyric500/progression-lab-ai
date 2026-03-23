@@ -1,77 +1,22 @@
 import * as Tone from 'tone';
+import type {
+  AudioEngine,
+  PlayChordVoicingParams,
+  PlaybackRegister,
+  PlaybackStyle,
+  PlayProgressionOptions,
+  ProgressionVoicing,
+} from './audioEngine';
 
-export type PlaybackStyle = 'strum' | 'block';
-export type PlaybackRegister = 'off' | 'low' | 'mid' | 'high';
-export type AudioInstrument = 'piano' | 'rhodes';
-
-export type ProgressionVoicing = {
-  leftHand: string[];
-  rightHand: string[];
-};
-
-export type PlayChordVoicingParams = {
-  leftHand: string[];
-  rightHand: string[];
-  duration?: Tone.Unit.Time;
-  tempoBpm?: number;
-  playbackStyle?: PlaybackStyle;
-  attack?: number;
-  decay?: number;
-  velocity?: number;
-  humanize?: number;
-  gate?: number;
-  inversionRegister?: PlaybackRegister;
-  instrument?: AudioInstrument;
-  octaveShift?: number;
-};
-
-export type PlayProgressionOptions = {
-  velocity?: number;
-  humanize?: number;
-  gate?: number;
-  inversionRegister?: PlaybackRegister;
-  instrument?: AudioInstrument;
-  octaveShift?: number;
-};
-
-export interface AudioEngine {
-  setReverbWet: (wet: number) => void;
-  setChorusWet: (wet: number) => void;
-  setReverbRoomSize: (roomSize: number) => void;
-  setReverbEnabled: (enabled: boolean) => void;
-  setChorusEnabled: (enabled: boolean) => void;
-  setChorusFrequency: (value: number) => void;
-  setChorusDelayTime: (value: number) => void;
-  setChorusDepth: (value: number) => void;
-  setFeedbackDelayEnabled: (enabled: boolean) => void;
-  setFeedbackDelayWet: (wet: number) => void;
-  setFeedbackDelayTime: (value: number) => void;
-  setFeedbackDelayFeedback: (value: number) => void;
-  setTremoloEnabled: (enabled: boolean) => void;
-  setTremoloWet: (wet: number) => void;
-  setTremoloFrequency: (value: number) => void;
-  setTremoloDepth: (value: number) => void;
-  setVibratoEnabled: (enabled: boolean) => void;
-  setVibratoWet: (wet: number) => void;
-  setVibratoFrequency: (value: number) => void;
-  setVibratoDepth: (value: number) => void;
-  setPhaserEnabled: (enabled: boolean) => void;
-  setPhaserWet: (wet: number) => void;
-  setPhaserFrequency: (value: number) => void;
-  setPhaserOctaves: (value: number) => void;
-  setPhaserQ: (value: number) => void;
-  startAudio: () => Promise<void>;
-  stopAllAudio: () => void;
-  playChordVoicing: (params: PlayChordVoicingParams) => Promise<void>;
-  playProgression: (
-    voicings: ProgressionVoicing[],
-    tempoBpm?: number,
-    playbackStyle?: PlaybackStyle,
-    attack?: number,
-    decay?: number,
-    opts?: PlayProgressionOptions,
-  ) => Promise<void>;
-}
+export type {
+  AudioEngine,
+  AudioInstrument,
+  PlayChordVoicingParams,
+  PlaybackRegister,
+  PlaybackStyle,
+  PlayProgressionOptions,
+  ProgressionVoicing,
+} from './audioEngine';
 
 const DEFAULT_TEMPO_BPM = 100;
 const MIN_TEMPO_BPM = 40;
@@ -1107,6 +1052,14 @@ export const createToneAudioEngine = (): AudioEngine => {
 
 let activeAudioEngine: AudioEngine | null = null;
 
+export type AudioEngineScope = {
+  engine: AudioEngine;
+  attach: () => void;
+  detach: () => void;
+  run: <T>(work: () => T) => T;
+  runAsync: <T>(work: () => Promise<T>) => Promise<T>;
+};
+
 export const getAudioEngine = (): AudioEngine => {
   if (!activeAudioEngine) {
     activeAudioEngine = createToneAudioEngine();
@@ -1121,6 +1074,62 @@ export const setAudioEngine = (engine: AudioEngine): void => {
 
 export const resetAudioEngine = (): void => {
   activeAudioEngine = null;
+};
+
+export const createAudioEngineScope = (
+  engine: AudioEngine = createToneAudioEngine(),
+): AudioEngineScope => {
+  let previousAttachedEngine: AudioEngine | null = null;
+  let isAttached = false;
+
+  const attach = (): void => {
+    previousAttachedEngine = activeAudioEngine;
+    isAttached = true;
+    setAudioEngine(engine);
+  };
+
+  const detach = (): void => {
+    if (!isAttached) {
+      return;
+    }
+
+    if (activeAudioEngine === engine) {
+      activeAudioEngine = previousAttachedEngine;
+    }
+
+    previousAttachedEngine = null;
+    isAttached = false;
+  };
+
+  const run = <T>(work: () => T): T => {
+    const previousEngine = activeAudioEngine;
+    activeAudioEngine = engine;
+
+    try {
+      return work();
+    } finally {
+      activeAudioEngine = previousEngine;
+    }
+  };
+
+  const runAsync = async <T>(work: () => Promise<T>): Promise<T> => {
+    const previousEngine = activeAudioEngine;
+    activeAudioEngine = engine;
+
+    try {
+      return await work();
+    } finally {
+      activeAudioEngine = previousEngine;
+    }
+  };
+
+  return {
+    engine,
+    attach,
+    detach,
+    run,
+    runAsync,
+  };
 };
 
 export const setReverbWet = (wet: number): void => {
