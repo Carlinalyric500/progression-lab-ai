@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Suspense, lazy, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import GridViewIcon from '@mui/icons-material/GridView';
@@ -22,11 +22,8 @@ import GeneratorFormCard from '../components/home/GeneratorFormCard';
 import GeneratedChordGridDialog from '../components/home/GeneratedChordGridDialog';
 import GeneratorHeader from '../components/home/GeneratorHeader';
 import InstrumentToggle from '../components/home/InstrumentToggle';
-import NextChordSuggestionsSection from '../components/home/NextChordSuggestionsSection';
 import PlaybackSettingsButton from '../components/home/PlaybackSettingsButton';
-import ProgressionIdeasSection from '../components/home/ProgressionIdeasSection';
 import RestoringState from '../components/home/RestoringState';
-import StructureSuggestionsSection from '../components/home/StructureSuggestionsSection';
 import useGeneratorSessionCache from '../components/home/useGeneratorSessionCache';
 import {
   type PlaybackSettings,
@@ -72,6 +69,13 @@ const RANDOM_MODE_OPTIONS = MODE_OPTIONS.filter((option) => option.value !== 'cu
 );
 const RANDOM_GENRE_OPTIONS = GENRE_OPTIONS.filter((option) => option.value !== 'custom').map(
   (option) => option.value,
+);
+const NextChordSuggestionsSection = lazy(
+  () => import('../components/home/NextChordSuggestionsSection'),
+);
+const ProgressionIdeasSection = lazy(() => import('../components/home/ProgressionIdeasSection'));
+const StructureSuggestionsSection = lazy(
+  () => import('../components/home/StructureSuggestionsSection'),
 );
 const INITIAL_NEXT_SUGGESTIONS = 3;
 const INITIAL_PROGRESSION_IDEAS = 1;
@@ -691,23 +695,6 @@ export default function HomePage() {
     [data, visibleStructureSuggestionsCount],
   );
 
-  const isProgressivelyRenderingResults = useMemo(() => {
-    if (!data) {
-      return false;
-    }
-
-    return (
-      visibleNextSuggestionsCount < data.nextChordSuggestions.length ||
-      visibleProgressionIdeasCount < data.progressionIdeas.length ||
-      visibleStructureSuggestionsCount < data.structureSuggestions.length
-    );
-  }, [
-    data,
-    visibleNextSuggestionsCount,
-    visibleProgressionIdeasCount,
-    visibleStructureSuggestionsCount,
-  ]);
-
   const handleRequestSaveProgression = useCallback(
     ({
       chords,
@@ -959,11 +946,6 @@ export default function HomePage() {
 
                   {useCollapsibleSections ? (
                     <Stack spacing={4}>
-                      {isProgressivelyRenderingResults ? (
-                        <Typography variant="body2" color="text.secondary">
-                          Rendering results...
-                        </Typography>
-                      ) : null}
                       <Box component="section" id="suggestions">
                         <Typography variant="h5" component="h2" sx={{ mb: 2 }}>
                           Next chord suggestions
@@ -978,57 +960,43 @@ export default function HomePage() {
                             </Typography>
                           </AccordionSummary>
                           <AccordionDetails>
-                            <NextChordSuggestionsSection
-                              suggestions={visibleNextChordSuggestions}
-                              progressionDiagramInstrument={progressionDiagramInstrument}
-                              tempoBpm={tempoBpm}
-                              playbackStyle={playbackStyle}
-                              attack={attack}
-                              decay={decay}
-                              humanize={humanize}
-                              gate={gate}
-                              inversionRegister={inversionRegister}
-                              instrument={instrument}
-                              scale={mode === 'custom' ? customMode.trim() : mode}
-                              genre={genre === 'custom' ? customGenre.trim() : genre}
-                              showTitle={false}
-                            />
+                            <Suspense
+                              fallback={
+                                <Typography variant="body2" color="text.secondary">
+                                  Loading suggestions...
+                                </Typography>
+                              }
+                            >
+                              <NextChordSuggestionsSection
+                                suggestions={visibleNextChordSuggestions}
+                                progressionDiagramInstrument={progressionDiagramInstrument}
+                                tempoBpm={tempoBpm}
+                                playbackStyle={playbackStyle}
+                                attack={attack}
+                                decay={decay}
+                                humanize={humanize}
+                                gate={gate}
+                                inversionRegister={inversionRegister}
+                                instrument={instrument}
+                                scale={mode === 'custom' ? customMode.trim() : mode}
+                                genre={genre === 'custom' ? customGenre.trim() : genre}
+                                showTitle={false}
+                              />
+                            </Suspense>
                           </AccordionDetails>
                         </Accordion>
                       </Box>
 
-                      <ProgressionIdeasSection
-                        progressionIdeas={visibleProgressionIdeas}
-                        isLoadedFromSavedProgression={isLoadedFromSavedProgression}
-                        progressionDiagramInstrument={progressionDiagramInstrument}
-                        tempoBpm={tempoBpm}
-                        playbackStyle={playbackStyle}
-                        attack={attack}
-                        decay={decay}
-                        humanize={humanize}
-                        gate={gate}
-                        inversionRegister={inversionRegister}
-                        instrument={instrument}
-                        octaveShift={octaveShift}
-                        scale={mode === 'custom' ? customMode.trim() : mode}
-                        resolvedGenreForSave={genre === 'custom' ? customGenre.trim() : genre}
-                        onRequestSaveProgression={handleRequestSaveProgression}
-                      />
-
-                      <StructureSuggestionsSection
-                        structureSuggestions={visibleStructureSuggestions}
-                      />
-                    </Stack>
-                  ) : (
-                    <Stack spacing={4}>
-                      {isProgressivelyRenderingResults ? (
-                        <Typography variant="body2" color="text.secondary">
-                          Rendering results...
-                        </Typography>
-                      ) : null}
-                      {!isLoadedFromSavedProgression ? (
-                        <NextChordSuggestionsSection
-                          suggestions={visibleNextChordSuggestions}
+                      <Suspense
+                        fallback={
+                          <Typography variant="body2" color="text.secondary">
+                            Loading progression ideas...
+                          </Typography>
+                        }
+                      >
+                        <ProgressionIdeasSection
+                          progressionIdeas={visibleProgressionIdeas}
+                          isLoadedFromSavedProgression={isLoadedFromSavedProgression}
                           progressionDiagramInstrument={progressionDiagramInstrument}
                           tempoBpm={tempoBpm}
                           playbackStyle={playbackStyle}
@@ -1038,33 +1006,90 @@ export default function HomePage() {
                           gate={gate}
                           inversionRegister={inversionRegister}
                           instrument={instrument}
+                          octaveShift={octaveShift}
                           scale={mode === 'custom' ? customMode.trim() : mode}
-                          genre={genre === 'custom' ? customGenre.trim() : genre}
+                          resolvedGenreForSave={genre === 'custom' ? customGenre.trim() : genre}
+                          onRequestSaveProgression={handleRequestSaveProgression}
                         />
-                      ) : null}
+                      </Suspense>
 
-                      <ProgressionIdeasSection
-                        progressionIdeas={visibleProgressionIdeas}
-                        isLoadedFromSavedProgression={isLoadedFromSavedProgression}
-                        progressionDiagramInstrument={progressionDiagramInstrument}
-                        tempoBpm={tempoBpm}
-                        playbackStyle={playbackStyle}
-                        attack={attack}
-                        decay={decay}
-                        humanize={humanize}
-                        gate={gate}
-                        inversionRegister={inversionRegister}
-                        instrument={instrument}
-                        octaveShift={octaveShift}
-                        scale={mode === 'custom' ? customMode.trim() : mode}
-                        resolvedGenreForSave={genre === 'custom' ? customGenre.trim() : genre}
-                        onRequestSaveProgression={handleRequestSaveProgression}
-                      />
-
-                      {!isLoadedFromSavedProgression ? (
+                      <Suspense
+                        fallback={
+                          <Typography variant="body2" color="text.secondary">
+                            Loading structure suggestions...
+                          </Typography>
+                        }
+                      >
                         <StructureSuggestionsSection
                           structureSuggestions={visibleStructureSuggestions}
                         />
+                      </Suspense>
+                    </Stack>
+                  ) : (
+                    <Stack spacing={4}>
+                      {!isLoadedFromSavedProgression ? (
+                        <Suspense
+                          fallback={
+                            <Typography variant="body2" color="text.secondary">
+                              Loading suggestions...
+                            </Typography>
+                          }
+                        >
+                          <NextChordSuggestionsSection
+                            suggestions={visibleNextChordSuggestions}
+                            progressionDiagramInstrument={progressionDiagramInstrument}
+                            tempoBpm={tempoBpm}
+                            playbackStyle={playbackStyle}
+                            attack={attack}
+                            decay={decay}
+                            humanize={humanize}
+                            gate={gate}
+                            inversionRegister={inversionRegister}
+                            instrument={instrument}
+                            scale={mode === 'custom' ? customMode.trim() : mode}
+                            genre={genre === 'custom' ? customGenre.trim() : genre}
+                          />
+                        </Suspense>
+                      ) : null}
+
+                      <Suspense
+                        fallback={
+                          <Typography variant="body2" color="text.secondary">
+                            Loading progression ideas...
+                          </Typography>
+                        }
+                      >
+                        <ProgressionIdeasSection
+                          progressionIdeas={visibleProgressionIdeas}
+                          isLoadedFromSavedProgression={isLoadedFromSavedProgression}
+                          progressionDiagramInstrument={progressionDiagramInstrument}
+                          tempoBpm={tempoBpm}
+                          playbackStyle={playbackStyle}
+                          attack={attack}
+                          decay={decay}
+                          humanize={humanize}
+                          gate={gate}
+                          inversionRegister={inversionRegister}
+                          instrument={instrument}
+                          octaveShift={octaveShift}
+                          scale={mode === 'custom' ? customMode.trim() : mode}
+                          resolvedGenreForSave={genre === 'custom' ? customGenre.trim() : genre}
+                          onRequestSaveProgression={handleRequestSaveProgression}
+                        />
+                      </Suspense>
+
+                      {!isLoadedFromSavedProgression ? (
+                        <Suspense
+                          fallback={
+                            <Typography variant="body2" color="text.secondary">
+                              Loading structure suggestions...
+                            </Typography>
+                          }
+                        >
+                          <StructureSuggestionsSection
+                            structureSuggestions={visibleStructureSuggestions}
+                          />
+                        </Suspense>
                       ) : null}
                     </Stack>
                   )}
