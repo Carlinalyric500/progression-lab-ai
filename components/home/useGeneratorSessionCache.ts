@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { Dispatch, SetStateAction } from 'react';
 import type { UseFormReset } from 'react-hook-form';
 
@@ -52,6 +52,11 @@ export default function useGeneratorSessionCache({
 }: UseGeneratorSessionCacheParams): UseGeneratorSessionCacheResult {
   const [isRestoringState, setIsRestoringState] = useState(true);
   const [hasRestoredSessionData, setHasRestoredSessionData] = useState(false);
+  const playbackSettingsSettersRef = useRef(playbackSettingsSetters);
+
+  useEffect(() => {
+    playbackSettingsSettersRef.current = playbackSettingsSetters;
+  }, [playbackSettingsSetters]);
 
   useEffect(() => {
     try {
@@ -161,7 +166,7 @@ export default function useGeneratorSessionCache({
           roomSize: parsedCache.playbackSettings?.roomSize ?? parsedCache.roomSize,
         });
 
-        applyPlaybackSettings(playbackSettingsSetters, sanitizedSettings);
+        applyPlaybackSettings(playbackSettingsSettersRef.current, sanitizedSettings);
       } catch (err) {
         console.error('Failed to restore generator cache from session storage:', err);
         sessionStorage.removeItem(GENERATOR_CACHE_KEY);
@@ -169,7 +174,7 @@ export default function useGeneratorSessionCache({
     } finally {
       setIsRestoringState(false);
     }
-  }, [reset, setData, setIsLoadedFromSavedProgression, playbackSettingsSetters]);
+  }, [reset, setData, setIsLoadedFromSavedProgression]);
 
   const cacheGeneratorResult = (formData: GeneratorFormData, data: ChordSuggestionResponse) => {
     const cachePayload: GeneratorCache = {
