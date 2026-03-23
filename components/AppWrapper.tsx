@@ -1,5 +1,6 @@
 'use client';
 import Image from 'next/image';
+import { usePathname } from 'next/navigation';
 import MenuIcon from '@mui/icons-material/Menu';
 import GitHubIcon from '@mui/icons-material/GitHub';
 import LinkedInIcon from '@mui/icons-material/LinkedIn';
@@ -18,7 +19,7 @@ import {
   Toolbar,
   Typography,
 } from '@mui/material';
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import ThemeModeToggle from './ui/ThemeModeToggle';
 import { useAuth } from '../lib/authContext';
@@ -27,16 +28,71 @@ type Props = {
   children: React.ReactNode;
 };
 
+type NavItem = {
+  label: string;
+  href: string;
+  sectionId?: string;
+};
+
 const NAV_ITEMS = [
   { label: 'Generator', href: '/#generator' },
-  // { label: 'Suggestions', href: '/#suggestions' },
-  // { label: 'Progressions', href: '/#progressions' },
-  // { label: 'Structure', href: '/#structure' },
-];
+  { label: 'Suggestions', href: '/#suggestions', sectionId: 'suggestions' },
+  { label: 'Progressions', href: '/#progressions', sectionId: 'progressions' },
+  { label: 'Structure', href: '/#structure', sectionId: 'structure' },
+] satisfies NavItem[];
+
+const RESULT_SECTION_IDS = ['suggestions', 'progressions', 'structure'] as const;
 
 export default function AppWrapper({ children }: Props) {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [availableSections, setAvailableSections] = useState<string[]>([]);
   const { isAuthenticated, isLoading, logout } = useAuth();
+  const pathname = usePathname();
+
+  useEffect(() => {
+    if (pathname !== '/') {
+      setAvailableSections([]);
+      return;
+    }
+
+    const syncAvailableSections = () => {
+      const nextSections = RESULT_SECTION_IDS.filter((sectionId) =>
+        Boolean(document.getElementById(sectionId)),
+      );
+
+      setAvailableSections((previousSections) => {
+        if (
+          previousSections.length === nextSections.length &&
+          previousSections.every((sectionId, index) => sectionId === nextSections[index])
+        ) {
+          return previousSections;
+        }
+
+        return nextSections;
+      });
+    };
+
+    syncAvailableSections();
+
+    const observer = new MutationObserver(() => {
+      syncAvailableSections();
+    });
+
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true,
+    });
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [pathname, children]);
+
+  const visibleNavItems = useMemo(() => {
+    return NAV_ITEMS.filter(
+      (item) => !item.sectionId || availableSections.includes(item.sectionId),
+    );
+  }, [availableSections]);
 
   return (
     <Box
@@ -81,7 +137,7 @@ export default function AppWrapper({ children }: Props) {
             </Typography>
 
             <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 1, alignItems: 'center' }}>
-              {NAV_ITEMS.map((item) => (
+              {visibleNavItems.map((item) => (
                 <Button key={item.label} component={Link} href={item.href} color="inherit">
                   {item.label}
                 </Button>
@@ -122,7 +178,7 @@ export default function AppWrapper({ children }: Props) {
       <Drawer anchor="right" open={mobileOpen} onClose={() => setMobileOpen(false)}>
         <Box sx={{ width: 280, pt: 2 }} role="presentation">
           <List>
-            {NAV_ITEMS.map((item) => (
+            {visibleNavItems.map((item) => (
               <ListItemButton
                 key={item.label}
                 component={Link}
