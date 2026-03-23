@@ -30,6 +30,7 @@ import {
   setVibratoWet,
 } from '../../lib/audio';
 import {
+  DEFAULT_OCTAVE_SHIFT_BY_INSTRUMENT,
   PLAYBACK_SETTINGS_DEFAULTS,
   type PlaybackSettings,
   type PlaybackSettingsChangeHandlers,
@@ -136,6 +137,11 @@ export default function usePlaybackSettings(): UsePlaybackSettingsResult {
     setFeedbackDelayWet(normalizedValue);
   }, []);
 
+  const handleInstrumentChange = useCallback((value: PlaybackSettings['instrument']) => {
+    setInstrument(value);
+    setOctaveShift(DEFAULT_OCTAVE_SHIFT_BY_INSTRUMENT[value]);
+  }, []);
+
   const handleEffectToggle = useCallback(
     (setState: (value: boolean) => void) => (value: boolean) => {
       setState(value);
@@ -233,7 +239,7 @@ export default function usePlaybackSettings(): UsePlaybackSettingsResult {
       onHumanizeChange: setHumanize,
       onGateChange: setGate,
       onInversionRegisterChange: setInversionRegister,
-      onInstrumentChange: setInstrument,
+      onInstrumentChange: handleInstrumentChange,
       onOctaveShiftChange: setOctaveShift,
       onReverbChange: handleReverbChange,
       onReverbEnabledChange: handleEffectToggle(setReverbEnabledState),
@@ -265,6 +271,7 @@ export default function usePlaybackSettings(): UsePlaybackSettingsResult {
       handleChorusChange,
       handleEffectToggle,
       handleFeedbackDelayChange,
+      handleInstrumentChange,
       handleReverbChange,
       handleRoomSizeChange,
     ],

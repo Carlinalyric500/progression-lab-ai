@@ -1,5 +1,10 @@
 import type { AudioInstrument, PlaybackRegister, PlaybackStyle } from '../../lib/audio';
 
+export const DEFAULT_OCTAVE_SHIFT_BY_INSTRUMENT: Record<AudioInstrument, number> = {
+  piano: 0,
+  rhodes: -1,
+};
+
 /**
  * Canonical playback settings used across home page state, dialogs, and session cache.
  */
@@ -75,7 +80,7 @@ export const PLAYBACK_SETTINGS_DEFAULTS: PlaybackSettings = {
   gate: 1,
   inversionRegister: 'off',
   instrument: 'rhodes',
-  octaveShift: 0,
+  octaveShift: DEFAULT_OCTAVE_SHIFT_BY_INSTRUMENT.rhodes,
   reverbEnabled: false,
   reverb: 0,
   chorusEnabled: false,
@@ -122,6 +127,11 @@ const clamp = (value: number, min: number, max: number): number =>
  */
 export const sanitizePlaybackSettings = (input?: Partial<PlaybackSettings>): PlaybackSettings => {
   const raw = { ...PLAYBACK_SETTINGS_DEFAULTS, ...(input ?? {}) };
+  const instrument = INSTRUMENT_OPTIONS.includes(raw.instrument) ? raw.instrument : 'rhodes';
+  const octaveShiftDefault =
+    input?.octaveShift === undefined
+      ? DEFAULT_OCTAVE_SHIFT_BY_INSTRUMENT[instrument]
+      : raw.octaveShift;
 
   return {
     playbackStyle: PLAYBACK_STYLE_OPTIONS.includes(raw.playbackStyle) ? raw.playbackStyle : 'strum',
@@ -135,8 +145,8 @@ export const sanitizePlaybackSettings = (input?: Partial<PlaybackSettings>): Pla
     inversionRegister: INVERSION_REGISTER_OPTIONS.includes(raw.inversionRegister)
       ? raw.inversionRegister
       : 'off',
-    instrument: INSTRUMENT_OPTIONS.includes(raw.instrument) ? raw.instrument : 'rhodes',
-    octaveShift: Math.round(clamp(raw.octaveShift, -3, 3)),
+    instrument,
+    octaveShift: Math.round(clamp(octaveShiftDefault, -3, 3)),
     reverbEnabled: Boolean(raw.reverbEnabled),
     reverb: clamp(raw.reverb, 0, 1),
     chorusEnabled: Boolean(raw.chorusEnabled),
