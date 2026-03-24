@@ -1,5 +1,4 @@
-import { useEffect, useRef, useState, useCallback } from 'react';
-import * as Tone from 'tone';
+import { useRef, useState, useCallback } from 'react';
 import { stopAllAudio } from '../../lib/audio';
 
 /**
@@ -15,43 +14,56 @@ import { stopAllAudio } from '../../lib/audio';
  */
 export function usePlaybackToggle() {
   const [playingId, setPlayingId] = useState<string | number | null>(null);
-  const userInitiatedStopRef = useRef(false);
+  const autoResetTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const handlePlayToggle = useCallback(
-    (id: string | number, playCallback: () => void) => {
-      if (playingId === id) {
-        // Currently playing this ID - user wants to stop it
-        userInitiatedStopRef.current = true;
-        stopAllAudio();
-        setPlayingId(null);
-      } else {
-        // Not playing or playing different ID - play this one
-        userInitiatedStopRef.current = false;
-        playCallback();
-        setPlayingId(id);
+  const clearAutoResetTimeout = useCallback(() => {
+    if (autoResetTimeoutRef.current) {
+      clearTimeout(autoResetTimeoutRef.current);
+      autoResetTimeoutRef.current = null;
+    }
+  }, []);
+
+  const scheduleAutoReset = useCallback(
+    (id: string | number, autoResetAfterMs?: number) => {
+      clearAutoResetTimeout();
+
+      if (!autoResetAfterMs || autoResetAfterMs <= 0) {
+        return;
       }
+
+      autoResetTimeoutRef.current = setTimeout(() => {
+        setPlayingId((current) => (current === id ? null : current));
+        autoResetTimeoutRef.current = null;
+      }, autoResetAfterMs);
     },
-    [playingId],
+    [clearAutoResetTimeout],
   );
 
-  // Listen for when Tone.js Transport stops (audio naturally finishes playing)
-  useEffect(() => {
-    if (!playingId) return;
+  const handlePlayToggle = useCallback(
+    (id: string | number, playCallback: () => void, autoResetAfterMs?: number) => {
+      if (playingId === id) {
+        stopAllAudio();
+        clearAutoResetTimeout();
+        setPlayingId(null);
+        return;
+      }
 
-    const handleTransportStop = () => {
-      // Only reset state if this wasn't a user-initiated stop
-      if (!userInitiatedStopRef.current) {
+      if (playingId !== null) {
+        stopAllAudio();
+      }
+
+      setPlayingId(id);
+
+      try {
+        playCallback();
+        scheduleAutoReset(id, autoResetAfterMs);
+      } catch {
+        clearAutoResetTimeout();
         setPlayingId(null);
       }
-      userInitiatedStopRef.current = false;
-    };
-
-    Tone.Transport.on('stop', handleTransportStop);
-
-    return () => {
-      Tone.Transport.off('stop', handleTransportStop);
-    };
-  }, [playingId]);
+    },
+    [clearAutoResetTimeout, playingId, scheduleAutoReset],
+  );
 
   return {
     isPlaying: playingId !== null,
@@ -59,3 +71,17 @@ export function usePlaybackToggle() {
     handlePlayToggle,
   };
 }
+
+const CHORD_BEATS = 2;
+const PLAYBACK_FINISH_BUFFER_MS = 300;
+
+export const getProgressionAutoResetMs = (voicingCount: number, tempoBpm: number): number => {
+  if (voicingCount <= 0) {
+    return 0;
+  }
+
+  const safeTempo = Number.isFinite(tempoBpm) && tempoBpm > 0 ? tempoBpm : 100;
+  const chordDurationSeconds = (60 / safeTempo) * CHORD_BEATS;
+
+  return Math.ceil(voicingCount * chordDurationSeconds * 1000 + PLAYBACK_FINISH_BUFFER_MS);
+};

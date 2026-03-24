@@ -1,7 +1,7 @@
 import type { AudioInstrument, PlaybackRegister, PlaybackStyle } from '../../lib/audio';
 import type { PadPattern, TimeSignature } from '../../lib/audio';
 import { PAD_PATTERN_LABELS, TIME_SIGNATURE_LABELS } from '../../lib/audio';
-import type { SxProps, Theme } from '@mui/material/styles';
+import { alpha, type SxProps, type Theme } from '@mui/material/styles';
 import type { PlaybackSettings, PlaybackSettingsChangeHandlers } from './playbackSettingsModel';
 
 export type EffectId = 'reverb' | 'chorus' | 'tremolo' | 'feedbackDelay' | 'vibrato' | 'phaser';
@@ -118,8 +118,8 @@ export const formatGateLabel = (gate: number): string => {
 
 export const getSettingsTriggerButtonSx = (position: SettingsButtonPosition): SxProps<Theme> => ({
   borderWidth: 1.5,
-  color: '#60a5fa',
-  borderColor: 'rgba(96, 165, 250, 0.9)',
+  color: (theme) => theme.palette.primary.main,
+  borderColor: (theme) => alpha(theme.palette.primary.main, 0.9),
   backgroundColor:
     position === 'inline'
       ? (theme) =>
@@ -130,8 +130,8 @@ export const getSettingsTriggerButtonSx = (position: SettingsButtonPosition): Sx
   backdropFilter: position === 'inline' ? 'blur(10px)' : 'none',
   WebkitBackdropFilter: position === 'inline' ? 'blur(10px)' : 'none',
   '&:hover': {
-    borderColor: 'rgba(147, 197, 253, 1)',
-    backgroundColor: 'rgba(96, 165, 250, 0.08)',
+    borderColor: (theme) => theme.palette.primary.main,
+    backgroundColor: (theme) => alpha(theme.palette.primary.main, 0.08),
     borderWidth: 1.5,
   },
 });

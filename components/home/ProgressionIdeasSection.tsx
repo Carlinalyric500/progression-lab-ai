@@ -1,8 +1,6 @@
 'use client';
 
-import { Box, Button, Divider, IconButton, Stack, Typography } from '@mui/material';
-import PlayArrowIcon from '@mui/icons-material/PlayArrow';
-import StopIcon from '@mui/icons-material/Stop';
+import { Box, Button, Divider, Stack, Typography } from '@mui/material';
 
 import GuitarChordDiagram from '../GuitarChordDiagram';
 import PianoChordDiagram from '../PianoChordDiagram';
@@ -18,8 +16,9 @@ import {
 } from '../../lib/guitarDiagramUtils';
 import { downloadChordMidi, downloadProgressionMidi } from '../../lib/midi';
 import type { ChordItem, ChordSuggestionResponse, GuitarVoicing } from '../../lib/types';
+import PlaybackToggleButton from './PlaybackToggleButton';
 import type { ProgressionDiagramInstrument } from './types';
-import { usePlaybackToggle } from './usePlaybackToggle';
+import { getProgressionAutoResetMs, usePlaybackToggle } from './usePlaybackToggle';
 
 /**
  * Props for progression idea cards and interaction callbacks.
@@ -195,36 +194,34 @@ export default function ProgressionIdeasSection({
               {idea.pianoVoicings.length > 0 ? (
                 <Stack spacing={1}>
                   <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap">
-                    <IconButton
-                      title={playingId === idea.label ? 'Stop' : 'Play'}
+                    <PlaybackToggleButton
+                      playTitle="Play"
+                      stopTitle="Stop"
+                      isPlaying={playingId === idea.label}
                       onClick={() =>
-                        handlePlayToggle(idea.label, () => {
-                          playProgression(
-                            idea.pianoVoicings,
-                            tempoBpm,
-                            playbackStyle,
-                            attack,
-                            decay,
-                            {
-                              humanize,
-                              gate,
-                              inversionRegister,
-                              instrument,
-                              octaveShift,
-                              padPattern,
-                            },
-                          );
-                        })
+                        handlePlayToggle(
+                          idea.label,
+                          () => {
+                            playProgression(
+                              idea.pianoVoicings,
+                              tempoBpm,
+                              playbackStyle,
+                              attack,
+                              decay,
+                              {
+                                humanize,
+                                gate,
+                                inversionRegister,
+                                instrument,
+                                octaveShift,
+                                padPattern,
+                              },
+                            );
+                          },
+                          getProgressionAutoResetMs(idea.pianoVoicings.length, tempoBpm),
+                        )
                       }
-                      size="small"
-                      sx={{
-                        border: '1px solid',
-                        borderColor: 'divider',
-                        color: 'inherit',
-                      }}
-                    >
-                      {playingId === idea.label ? <StopIcon /> : <PlayArrowIcon />}
-                    </IconButton>
+                    />
                     <MidiDownloadButton
                       variant="outlined"
                       size="small"

@@ -1,8 +1,6 @@
 'use client';
 
-import { Box, IconButton, Stack, Typography } from '@mui/material';
-import PlayArrowIcon from '@mui/icons-material/PlayArrow';
-import StopIcon from '@mui/icons-material/Stop';
+import { Box, Stack, Typography } from '@mui/material';
 
 import { playProgression } from '../../lib/audio';
 import type { AudioInstrument, PlaybackRegister, PlaybackStyle, PadPattern } from '../../lib/audio';
@@ -12,7 +10,8 @@ import Card from '../ui/Card';
 import MidiDownloadButton from '../ui/MidiDownloadButton';
 import PdfDownloadButton from '../ui/PdfDownloadButton';
 import type { ChordSuggestionResponse } from '../../lib/types';
-import { usePlaybackToggle } from './usePlaybackToggle';
+import PlaybackToggleButton from './PlaybackToggleButton';
+import { getProgressionAutoResetMs, usePlaybackToggle } from './usePlaybackToggle';
 
 /**
  * Props for displaying arrangement/structure suggestions.
@@ -181,33 +180,31 @@ export default function StructureSuggestionsSection({
             Structure suggestions
           </Typography>
           <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap">
-            <IconButton
-              title={playingId === 'arrangement' ? 'Stop' : 'Play arrangement'}
+            <PlaybackToggleButton
+              playTitle="Play arrangement"
+              stopTitle="Stop"
+              isPlaying={playingId === 'arrangement'}
               disabled={arrangementVoicings.length === 0}
               onClick={() => {
-                handlePlayToggle('arrangement', () => {
-                  playProgression(arrangementVoicings, tempoBpm, playbackStyle, attack, decay, {
-                    humanize,
-                    gate,
-                    inversionRegister,
-                    instrument,
-                    octaveShift,
-                    padPattern,
-                    timeSignature,
-                    metronomeEnabled,
-                    metronomeVolume,
-                  });
-                });
+                handlePlayToggle(
+                  'arrangement',
+                  () => {
+                    playProgression(arrangementVoicings, tempoBpm, playbackStyle, attack, decay, {
+                      humanize,
+                      gate,
+                      inversionRegister,
+                      instrument,
+                      octaveShift,
+                      padPattern,
+                      timeSignature,
+                      metronomeEnabled,
+                      metronomeVolume,
+                    });
+                  },
+                  getProgressionAutoResetMs(arrangementVoicings.length, tempoBpm),
+                );
               }}
-              size="small"
-              sx={{
-                border: '1px solid',
-                borderColor: 'divider',
-                color: 'inherit',
-              }}
-            >
-              {playingId === 'arrangement' ? <StopIcon /> : <PlayArrowIcon />}
-            </IconButton>
+            />
             <PdfDownloadButton
               variant="outlined"
               size="small"
@@ -262,33 +259,31 @@ export default function StructureSuggestionsSection({
                 ) : null}
 
                 <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap">
-                  <IconButton
-                    title={playingId === `section-${index}` ? 'Stop' : 'Play section'}
+                  <PlaybackToggleButton
+                    playTitle="Play section"
+                    stopTitle="Stop"
+                    isPlaying={playingId === `section-${index}`}
                     disabled={sectionVoicings.length === 0}
                     onClick={() => {
-                      handlePlayToggle(`section-${index}`, () => {
-                        playProgression(sectionVoicings, tempoBpm, playbackStyle, attack, decay, {
-                          humanize,
-                          gate,
-                          inversionRegister,
-                          instrument,
-                          octaveShift,
-                          padPattern,
-                          timeSignature,
-                          metronomeEnabled,
-                          metronomeVolume,
-                        });
-                      });
+                      handlePlayToggle(
+                        `section-${index}`,
+                        () => {
+                          playProgression(sectionVoicings, tempoBpm, playbackStyle, attack, decay, {
+                            humanize,
+                            gate,
+                            inversionRegister,
+                            instrument,
+                            octaveShift,
+                            padPattern,
+                            timeSignature,
+                            metronomeEnabled,
+                            metronomeVolume,
+                          });
+                        },
+                        getProgressionAutoResetMs(sectionVoicings.length, tempoBpm),
+                      );
                     }}
-                    size="small"
-                    sx={{
-                      border: '1px solid',
-                      borderColor: 'divider',
-                      color: 'inherit',
-                    }}
-                  >
-                    {playingId === `section-${index}` ? <StopIcon /> : <PlayArrowIcon />}
-                  </IconButton>
+                  />
                   <PdfDownloadButton
                     variant="outlined"
                     size="small"
