@@ -7,6 +7,7 @@ import { playProgression, stopAllAudio } from '../../lib/audio';
 import type { AudioInstrument, PlaybackRegister, PlaybackStyle } from '../../lib/audio';
 import type { PdfChartOptions } from '../../lib/pdf';
 import Card from '../ui/Card';
+import MidiDownloadButton from '../ui/MidiDownloadButton';
 import PdfDownloadButton from '../ui/PdfDownloadButton';
 import type { ChordSuggestionResponse } from '../../lib/types';
 
@@ -195,8 +196,15 @@ export default function StructureSuggestionsSection({
             <PdfDownloadButton
               variant="outlined"
               size="small"
-              label="Export PDF"
+              label="PDF"
               chartOptions={arrangementChartOptions}
+            />
+            <MidiDownloadButton
+              variant="outlined"
+              size="small"
+              progressionName="Arrangement"
+              voicings={arrangementVoicings}
+              tempoBpm={tempoBpm}
             />
           </Stack>
         </Stack>
@@ -265,6 +273,13 @@ export default function StructureSuggestionsSection({
                     variant="outlined"
                     size="small"
                     chartOptions={sectionChartOptions}
+                  />
+                  <MidiDownloadButton
+                    variant="outlined"
+                    size="small"
+                    progressionName={`${toTitleCase(section.section)} (${section.bars} bars)`}
+                    voicings={sectionVoicings}
+                    tempoBpm={tempoBpm}
                   />
                 </Stack>
               </Stack>
