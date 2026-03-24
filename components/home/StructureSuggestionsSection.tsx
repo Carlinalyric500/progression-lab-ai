@@ -196,7 +196,7 @@ export default function StructureSuggestionsSection({
             <PdfDownloadButton
               variant="outlined"
               size="small"
-              label="Export PDF"
+              label="PDF"
               chartOptions={arrangementChartOptions}
             />
             <MidiDownloadButton

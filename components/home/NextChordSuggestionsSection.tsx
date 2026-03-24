@@ -62,7 +62,7 @@ export default function NextChordSuggestionsSection({
             <PdfDownloadButton
               variant="outlined"
               size="small"
-              label="Export PDF"
+              label="PDF"
               chartOptions={{
                 title: 'Next Chord Suggestions',
                 scale,
