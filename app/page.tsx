@@ -153,6 +153,7 @@ export default function HomePage() {
     inversionRegister,
     instrument,
     octaveShift,
+    padPattern,
     timeSignature,
     metronomeEnabled,
     metronomeVolume,
@@ -534,6 +535,7 @@ export default function HomePage() {
           inversionRegister={inversionRegister}
           instrument={instrument}
           octaveShift={octaveShift}
+          padPattern={padPattern}
           scale={resolvedScale}
           resolvedGenreForSave={resolvedGenre}
           guitarVoicingByChord={guitarVoicingByChord}
@@ -558,6 +560,7 @@ export default function HomePage() {
           inversionRegister={inversionRegister}
           instrument={instrument}
           octaveShift={octaveShift}
+          padPattern={padPattern}
           scale={resolvedScale}
           genre={resolvedGenre}
           timeSignature={timeSignature}

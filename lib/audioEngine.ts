@@ -33,6 +33,7 @@ export type PlayProgressionOptions = {
   inversionRegister?: PlaybackRegister;
   instrument?: AudioInstrument;
   octaveShift?: number;
+  padPattern?: PadPattern;
   timeSignature?: TimeSignature;
   metronomeEnabled?: boolean;
   metronomeVolume?: number;

@@ -8,7 +8,7 @@ import Card from '../ui/Card';
 import MidiDownloadButton from '../ui/MidiDownloadButton';
 import PdfDownloadButton from '../ui/PdfDownloadButton';
 import { playChordVoicing, playProgression } from '../../lib/audio';
-import type { AudioInstrument, PlaybackRegister, PlaybackStyle } from '../../lib/audio';
+import type { AudioInstrument, PlaybackRegister, PlaybackStyle, PadPattern } from '../../lib/audio';
 import {
   getGuitarDiagramFromChord,
   getGuitarShapeTextFromDiagram,
@@ -34,6 +34,7 @@ type ProgressionIdeasSectionProps = {
   inversionRegister?: PlaybackRegister;
   instrument: AudioInstrument;
   octaveShift?: number;
+  padPattern?: PadPattern;
   showTitle?: boolean;
   resolvedGenreForSave: string;
   scale?: string;
@@ -126,6 +127,7 @@ export default function ProgressionIdeasSection({
   inversionRegister,
   instrument,
   octaveShift = 0,
+  padPattern = 'single',
   showTitle = true,
   resolvedGenreForSave,
   scale,
@@ -204,6 +206,7 @@ export default function ProgressionIdeasSection({
                             inversionRegister,
                             instrument,
                             octaveShift,
+                            padPattern,
                           },
                         )
                       }

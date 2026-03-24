@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Box, Button, Stack, Typography } from '@mui/material';
 
 import { playProgression, stopAllAudio } from '../../lib/audio';
-import type { AudioInstrument, PlaybackRegister, PlaybackStyle } from '../../lib/audio';
+import type { AudioInstrument, PlaybackRegister, PlaybackStyle, PadPattern } from '../../lib/audio';
 import type { TimeSignature } from '../../lib/audio';
 import type { PdfChartOptions } from '../../lib/pdf';
 import Card from '../ui/Card';
@@ -27,6 +27,7 @@ type StructureSuggestionsSectionProps = {
   inversionRegister?: PlaybackRegister;
   instrument: AudioInstrument;
   octaveShift?: number;
+  padPattern?: PadPattern;
   timeSignature?: TimeSignature;
   metronomeEnabled?: boolean;
   metronomeVolume?: number;
@@ -140,6 +141,7 @@ export default function StructureSuggestionsSection({
   inversionRegister,
   instrument,
   octaveShift = 0,
+  padPattern = 'single',
   timeSignature,
   metronomeEnabled,
   metronomeVolume,
@@ -193,6 +195,7 @@ export default function StructureSuggestionsSection({
                     inversionRegister,
                     instrument,
                     octaveShift,
+                    padPattern,
                     timeSignature,
                     metronomeEnabled,
                     metronomeVolume,
@@ -272,6 +275,7 @@ export default function StructureSuggestionsSection({
                           inversionRegister,
                           instrument,
                           octaveShift,
+                          padPattern,
                           timeSignature,
                           metronomeEnabled,
                           metronomeVolume,
