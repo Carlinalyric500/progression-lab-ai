@@ -9,6 +9,7 @@ import MidiDownloadButton from '../ui/MidiDownloadButton';
 import PdfDownloadButton from '../ui/PdfDownloadButton';
 import { playChordVoicing, playProgression } from '../../lib/audio';
 import type { AudioInstrument, PlaybackRegister, PlaybackStyle, PadPattern } from '../../lib/audio';
+import type { TimeSignature } from '../../lib/audio';
 import {
   getGuitarDiagramFromChord,
   getGuitarShapeTextFromDiagram,
@@ -37,6 +38,9 @@ type ProgressionIdeasSectionProps = {
   instrument: AudioInstrument;
   octaveShift?: number;
   padPattern?: PadPattern;
+  timeSignature?: TimeSignature;
+  metronomeEnabled?: boolean;
+  metronomeVolume?: number;
   showTitle?: boolean;
   resolvedGenreForSave: string;
   scale?: string;
@@ -130,6 +134,9 @@ export default function ProgressionIdeasSection({
   instrument,
   octaveShift = 0,
   padPattern = 'single',
+  timeSignature,
+  metronomeEnabled,
+  metronomeVolume,
   showTitle = true,
   resolvedGenreForSave,
   scale,
@@ -195,8 +202,6 @@ export default function ProgressionIdeasSection({
                 <Stack spacing={1}>
                   <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap">
                     <PlaybackToggleButton
-                      playTitle="Play"
-                      stopTitle="Stop"
                       isPlaying={playingId === idea.label}
                       onClick={() =>
                         handlePlayToggle(
@@ -215,6 +220,9 @@ export default function ProgressionIdeasSection({
                                 instrument,
                                 octaveShift,
                                 padPattern,
+                                timeSignature,
+                                metronomeEnabled,
+                                metronomeVolume,
                               },
                             );
                           },

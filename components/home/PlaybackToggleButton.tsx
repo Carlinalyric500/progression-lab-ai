@@ -35,18 +35,20 @@ export default function PlaybackToggleButton({
   onClick,
   disabled = false,
   label,
-  playTitle = 'Play',
-  stopTitle = 'Stop',
+  playTitle,
+  stopTitle,
 }: PlaybackToggleButtonProps) {
   const icon = isPlaying ? <StopIcon /> : <PlayArrowIcon />;
-  const title = isPlaying ? stopTitle : playTitle;
+  const stateTitle = isPlaying ? stopTitle : playTitle;
+  const shouldRenderTextButton = Boolean(label || stateTitle);
+  const resolvedLabel = stateTitle ?? label;
 
-  if (label) {
+  if (shouldRenderTextButton) {
     return (
       <Button
         variant="outlined"
         size="small"
-        title={title}
+        title={stateTitle}
         onClick={onClick}
         disabled={disabled}
         startIcon={icon}
@@ -56,17 +58,18 @@ export default function PlaybackToggleButton({
           fontWeight: 600,
         })}
       >
-        {label}
+        {resolvedLabel}
       </Button>
     );
   }
 
   return (
     <IconButton
-      title={title}
+      aria-label={stateTitle ?? (isPlaying ? 'Stop playback' : 'Play playback')}
+      size="small"
+      title={stateTitle}
       onClick={onClick}
       disabled={disabled}
-      size="small"
       sx={(theme) => ({
         ...getPlayToggleButtonSx(theme),
         p: 0.625,

@@ -182,7 +182,7 @@ export default function StructureSuggestionsSection({
           <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap">
             <PlaybackToggleButton
               playTitle="Play arrangement"
-              stopTitle="Stop"
+              stopTitle="Stop arrangement"
               isPlaying={playingId === 'arrangement'}
               disabled={arrangementVoicings.length === 0}
               onClick={() => {

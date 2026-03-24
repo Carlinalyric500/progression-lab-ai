@@ -536,6 +536,9 @@ export default function HomePage() {
           instrument={instrument}
           octaveShift={octaveShift}
           padPattern={padPattern}
+          timeSignature={timeSignature}
+          metronomeEnabled={metronomeEnabled}
+          metronomeVolume={metronomeVolume}
           scale={resolvedScale}
           resolvedGenreForSave={resolvedGenre}
           guitarVoicingByChord={guitarVoicingByChord}
