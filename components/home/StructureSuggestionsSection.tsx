@@ -1,6 +1,8 @@
 'use client';
 
-import { Box, Button, Stack, Typography } from '@mui/material';
+import { Box, IconButton, Stack, Typography } from '@mui/material';
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import StopIcon from '@mui/icons-material/Stop';
 
 import { playProgression } from '../../lib/audio';
 import type { AudioInstrument, PlaybackRegister, PlaybackStyle, PadPattern } from '../../lib/audio';
@@ -179,9 +181,8 @@ export default function StructureSuggestionsSection({
             Structure suggestions
           </Typography>
           <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap">
-            <Button
-              variant="contained"
-              size="small"
+            <IconButton
+              title={playingId === 'arrangement' ? 'Stop' : 'Play arrangement'}
               disabled={arrangementVoicings.length === 0}
               onClick={() => {
                 handlePlayToggle('arrangement', () => {
@@ -198,9 +199,11 @@ export default function StructureSuggestionsSection({
                   });
                 });
               }}
+              color="primary"
+              sx={{ bgcolor: playingId === 'arrangement' ? 'action.selected' : 'transparent' }}
             >
-              {playingId === 'arrangement' ? 'Stop' : 'Play arrangement'}
-            </Button>
+              {playingId === 'arrangement' ? <StopIcon /> : <PlayArrowIcon />}
+            </IconButton>
             <PdfDownloadButton
               variant="outlined"
               size="small"
@@ -255,9 +258,8 @@ export default function StructureSuggestionsSection({
                 ) : null}
 
                 <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap">
-                  <Button
-                    variant="outlined"
-                    size="small"
+                  <IconButton
+                    title={playingId === `section-${index}` ? 'Stop' : 'Play section'}
                     disabled={sectionVoicings.length === 0}
                     onClick={() => {
                       handlePlayToggle(`section-${index}`, () => {
@@ -274,9 +276,13 @@ export default function StructureSuggestionsSection({
                         });
                       });
                     }}
+                    color="primary"
+                    sx={{
+                      bgcolor: playingId === `section-${index}` ? 'action.selected' : 'transparent',
+                    }}
                   >
-                    {playingId === `section-${index}` ? 'Stop' : 'Play section'}
-                  </Button>
+                    {playingId === `section-${index}` ? <StopIcon /> : <PlayArrowIcon />}
+                  </IconButton>
                   <PdfDownloadButton
                     variant="outlined"
                     size="small"

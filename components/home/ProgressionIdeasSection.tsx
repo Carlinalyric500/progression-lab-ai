@@ -1,6 +1,8 @@
 'use client';
 
-import { Box, Button, Divider, Stack, Typography } from '@mui/material';
+import { Box, Button, Divider, IconButton, Stack, Typography } from '@mui/material';
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import StopIcon from '@mui/icons-material/Stop';
 
 import GuitarChordDiagram from '../GuitarChordDiagram';
 import PianoChordDiagram from '../PianoChordDiagram';
@@ -193,9 +195,8 @@ export default function ProgressionIdeasSection({
               {idea.pianoVoicings.length > 0 ? (
                 <Stack spacing={1}>
                   <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap">
-                    <Button
-                      variant="contained"
-                      size="small"
+                    <IconButton
+                      title={playingId === idea.label ? 'Stop' : 'Play arrangement'}
                       onClick={() =>
                         handlePlayToggle(idea.label, () => {
                           playProgression(
@@ -215,9 +216,11 @@ export default function ProgressionIdeasSection({
                           );
                         })
                       }
+                      color="primary"
+                      sx={{ bgcolor: playingId === idea.label ? 'action.selected' : 'transparent' }}
                     >
-                      {playingId === idea.label ? 'Stop' : 'Play arrangement'}
-                    </Button>
+                      {playingId === idea.label ? <StopIcon /> : <PlayArrowIcon />}
+                    </IconButton>
                     <MidiDownloadButton
                       variant="outlined"
                       size="small"
