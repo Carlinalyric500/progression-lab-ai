@@ -11,7 +11,7 @@ import {
   Typography,
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
-import { alpha } from '@mui/material/styles';
+import { alpha, useTheme } from '@mui/material/styles';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { playChordPattern, stopAllAudio } from '../../lib/audio';
@@ -45,30 +45,28 @@ type GeneratedChordGridDialogProps = {
   chords: ChordGridEntry[];
 };
 
-const HAPPY_FALLBACK_BORDERS = ['#f97316', '#22d3ee', '#a3e635', '#f43f5e', '#f59e0b', '#60a5fa'];
-
 /**
  * Picks a deterministic border color from chord quality or chord-name hash.
  */
-function getChordBorderColor(chordName: string): string {
+function getChordBorderColor(chordName: string, suggestionBorders: readonly string[]): string {
   if (/sus/i.test(chordName)) {
-    return '#22d3ee';
+    return suggestionBorders[1] ?? suggestionBorders[0];
   }
 
   if (/(?:maj9|add9|\b9\b|\b7\b|11|13)/i.test(chordName)) {
-    return '#c084fc';
+    return suggestionBorders[5] ?? suggestionBorders[0];
   }
 
   if (/(?:^|[^A-Za-z])m(?!aj)|min/i.test(chordName)) {
-    return '#34d399';
+    return suggestionBorders[2] ?? suggestionBorders[0];
   }
 
   if (/dim|o/i.test(chordName)) {
-    return '#f87171';
+    return suggestionBorders[3] ?? suggestionBorders[0];
   }
 
   if (/aug|\+/i.test(chordName)) {
-    return '#f59e0b';
+    return suggestionBorders[4] ?? suggestionBorders[0];
   }
 
   let hash = 0;
@@ -76,7 +74,7 @@ function getChordBorderColor(chordName: string): string {
     hash = (hash * 31 + char.charCodeAt(0)) % 2147483647;
   }
 
-  return HAPPY_FALLBACK_BORDERS[Math.abs(hash) % HAPPY_FALLBACK_BORDERS.length];
+  return suggestionBorders[Math.abs(hash) % suggestionBorders.length] ?? suggestionBorders[0];
 }
 
 /**
@@ -91,6 +89,9 @@ export default function GeneratedChordGridDialog({
   onTempoBpmChange,
   chords,
 }: GeneratedChordGridDialogProps) {
+  const theme = useTheme();
+  const { appColors } = theme.palette;
+
   const {
     playbackStyle,
     attack,
@@ -113,12 +114,12 @@ export default function GeneratedChordGridDialog({
   const activePadTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
   const padStyles = {
     body: {
-      bg: 'linear-gradient(180deg, rgba(84, 84, 87, 0.97) 0%, rgba(44, 45, 49, 0.99) 100%)',
-      bgHover: 'linear-gradient(180deg, rgba(98, 98, 102, 0.98) 0%, rgba(52, 53, 58, 0.99) 100%)',
+      bg: appColors.surface.chordPadBodyGradient,
+      bgHover: appColors.surface.chordPadBodyGradientHover,
     },
     active: {
-      bg: 'linear-gradient(180deg, rgba(116, 117, 121, 0.99) 0%, rgba(63, 64, 69, 0.99) 100%)',
-      border: '#facc15',
+      bg: appColors.surface.chordPadActiveGradient,
+      border: appColors.accent.chordPadActiveBorder,
     },
   } as const;
 
@@ -241,9 +242,8 @@ export default function GeneratedChordGridDialog({
           paddingTop: 2,
           borderRadius: 2,
           color: 'common.white',
-          background:
-            'linear-gradient(160deg, rgba(95, 101, 109, 0.96) 0%, rgba(49, 54, 61, 0.98) 52%, rgba(32, 36, 42, 0.98) 100%)',
-          border: '1px solid rgba(190, 196, 204, 0.28)',
+          background: appColors.surface.chordPlaygroundDialogGradient,
+          border: `1px solid ${appColors.surface.chordPlaygroundDialogBorder}`,
         },
       }}
     >
@@ -254,7 +254,7 @@ export default function GeneratedChordGridDialog({
             aria-label="Close chord playground"
             onClick={onClose}
             size="small"
-            sx={{ color: '#cbd5e1' }}
+            sx={{ color: appColors.accent.chordCloseIcon }}
           >
             <CloseIcon fontSize="small" />
           </IconButton>
@@ -267,8 +267,8 @@ export default function GeneratedChordGridDialog({
               mb: 1.5,
               p: 1.5,
               borderRadius: 1.5,
-              bgcolor: 'rgba(23, 27, 32, 0.45)',
-              border: '1px solid rgba(188, 194, 201, 0.2)',
+              bgcolor: appColors.surface.translucentPanel,
+              border: `1px solid ${appColors.surface.translucentPanelBorder}`,
             }}
           >
             <Typography variant="subtitle2" sx={{ mb: 1 }}>
@@ -313,15 +313,18 @@ export default function GeneratedChordGridDialog({
             gap: { xs: 1, sm: 1.5 },
             p: { xs: 0.5, sm: 1 },
             borderRadius: 2,
-            bgcolor: 'rgba(23, 27, 32, 0.5)',
-            border: '1px solid rgba(188, 194, 201, 0.2)',
+            bgcolor: appColors.surface.chordPadGridBackground,
+            border: `1px solid ${appColors.surface.translucentPanelBorder}`,
           }}
         >
           {editableChords.map((entry) => {
             const isActive = activePadKey === entry.key;
             const isEditing = editingPadKey === entry.key;
-            const borderColor = getChordBorderColor(entry.chord);
-            const editingBorderColor = '#ff4d9d';
+            const borderColor = getChordBorderColor(
+              entry.chord,
+              appColors.accent.chordSuggestionBorders,
+            );
+            const editingBorderColor = appColors.accent.chordPadEditBorder;
 
             return (
               <Button
@@ -338,11 +341,11 @@ export default function GeneratedChordGridDialog({
                   textTransform: 'none',
                   color: 'common.white',
                   background: isEditing
-                    ? 'linear-gradient(180deg, rgba(255, 77, 157, 0.2) 0%, rgba(60, 38, 53, 0.95) 100%)'
+                    ? appColors.surface.chordPadEditGradient
                     : isActive
                       ? padStyles.active.bg
                       : padStyles.body.bg,
-                  backgroundColor: '#2e3136',
+                  backgroundColor: appColors.surface.chordPadDefaultBackground,
                   border: '2px solid',
                   borderColor: isEditing
                     ? editingBorderColor
@@ -350,24 +353,24 @@ export default function GeneratedChordGridDialog({
                       ? padStyles.active.border
                       : borderColor,
                   boxShadow: isEditing
-                    ? '0 0 0 2px rgba(255, 77, 157, 0.45), 0 8px 0 rgba(20, 23, 28, 0.82)'
+                    ? `0 0 0 2px ${appColors.surface.chordPadEditGlow}, 0 8px 0 ${appColors.surface.chordPadShadowRest}`
                     : isActive
-                      ? '0 3px 0 rgba(20, 23, 28, 0.92)'
-                      : '0 8px 0 rgba(20, 23, 28, 0.82)',
+                      ? `0 3px 0 ${appColors.surface.chordPadShadowPressed}`
+                      : `0 8px 0 ${appColors.surface.chordPadShadowRest}`,
                   transform: isActive ? 'translateY(5px)' : 'translateY(0)',
                   transition:
                     'transform 90ms ease, box-shadow 90ms ease, background 120ms, border-color 120ms',
                   '&:hover': {
                     background: isEditing
-                      ? 'linear-gradient(180deg, rgba(255, 77, 157, 0.26) 0%, rgba(68, 42, 60, 0.97) 100%)'
+                      ? appColors.surface.chordPadEditGradientHover
                       : isActive
                         ? padStyles.active.bg
                         : padStyles.body.bgHover,
                     boxShadow: isEditing
-                      ? '0 0 0 2px rgba(255, 77, 157, 0.6), 0 8px 0 rgba(20, 23, 28, 0.82)'
+                      ? `0 0 0 2px ${appColors.surface.chordPadEditGlowHover}, 0 8px 0 ${appColors.surface.chordPadShadowRest}`
                       : isActive
-                        ? '0 3px 0 rgba(20, 23, 28, 0.92)'
-                        : '0 8px 0 rgba(20, 23, 28, 0.82)',
+                        ? `0 3px 0 ${appColors.surface.chordPadShadowPressed}`
+                        : `0 8px 0 ${appColors.surface.chordPadShadowRest}`,
                     borderColor: isEditing
                       ? editingBorderColor
                       : isActive
@@ -377,11 +380,11 @@ export default function GeneratedChordGridDialog({
                   '&:active': {
                     transform: 'translateY(5px)',
                     background: isEditing
-                      ? 'linear-gradient(180deg, rgba(255, 77, 157, 0.3) 0%, rgba(72, 44, 64, 0.98) 100%)'
+                      ? appColors.surface.chordPadEditGradientActive
                       : isActive
                         ? padStyles.active.bg
                         : padStyles.body.bgHover,
-                    boxShadow: '0 3px 0 rgba(20, 23, 28, 0.92)',
+                    boxShadow: `0 3px 0 ${appColors.surface.chordPadShadowPressed}`,
                   },
                 }}
               >

@@ -4,6 +4,7 @@ import { Suspense, lazy, useCallback, useEffect, useMemo, useRef, useState } fro
 import { useForm } from 'react-hook-form';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import GridViewIcon from '@mui/icons-material/GridView';
+import { alpha } from '@mui/material/styles';
 import {
   Accordion,
   AccordionDetails,
@@ -660,16 +661,16 @@ export default function HomePage() {
                           onClick={() => setIsGeneratedChordGridOpen(true)}
                           sx={{
                             borderWidth: 1.5,
-                            color: '#60a5fa',
-                            borderColor: 'rgba(96, 165, 250, 0.9)',
+                            color: (theme) => theme.palette.primary.main,
+                            borderColor: (theme) => alpha(theme.palette.primary.main, 0.9),
                             backgroundColor: 'transparent',
                             textTransform: 'none',
                             fontWeight: 600,
                             backdropFilter: 'blur(10px)',
                             WebkitBackdropFilter: 'blur(10px)',
                             '&:hover': {
-                              borderColor: 'rgba(147, 197, 253, 1)',
-                              backgroundColor: 'rgba(96, 165, 250, 0.08)',
+                              borderColor: (theme) => theme.palette.primary.main,
+                              backgroundColor: (theme) => alpha(theme.palette.primary.main, 0.08),
                               borderWidth: 1.5,
                             },
                           }}

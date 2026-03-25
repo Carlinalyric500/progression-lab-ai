@@ -33,8 +33,8 @@ export default function OpenGraphImage() {
             borderRadius: '999px',
             fontSize: 28,
             fontWeight: 700,
-            background: 'rgba(255,255,255,0.65)',
-            border: '1px solid rgba(15,23,42,0.15)',
+            background: '#FFFFFFA6',
+            border: '1px solid #0F172A26',
           }}
         >
           Progression Lab AI

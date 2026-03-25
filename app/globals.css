@@ -2,13 +2,29 @@
     box-sizing: border-box;
 }
 
+:root {
+    --app-font-family: Arial, Helvetica, sans-serif;
+    --app-bg-default: #0f1115;
+    --app-text-primary: #f3f4f6;
+    --app-text-muted: #c0c7d1;
+    --app-panel-bg: #171a21;
+    --app-panel-border: #2a3040;
+    --app-input-bg: #0f1115;
+    --app-input-border: #394152;
+    --app-primary: #6d7cff;
+    --app-danger: #ff8b8b;
+    --app-card-bg: #12161d;
+    --app-card-border: #2d3444;
+    --app-surface-muted: #0f1319;
+}
+
 html,
 body {
     margin: 0;
     padding: 0;
-    background: #0f1115;
-    color: #f3f4f6;
-    font-family: Arial, Helvetica, sans-serif;
+    background: var(--app-bg-default);
+    color: var(--app-text-primary);
+    font-family: var(--app-font-family);
 }
 
 body {
@@ -37,14 +53,14 @@ button {
 }
 
 .hero p {
-    color: #c0c7d1;
+    color: var(--app-text-muted);
     max-width: 760px;
     line-height: 1.5;
 }
 
 .panel {
-    background: #171a21;
-    border: 1px solid #2a3040;
+    background: var(--app-panel-bg);
+    border: 1px solid var(--app-panel-border);
     border-radius: 4px;
     padding: 20px;
     margin-bottom: 20px;
@@ -66,16 +82,16 @@ label {
 
 input,
 select {
-    background: #0f1115;
-    color: #f3f4f6;
-    border: 1px solid #394152;
+    background: var(--app-input-bg);
+    color: var(--app-text-primary);
+    border: 1px solid var(--app-input-border);
     border-radius: 4px;
     padding: 10px 12px;
 }
 
 .primary-button {
-    background: #6d7cff;
-    color: white;
+    background: var(--app-primary);
+    color: var(--app-text-primary);
     border: 0;
     border-radius: 4px;
     padding: 12px 18px;
@@ -88,7 +104,7 @@ select {
 }
 
 .error-text {
-    color: #ff8b8b;
+    color: var(--app-danger);
     margin-top: 12px;
 }
 
@@ -98,8 +114,8 @@ select {
 }
 
 .card {
-    border: 1px solid #2d3444;
-    background: #12161d;
+    border: 1px solid var(--app-card-border);
+    background: var(--app-card-bg);
     border-radius: 4px;
     padding: 16px;
 }
@@ -118,10 +134,10 @@ select {
 .diagram-card {
     min-width: 220px;
     flex: 1;
-    border: 1px solid #2d3444;
+    border: 1px solid var(--app-card-border);
     border-radius: 4px;
     padding: 12px;
-    background: #0f1319;
+    background: var(--app-surface-muted);
 }
 
 .fret-grid {
@@ -132,7 +148,7 @@ select {
 }
 
 .fret-cell {
-    border: 1px solid #3b4254;
+    border: 1px solid var(--app-input-border);
     border-radius: 4px;
     padding: 10px;
     text-align: center;
@@ -146,7 +162,7 @@ select {
 }
 
 .key {
-    border: 1px solid #3b4254;
+    border: 1px solid var(--app-input-border);
     border-radius: 4px;
     padding: 12px 4px;
     text-align: center;
@@ -154,9 +170,9 @@ select {
 }
 
 .active-key {
-    background: #6d7cff;
-    color: white;
-    border-color: #6d7cff;
+    background: var(--app-primary);
+    color: var(--app-text-primary);
+    border-color: var(--app-primary);
 }
 
 .progression-line {
@@ -165,5 +181,5 @@ select {
 }
 
 .muted {
-    color: #a0a8b8;
+    color: var(--app-text-muted);
 }

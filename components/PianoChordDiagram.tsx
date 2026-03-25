@@ -1,6 +1,7 @@
 'use client';
 
 import { Box } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import { useEffect, useRef } from 'react';
 import { Instrument } from 'piano-chart';
 
@@ -11,6 +12,7 @@ type Props = {
 
 export default function PianoChordDiagram({ leftHand, rightHand }: Props) {
   const ref = useRef<HTMLDivElement | null>(null);
+  const theme = useTheme();
 
   useEffect(() => {
     if (!ref.current) return;
@@ -22,7 +24,7 @@ export default function PianoChordDiagram({ leftHand, rightHand }: Props) {
       endOctave: 6,
       showNoteNames: 'always',
       keyPressStyle: 'vivid',
-      vividKeyPressColor: '#60a5fa',
+      vividKeyPressColor: theme.palette.primary.main,
     });
 
     piano.create();
@@ -34,7 +36,7 @@ export default function PianoChordDiagram({ leftHand, rightHand }: Props) {
     return () => {
       piano.destroy();
     };
-  }, [leftHand, rightHand]);
+  }, [leftHand, rightHand, theme.palette.primary.main]);
 
   return (
     <Box
