@@ -1,297 +1,324 @@
 # ProgressionLab
 
-ProgressionLab is an AI-assisted harmony and songwriting workspace built with Next.js App Router. It generates chord suggestions and progression ideas from your inputs, provides playable piano/guitar voicings, and supports account-based saving, filtering, and sharing of progressions.
+> An AI-assisted harmony and songwriting workspace — generate chord progressions, hear them instantly, and share them with the world.
 
-## Current Product Capabilities
+[![Storybook](https://img.shields.io/badge/Storybook-FF4785?style=flat&logo=storybook&logoColor=white)](https://progressionlab-storybook.vercel.app)
+[![Next.js](https://img.shields.io/badge/Next.js_15-black?style=flat&logo=next.js)](https://nextjs.org)
+[![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=flat&logo=typescript&logoColor=white)](https://www.typescriptlang.org)
+[![MUI](https://img.shields.io/badge/MUI_v7-007FFF?style=flat&logo=mui&logoColor=white)](https://mui.com)
 
-- Generator form with react-hook-form validation
-- Multi-chip autocomplete inputs for seed chords and mood
-- Optional style reference autocomplete to steer harmonic language
-- Randomize Inputs action for quick idea generation
-	- Random seed chord count: 1 to 7
-	- Random mood tag count: 1 to 7
-	- Random mode, genre, instrument, and adventurousness
-- AI-generated output sections:
-	- Next chord suggestions
-	- Progression ideas
-	- Structure suggestions
-- Playable voicings:
-	- Play single chord voicings
-	- Play full progression voicings
-	- Stop currently playing audio before new playback starts
-	- Global BPM-driven playback timing
-	- Piano sampler playback via Tone.js Salamander samples
-	- Slight strum timing for more humanized chord playback
-- Visual diagrams:
-	- Piano chord diagrams
-	- Guitar chord diagrams (theme-aware in light/dark mode)
-- Authentication:
-	- Register, login, logout, session-based auth
-- Progression persistence:
-	- Save progressions with chords, voicings, feel, scale, genre, notes, tags, and visibility
-	- Authenticated "My Progressions" page with filters and chip-based autocomplete
-	- Public progressions browser accessible from nav bar (no login required)
-	- Clear Filters action
-	- Per-card delete loading state
-- Sharing:
-	- Public share links
-	- Public progression browsing with tag/key filters
-- Diagram instrument selector:
-	- Sticky theme-aware selector for piano/guitar diagram modes
-	- Semi-transparent frosted-glass background with gradient selected state
-	- Smooth scroll position restoration when switching diagrams
-	- Available in both generator and loaded progression views
-- MIDI export:
-	- Download single chord voicings as .mid
-	- Download full progression voicings as .mid
-	- Generator BPM is applied to both playback and MIDI export
-	- Reusable icon-based MIDI action button across sections
-- Link preview/metadata:
-	- Open Graph and Twitter image routes for richer link previews in sharing apps
-- Footer links:
-	- Site-wide footer with icon links to GitHub repository and LinkedIn profile
-- Access control:
-	- Unauthenticated users can browse public progressions
-	- In-page "My Progressions" button routes unauth users to registration flow
-	- Pre-populated register mode with contextual prompt
-- Restore flow:
-	- Open saved/shared progression back into generator with form values restored
+---
+
+## Overview
+
+ProgressionLab turns harmonic intent into playable music. Describe a mood, a style reference, a mode — and the AI returns chord suggestions, full progression ideas, and structure recommendations, each with piano and guitar voicings ready to play or export.
+
+---
+
+## Features
+
+### Generator
+
+- Structured input form: seed chords, mood tags, mode, genre, style reference, and adventurousness level
+- **Randomize** action generates a full set of varied inputs in one click (1–7 seed chords and mood tags)
+- AI returns three output sections simultaneously:
+  - **Next Chord Suggestions** — individual chord recommendations with roman numeral, tension level, confidence score, and a voicing hint
+  - **Progression Ideas** — complete chord sequences with a descriptive feel and performance tip
+  - **Structure Suggestions** — song section layout (verse/chorus/bridge) mapped to bar counts and harmonic ideas
+
+### Playback
+
+- BPM-controlled playback for individual chords and full progressions
+- Piano sampler powered by Tone.js with Salamander grand piano samples
+- Humanized strum timing for a more natural chord attack
+- Playback is gated — starting a new chord stops any currently playing audio
+
+### Visual Diagrams
+
+- **Piano chord diagrams** rendered inline via `piano-chart`
+- **Guitar chord diagrams** rendered via `svguitar`, fully theme-aware (light/dark)
+- Sticky instrument toggle (piano/guitar) with frosted-glass styling and smooth scroll restoration
+
+### Export
+
+- Download individual chords or full progressions as `.mid` files
+- BPM from the generator is baked into MIDI timing
+- PDF export for chord charts
+
+### Progression Library
+
+- Save progressions with title, chords, voicings, feel, scale, mode, genre, notes, tags, and visibility
+- **My Progressions** — authenticated view with chip-based tag/key filters
+- **Public Feed** — browsable without an account; filterable by tag and first chord
+- One-click restore: load any saved or shared progression back into the generator with all form values pre-filled
+
+### Sharing
+
+- Every saved progression gets a unique `shareId`
+- Public share URLs (`/p/[shareId]`) with full Open Graph and Twitter Card metadata for rich link previews
+
+### Auth & Access Control
+
+- Session-based authentication (register, login, logout)
+- Unauthenticated users can browse the public feed
+- Contextual registration prompt when an unauth user tries to access protected features
+
+---
 
 ## Tech Stack
 
-- Next.js 15 (App Router)
-- React 19 + TypeScript
-- Material UI 7
-- react-hook-form
-- OpenAI API (structured JSON output)
-- Prisma ORM + PostgreSQL
-- Tone.js
-- piano-chart
-- svguitar
+| Layer | Technology |
+|---|---|
+| Framework | Next.js 15 (App Router) |
+| Language | TypeScript |
+| UI | React 19, Material UI v7 |
+| Forms | react-hook-form |
+| AI | OpenAI API — structured JSON output via `json_schema` |
+| ORM | Prisma + PostgreSQL |
+| Audio | Tone.js (Salamander samples) |
+| Diagrams | piano-chart, svguitar |
+| PDF | jsPDF + jspdf-autotable |
+| Testing | Jest, React Testing Library, Playwright |
+| Component Docs | Storybook 10 (deployed via Vercel) |
+| Error Monitoring | Sentry |
+
+---
 
 ## Project Structure
 
-- app/page.tsx: Main generator UI and AI request flow
-- app/progressions/page.tsx: My/Public progression browser and filters
-- app/p/[shareId]/page.tsx: Shared progression landing page
-- app/api/chord-suggestions/route.ts: AI generation endpoint
-- app/api/auth/*: Auth endpoints
-- app/api/progressions/*: Authenticated progression CRUD endpoints
-- app/api/shared/*: Public progression endpoints
-- components/: Reusable UI, diagrams, and dialogs
-- lib/: API clients, auth helpers, option sets, metadata, and types
-- prisma/: Schema, migrations, and seed script
+```
+app/
+  page.tsx                         # Main generator UI
+  progressions/page.tsx            # My / Public progression browser
+  p/[shareId]/page.tsx             # Shared progression landing page
+  api/
+    chord-suggestions/route.ts     # AI generation endpoint
+    auth/                          # register, login, logout, me
+    progressions/                  # Authenticated CRUD
+    shared/                        # Public read endpoints
+features/
+  generator/                       # Generator form, playback, diagrams
+  progressions/                    # Progression list and cards
+components/
+  ui/                              # Primitive UI components
+lib/
+  audio.ts                         # Tone.js playback engine
+  midi.ts                          # MIDI file generation
+  pdf.ts                           # PDF chart export
+  auth.ts / authContext.tsx        # Session helpers
+  prisma.ts                        # Prisma client singleton
+prisma/
+  schema.prisma                    # Data model
+  migrations/                      # Migration history
+```
 
-## API Overview
+---
 
-### AI
+## AI Design
 
-- POST /api/chord-suggestions
+The AI layer is a **strict-contract integration**, not free-form text generation.
 
-## OpenAI Implementation Notes
+1. The client submits a normalized payload to `POST /api/chord-suggestions`
+2. The route calls the OpenAI Responses API with harmonic system instructions
+3. The response is constrained with `text.format = { type: 'json_schema', strict: true }`
+4. The parsed output maps directly to typed UI sections — no post-processing heuristics
 
-The AI layer is intentionally implemented as a strict contract instead of free-form text generation.
+**Schema guarantees:**
 
-How it works:
+| Field | Description |
+|---|---|
+| `inputSummary` | Echo of normalized request context |
+| `nextChordSuggestions` | Chord, roman numeral, tension (1–5), confidence (1–5), optional piano + guitar voicings |
+| `progressionIdeas` | Chord sequence, feel description, performance tip, piano voicings |
+| `structureSuggestions` | Section name, bar count, harmonic idea |
 
-1. The generator submits normalized input to `POST /api/chord-suggestions`.
-2. The route calls OpenAI Responses API with explicit instructions for harmonic behavior and voicing constraints.
-3. The response is forced into a strict JSON schema using `text.format = { type: 'json_schema', strict: true }`.
-4. The app parses that JSON and renders it directly into typed UI sections (next chords, progression ideas, structure).
+<details>
+<summary>Example request / response</summary>
 
-Why this is reliable:
-
-- Schema validation enforces exact shape and required fields.
-- The model cannot return arbitrary prose outside the defined contract.
-- Types for voicings and structural fields are predictable for rendering/playback.
-- Parse failures and empty-output cases are explicitly handled in the route.
-
-What the schema guarantees:
-
-- `inputSummary` with normalized request context
-- `nextChordSuggestions` with tension/confidence plus optional piano and guitar voicings
-- `progressionIdeas` with matched `chords` and `pianoVoicings`
-- `structureSuggestions` with constrained section names and bar ranges
-
-Key file:
-
-- `app/api/chord-suggestions/route.ts`
-
-Example request payload:
-
+**Request:**
 ```json
 {
-	"seedChords": ["Fmaj7", "F#m7"],
-	"mood": "dreamy, uplifting",
-	"mode": "dorian",
-	"genre": "piano house",
-	"styleReference": "Barry Harris",
-	"instrument": "both",
-	"adventurousness": "balanced"
+  "seedChords": ["Fmaj7", "F#m7"],
+  "mood": "dreamy, uplifting",
+  "mode": "dorian",
+  "genre": "piano house",
+  "styleReference": "Barry Harris",
+  "instrument": "both",
+  "adventurousness": "balanced"
 }
 ```
 
-Example response shape (abbreviated):
-
+**Response (abbreviated):**
 ```json
 {
-	"inputSummary": {
-		"seedChords": ["Fmaj7", "F#m7"],
-		"mood": "dreamy, uplifting",
-		"mode": "dorian",
-		"genre": "piano house",
-		"styleReference": "Barry Harris",
-		"instrument": "both",
-		"adventurousness": "balanced"
-	},
-	"nextChordSuggestions": [
-		{
-			"chord": "Gmaj7",
-			"romanNumeral": "IImaj7",
-			"functionExplanation": "Lifts the progression while keeping modal color.",
-			"tensionLevel": 3,
-			"confidence": 4,
-			"voicingHint": "Keep upper voices close for smooth motion.",
-			"pianoVoicing": {
-				"leftHand": ["G2", "D3"],
-				"rightHand": ["F#3", "B3", "D4", "G4"]
-			},
-			"guitarVoicing": {
-				"title": "Gmaj7",
-				"position": 3,
-				"fingers": [
-					{ "string": 6, "fret": 3, "finger": "2" },
-					{ "string": 5, "fret": 2, "finger": "1" },
-					{ "string": 4, "fret": 0, "finger": null }
-				],
-				"barres": []
-			}
-		}
-	],
-	"progressionIdeas": [
-		{
-			"label": "Lift and Resolve",
-			"chords": ["Fmaj7", "F#m7", "Gmaj7", "Aadd9"],
-			"feel": "Airy and modern",
-			"performanceTip": "Accent the offbeats in the right hand.",
-			"pianoVoicings": [
-				{ "leftHand": ["F2", "C3"], "rightHand": ["E3", "A3", "C4", "F4"] }
-			]
-		}
-	],
-	"structureSuggestions": [
-		{
-			"section": "verse",
-			"bars": 8,
-			"harmonicIdea": "Cycle through the first 4 chords with sparse voicings."
-		}
-	]
+  "nextChordSuggestions": [
+    {
+      "chord": "Gmaj7",
+      "romanNumeral": "IImaj7",
+      "functionExplanation": "Lifts the progression while keeping modal color.",
+      "tensionLevel": 3,
+      "confidence": 4,
+      "pianoVoicing": {
+        "leftHand": ["G2", "D3"],
+        "rightHand": ["F#3", "B3", "D4", "G4"]
+      }
+    }
+  ],
+  "progressionIdeas": [
+    {
+      "label": "Lift and Resolve",
+      "chords": ["Fmaj7", "F#m7", "Gmaj7", "Aadd9"],
+      "feel": "Airy and modern",
+      "performanceTip": "Accent the offbeats in the right hand."
+    }
+  ],
+  "structureSuggestions": [
+    {
+      "section": "verse",
+      "bars": 8,
+      "harmonicIdea": "Cycle through the first 4 chords with sparse voicings."
+    }
+  ]
 }
 ```
+</details>
+
+---
+
+## API Reference
 
 ### Auth
+| Method | Endpoint |
+|---|---|
+| `POST` | `/api/auth/register` |
+| `POST` | `/api/auth/login` |
+| `POST` | `/api/auth/logout` |
+| `GET` | `/api/auth/me` |
 
-- POST /api/auth/register
-- POST /api/auth/login
-- POST /api/auth/logout
-- GET /api/auth/me
+### AI Generation
+| Method | Endpoint |
+|---|---|
+| `POST` | `/api/chord-suggestions` |
 
 ### Progressions (authenticated)
+| Method | Endpoint |
+|---|---|
+| `GET` | `/api/progressions` |
+| `POST` | `/api/progressions` |
+| `GET` | `/api/progressions/[id]` |
+| `PUT` | `/api/progressions/[id]` |
+| `DELETE` | `/api/progressions/[id]` |
 
-- GET /api/progressions
-- POST /api/progressions
-- GET /api/progressions/[id]
-- PUT /api/progressions/[id]
-- DELETE /api/progressions/[id]
+### Public / Sharing
+| Method | Endpoint | Query params |
+|---|---|---|
+| `GET` | `/api/shared` | `tag` (comma-separated), `key` (comma-separated first chord) |
+| `GET` | `/api/shared/[shareId]` | — |
 
-### Public/Sharing
+---
 
-- GET /api/shared
-	- Supports query params:
-		- tag: comma-separated tag filters
-		- key: comma-separated first-chord filters
-- GET /api/shared/[shareId]
+## Data Model
 
-## Data Model Snapshot
+```prisma
+model User {
+  id           String        @id @default(cuid())
+  email        String        @unique
+  name         String?
+  passwordHash String
+  progressions Progression[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+}
 
-Core Prisma models:
+model Progression {
+  id            String   @id @default(cuid())
+  shareId       String   @unique @default(cuid())
+  userId        String
+  title         String
+  chords        Json
+  pianoVoicings Json?
+  feel          String?
+  scale         String?
+  genre         String?
+  notes         String?
+  tags          String[]
+  isPublic      Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+```
 
-- User
-	- id, email, name, passwordHash, createdAt, updatedAt
-- Progression
-	- id, shareId, userId, title
-	- chords (Json)
-	- pianoVoicings (Json?)
-	- feel (String?)
-	- scale (String?)
-	- genre (String?)
-	- notes (String?)
-	- tags (String[])
-	- isPublic (Boolean)
-	- createdAt, updatedAt
+---
 
-Latest schema addition:
+## Local Development
 
-- genre field is now persisted on Progression and restored into the generator when opening saved progressions.
+**1. Clone and install**
+```bash
+yarn install
+```
 
-## Environment Variables
-
-Copy the example file:
-
+**2. Configure environment**
 ```bash
 cp .env.local.example .env.local
 ```
-
-Required values:
 
 ```dotenv
 OPENAI_API_KEY=your_openai_api_key_here
 OPENAI_MODEL=gpt-4o
 DATABASE_URL=postgresql://postgres:postgres@localhost:5432/progression_lab
-AUTH_SECRET=replace_with_output_of_openssl_rand_base64_32
+AUTH_SECRET=      # generate with: openssl rand -base64 32
 ```
 
-Generate AUTH_SECRET:
-
+**3. Start the database**
 ```bash
-openssl rand -base64 32
+docker-compose up -d
 ```
 
-## Local Development
-
-Install dependencies:
-
+**4. Run migrations and seed**
 ```bash
-yarn install
+yarn db:push
+yarn db:seed
 ```
 
-Run the app locally:
-
+**5. Start the dev server**
 ```bash
 yarn dev
 ```
 
+App runs at `http://localhost:3000`.
+
+---
+
 ## Testing
 
-Unit and component tests:
-
 ```bash
+# Unit + component tests
 yarn test
-```
 
-End-to-end tests with Playwright:
+# Watch mode
+yarn test:watch
 
-```bash
+# Coverage
+yarn test:coverage
+
+# End-to-end (Playwright)
 yarn playwright install chromium
 yarn test:e2e
 ```
 
-Playwright reports and failure artifacts are written to dedicated generated folders:
+---
 
-- `playwright-report/`
-- `test-results/`
+## Storybook
 
-These folders are ignored by git and should not be committed.
+Component documentation is co-located with source files and published via Vercel.
+
+```bash
+# Dev server
+yarn storybook          # http://localhost:6006
+
+# Static build
+yarn build-storybook    # output: storybook-static/
+```
 
 Start local Postgres via Docker:
 
