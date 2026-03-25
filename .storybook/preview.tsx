@@ -1,9 +1,14 @@
 import type { Preview } from '@storybook/nextjs-vite';
 import React from 'react';
+import { initialize, mswLoader } from 'msw-storybook-addon';
+import { themes } from 'storybook/theming';
 
 import AppThemeProvider from '../components/AppThemeProvider';
 
+initialize({ onUnhandledRequest: 'bypass' });
+
 const preview: Preview = {
+  loaders: [mswLoader],
   decorators: [
     (Story) => (
       <AppThemeProvider>
@@ -12,6 +17,17 @@ const preview: Preview = {
     ),
   ],
   parameters: {
+    backgrounds: {
+      default: 'app-dark',
+      values: [
+        { name: 'app-dark', value: '#12171d' },
+        { name: 'app-light', value: '#f6f8fb' },
+        { name: 'neutral', value: '#1e1e1e' },
+      ],
+    },
+    docs: {
+      theme: themes.dark,
+    },
     controls: {
       matchers: {
         color: /(background|color)$/i,
