@@ -2,7 +2,7 @@
 
 import DarkModeOutlinedIcon from '@mui/icons-material/DarkModeOutlined';
 import LightModeOutlinedIcon from '@mui/icons-material/LightModeOutlined';
-import LayersOutlinedIcon from '@mui/icons-material/LayersOutlined';
+// import LayersOutlinedIcon from '@mui/icons-material/LayersOutlined';
 import { IconButton, Stack, Tooltip } from '@mui/material';
 
 import { useThemeMode } from '../../lib/themeMode';
@@ -25,11 +25,11 @@ export default function ThemeModeToggle() {
           {isDark ? <LightModeOutlinedIcon /> : <DarkModeOutlinedIcon />}
         </IconButton>
       </Tooltip>
-      <Tooltip title={`Preset: ${presetLabel}. Click to cycle presets.`}>
+      {/* <Tooltip title={`Preset: ${presetLabel}. Click to cycle presets.`}>
         <IconButton aria-label={`Theme preset ${presetLabel}`} onClick={cyclePreset}>
           <LayersOutlinedIcon />
         </IconButton>
-      </Tooltip>
+      </Tooltip> */}
     </Stack>
   );
 }
