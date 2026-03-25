@@ -122,8 +122,7 @@ export const getSettingsTriggerButtonSx = (position: SettingsButtonPosition): Sx
   borderColor: (theme) => alpha(theme.palette.primary.main, 0.9),
   backgroundColor:
     position === 'inline'
-      ? (theme) =>
-          theme.palette.mode === 'dark' ? 'rgba(15, 23, 42, 0.35)' : 'rgba(255, 255, 255, 0.5)'
+      ? (theme) => theme.palette.appColors.surface.glassInlineButton
       : 'transparent',
   textTransform: 'none',
   fontWeight: 600,

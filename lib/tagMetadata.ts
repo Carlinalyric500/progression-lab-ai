@@ -1,3 +1,5 @@
+import type { Theme } from '@mui/material/styles';
+
 type TagCategory = 'genre' | 'feeling' | 'custom';
 
 const GENRE_TAGS = [
@@ -45,56 +47,6 @@ const normalize = (value: string) => value.trim().toLowerCase();
 
 const GENRE_TAG_SET = new Set(GENRE_TAGS.map(normalize));
 const FEELING_TAG_SET = new Set(FEELING_TAGS.map(normalize));
-
-const GENRE_COLORS = [
-  '#1565c0',
-  '#0d47a1',
-  '#283593',
-  '#2e7d32',
-  '#00695c',
-  '#455a64',
-  '#6a1b9a',
-  '#0277bd',
-];
-
-const FEELING_COLORS = [
-  '#ad1457',
-  '#6a1b9a',
-  '#d81b60',
-  '#7b1fa2',
-  '#c2185b',
-  '#8e24aa',
-  '#4a148c',
-  '#880e4f',
-];
-
-const CUSTOM_COLORS = ['#37474f', '#4e342e', '#3e2723', '#424242', '#5d4037', '#263238'];
-
-const CHORD_COLORS = [
-  '#0277bd', // cyan blue
-  '#1565c0', // blue
-  '#283593', // indigo
-  '#6a1b9a', // purple
-  '#ad1457', // deep pink
-  '#c41c3b', // red
-  '#e74c3c', // orange-red
-  '#f39c12', // orange
-  '#27ae60', // green
-  '#1abc9c', // teal
-];
-
-const MOOD_COLORS = [
-  '#00838f', // dark cyan
-  '#0d47a1', // dark blue
-  '#512da8', // deep purple
-  '#7b1fa2', // purple
-  '#c2185b', // pink
-  '#d32f2f', // red
-  '#f57c00', // deep orange
-  '#fbc02d', // amber
-  '#388e3c', // green
-  '#00796b', // teal
-];
 
 /**
  * Produces a deterministic palette index from text content.
@@ -151,19 +103,31 @@ export function getTagCategory(tag: string): TagCategory {
   return 'custom';
 }
 
+function getSemanticTagPalette(theme: Theme, category: TagCategory): string[] {
+  if (category === 'genre') {
+    return theme.palette.appColors.tags.genre;
+  }
+
+  if (category === 'feeling') {
+    return theme.palette.appColors.tags.feeling;
+  }
+
+  return theme.palette.appColors.tags.custom;
+}
+
 /**
  * Returns MUI chip styling for general tags.
  */
 export function getTagChipSx(tag: string) {
   const category = getTagCategory(tag);
-  const palette =
-    category === 'genre' ? GENRE_COLORS : category === 'feeling' ? FEELING_COLORS : CUSTOM_COLORS;
-  const backgroundColor = palette[getColorIndex(tag, palette.length)];
 
   return {
-    backgroundColor,
-    color: '#ffffff',
-    borderColor: 'rgba(255, 255, 255, 0.35)',
+    backgroundColor: (theme: Theme) => {
+      const palette = getSemanticTagPalette(theme, category);
+      return palette[getColorIndex(tag, palette.length)];
+    },
+    color: (theme: Theme) => theme.palette.appColors.tags.chipText,
+    borderColor: (theme: Theme) => theme.palette.appColors.tags.chipBorder,
     fontWeight: 600,
   };
 }
@@ -172,12 +136,13 @@ export function getTagChipSx(tag: string) {
  * Returns deterministic MUI chip styling for chord labels.
  */
 export function getChordChipSx(chord: string) {
-  const backgroundColor = CHORD_COLORS[getColorIndex(chord, CHORD_COLORS.length)];
-
   return {
-    backgroundColor,
-    color: '#ffffff',
-    borderColor: 'rgba(255, 255, 255, 0.35)',
+    backgroundColor: (theme: Theme) => {
+      const palette = theme.palette.appColors.tags.chord;
+      return palette[getColorIndex(chord, palette.length)];
+    },
+    color: (theme: Theme) => theme.palette.appColors.tags.chipText,
+    borderColor: (theme: Theme) => theme.palette.appColors.tags.chipBorder,
     fontWeight: 600,
   };
 }
@@ -186,12 +151,13 @@ export function getChordChipSx(chord: string) {
  * Returns deterministic MUI chip styling for mood labels.
  */
 export function getMoodChipSx(mood: string) {
-  const backgroundColor = MOOD_COLORS[getColorIndex(mood, MOOD_COLORS.length)];
-
   return {
-    backgroundColor,
-    color: '#ffffff',
-    borderColor: 'rgba(255, 255, 255, 0.35)',
+    backgroundColor: (theme: Theme) => {
+      const palette = theme.palette.appColors.tags.mood;
+      return palette[getColorIndex(mood, palette.length)];
+    },
+    color: (theme: Theme) => theme.palette.appColors.tags.chipText,
+    borderColor: (theme: Theme) => theme.palette.appColors.tags.chipBorder,
     fontWeight: 600,
   };
 }

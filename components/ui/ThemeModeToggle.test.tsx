@@ -4,6 +4,14 @@ import userEvent from '@testing-library/user-event';
 import ThemeModeToggle from './ThemeModeToggle';
 
 const mockToggleMode = jest.fn();
+const mockCyclePreset = jest.fn();
+
+const createMockThemeModeContext = (mode: 'light' | 'dark') => ({
+  mode,
+  toggleMode: mockToggleMode,
+  preset: 'default' as const,
+  cyclePreset: mockCyclePreset,
+});
 
 jest.mock('../../lib/themeMode', () => ({
   useThemeMode: jest.fn(),
@@ -16,14 +24,12 @@ const mockUseThemeMode = useThemeMode as jest.MockedFunction<typeof useThemeMode
 describe('ThemeModeToggle', () => {
   beforeEach(() => {
     mockToggleMode.mockClear();
+    mockCyclePreset.mockClear();
     mockUseThemeMode.mockClear();
   });
 
   it('renders button when in light mode', () => {
-    mockUseThemeMode.mockReturnValue({
-      mode: 'light',
-      toggleMode: mockToggleMode,
-    });
+    mockUseThemeMode.mockReturnValue(createMockThemeModeContext('light'));
 
     render(<ThemeModeToggle />);
     const button = screen.getByRole('button', {
@@ -33,10 +39,7 @@ describe('ThemeModeToggle', () => {
   });
 
   it('renders button when in dark mode', () => {
-    mockUseThemeMode.mockReturnValue({
-      mode: 'dark',
-      toggleMode: mockToggleMode,
-    });
+    mockUseThemeMode.mockReturnValue(createMockThemeModeContext('dark'));
 
     render(<ThemeModeToggle />);
     const button = screen.getByRole('button', {
@@ -47,22 +50,18 @@ describe('ThemeModeToggle', () => {
 
   it('calls toggleMode when button is clicked', async () => {
     const user = userEvent.setup();
-    mockUseThemeMode.mockReturnValue({
-      mode: 'light',
-      toggleMode: mockToggleMode,
-    });
+    mockUseThemeMode.mockReturnValue(createMockThemeModeContext('light'));
 
     render(<ThemeModeToggle />);
-    const button = screen.getByRole('button');
+    const button = screen.getByRole('button', {
+      name: 'Switch to dark mode',
+    });
     await user.click(button);
     expect(mockToggleMode).toHaveBeenCalledTimes(1);
   });
 
   it('shows correct aria-label for light mode', () => {
-    mockUseThemeMode.mockReturnValue({
-      mode: 'light',
-      toggleMode: mockToggleMode,
-    });
+    mockUseThemeMode.mockReturnValue(createMockThemeModeContext('light'));
 
     render(<ThemeModeToggle />);
     const button = screen.getByRole('button', {
@@ -72,10 +71,7 @@ describe('ThemeModeToggle', () => {
   });
 
   it('shows correct aria-label for dark mode', () => {
-    mockUseThemeMode.mockReturnValue({
-      mode: 'dark',
-      toggleMode: mockToggleMode,
-    });
+    mockUseThemeMode.mockReturnValue(createMockThemeModeContext('dark'));
 
     render(<ThemeModeToggle />);
     const button = screen.getByRole('button', {
@@ -85,13 +81,12 @@ describe('ThemeModeToggle', () => {
   });
 
   it('displays correct tooltip text for light mode', async () => {
-    mockUseThemeMode.mockReturnValue({
-      mode: 'light',
-      toggleMode: mockToggleMode,
-    });
+    mockUseThemeMode.mockReturnValue(createMockThemeModeContext('light'));
 
     render(<ThemeModeToggle />);
-    const button = screen.getByRole('button');
+    const button = screen.getByRole('button', {
+      name: 'Switch to dark mode',
+    });
 
     // Hover to show tooltip
     await userEvent.hover(button);
@@ -99,13 +94,12 @@ describe('ThemeModeToggle', () => {
   });
 
   it('displays correct tooltip text for dark mode', async () => {
-    mockUseThemeMode.mockReturnValue({
-      mode: 'dark',
-      toggleMode: mockToggleMode,
-    });
+    mockUseThemeMode.mockReturnValue(createMockThemeModeContext('dark'));
 
     render(<ThemeModeToggle />);
-    const button = screen.getByRole('button');
+    const button = screen.getByRole('button', {
+      name: 'Switch to light mode',
+    });
 
     // Hover to show tooltip
     await userEvent.hover(button);
@@ -113,12 +107,10 @@ describe('ThemeModeToggle', () => {
   });
 
   it('updates aria-label when mode changes', () => {
+    mockUseThemeMode.mockReturnValue(createMockThemeModeContext('dark'));
     const { rerender } = render(<ThemeModeToggle />);
 
-    mockUseThemeMode.mockReturnValue({
-      mode: 'light',
-      toggleMode: mockToggleMode,
-    });
+    mockUseThemeMode.mockReturnValue(createMockThemeModeContext('light'));
     rerender(<ThemeModeToggle />);
 
     let button = screen.getByRole('button', {
@@ -126,15 +118,25 @@ describe('ThemeModeToggle', () => {
     });
     expect(button).toBeInTheDocument();
 
-    mockUseThemeMode.mockReturnValue({
-      mode: 'dark',
-      toggleMode: mockToggleMode,
-    });
+    mockUseThemeMode.mockReturnValue(createMockThemeModeContext('dark'));
     rerender(<ThemeModeToggle />);
 
     button = screen.getByRole('button', {
       name: 'Switch to light mode',
     });
     expect(button).toBeInTheDocument();
+  });
+
+  it('calls cyclePreset when preset button is clicked', async () => {
+    const user = userEvent.setup();
+    mockUseThemeMode.mockReturnValue(createMockThemeModeContext('dark'));
+
+    render(<ThemeModeToggle />);
+    const button = screen.getByRole('button', {
+      name: 'Theme preset DEFAULT',
+    });
+
+    await user.click(button);
+    expect(mockCyclePreset).toHaveBeenCalledTimes(1);
   });
 });

@@ -26,7 +26,12 @@ export default function SuccessSnackbar({
       autoHideDuration={autoHideDuration}
       onClose={onClose}
     >
-      <Alert severity="success" variant="filled" onClose={onClose} sx={{ color: '#fff' }}>
+      <Alert
+        severity="success"
+        variant="filled"
+        onClose={onClose}
+        sx={{ color: (theme) => theme.palette.common.white }}
+      >
         {message}
       </Alert>
     </Snackbar>

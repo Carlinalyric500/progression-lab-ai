@@ -1,6 +1,7 @@
 'use client';
 
 import { Box } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import { useEffect, useRef } from 'react';
 import { Instrument } from 'piano-chart';
 
@@ -20,6 +21,7 @@ export default function PianoChordChart({
   endOctave = 5,
 }: PianoChordChartProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const theme = useTheme();
 
   useEffect(() => {
     if (!containerRef.current) {
@@ -32,7 +34,7 @@ export default function PianoChordChart({
       showNoteNames: 'onpress',
       highlightedNotes,
       keyPressStyle: 'vivid',
-      vividKeyPressColor: '#2563eb',
+      vividKeyPressColor: theme.palette.primary.main,
     });
 
     piano.create();
@@ -44,7 +46,7 @@ export default function PianoChordChart({
     return () => {
       piano.destroy();
     };
-  }, [notes, highlightedNotes, rootNote, startOctave, endOctave]);
+  }, [notes, highlightedNotes, rootNote, startOctave, endOctave, theme.palette.primary.main]);
 
   return <Box ref={containerRef} />;
 }
