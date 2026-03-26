@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { Alert, Box, Button, CircularProgress, Container, Stack, Typography } from '@mui/material';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import StopIcon from '@mui/icons-material/Stop';
 import Link from 'next/link';
 
 import ProgressionCard from '../../../features/progressions/components/ProgressionCard';
@@ -12,6 +13,10 @@ import { getSharedProgression } from '../../../features/progressions/api/progres
 import { playProgression } from '../../../domain/audio/audio';
 import type { AudioInstrument } from '../../../domain/audio/audio';
 import type { Progression } from '../../../lib/types';
+import {
+  getProgressionAutoResetMs,
+  usePlaybackToggle,
+} from '../../../features/generator/hooks/usePlaybackToggle';
 
 export default function SharedProgressionPage() {
   const params = useParams();
@@ -22,6 +27,7 @@ export default function SharedProgressionPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [instrument] = useState<AudioInstrument>('piano');
+  const { playingId, initializingId, handlePlayToggle } = usePlaybackToggle();
 
   const loadProgression = useCallback(async () => {
     try {
@@ -46,6 +52,21 @@ export default function SharedProgressionPage() {
     // Store in sessionStorage and navigate to lab
     sessionStorage.setItem('loadedProgression', JSON.stringify(progression));
     router.push('/');
+  };
+
+  const handlePlay = async () => {
+    if (!progression?.pianoVoicings?.length) {
+      return;
+    }
+
+    await handlePlayToggle(
+      `shared-page-${progression.id}`,
+      () =>
+        playProgression(progression.pianoVoicings, undefined, undefined, undefined, undefined, {
+          instrument,
+        }),
+      getProgressionAutoResetMs(progression.pianoVoicings.length, 100),
+    );
   };
 
   return (
@@ -95,21 +116,24 @@ export default function SharedProgressionPage() {
               <Button
                 variant="outlined"
                 size="large"
-                startIcon={<PlayArrowIcon />}
-                onClick={() =>
-                  playProgression(
-                    progression.pianoVoicings ?? [],
-                    undefined,
-                    undefined,
-                    undefined,
-                    undefined,
-                    { instrument },
+                startIcon={
+                  initializingId === `shared-page-${progression.id}` ? (
+                    <CircularProgress size={18} color="inherit" />
+                  ) : playingId === `shared-page-${progression.id}` ? (
+                    <StopIcon />
+                  ) : (
+                    <PlayArrowIcon />
                   )
                 }
+                onClick={handlePlay}
                 fullWidth
                 sx={{ py: 2 }}
               >
-                Play progression
+                {initializingId === `shared-page-${progression.id}`
+                  ? 'Initializing audio...'
+                  : playingId === `shared-page-${progression.id}`
+                    ? 'Stop progression'
+                    : 'Play progression'}
               </Button>
             ) : null}
 

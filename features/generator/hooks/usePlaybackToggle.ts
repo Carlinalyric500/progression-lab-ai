@@ -1,5 +1,49 @@
-import { useRef, useState, useCallback } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { stopAllAudio } from '../../../domain/audio/audio';
+
+type PlaybackPhase = 'idle' | 'initializing' | 'playing';
+
+type GlobalPlaybackState = {
+  key: string | null;
+  phase: PlaybackPhase;
+  requestId: number;
+};
+
+let playbackInstanceCounter = 0;
+let playbackRequestCounter = 0;
+
+let globalPlaybackState: GlobalPlaybackState = {
+  key: null,
+  phase: 'idle',
+  requestId: 0,
+};
+
+const globalPlaybackListeners = new Set<(state: GlobalPlaybackState) => void>();
+
+const getGlobalPlaybackState = (): GlobalPlaybackState => globalPlaybackState;
+
+const notifyGlobalPlaybackListeners = (): void => {
+  globalPlaybackListeners.forEach((listener) => listener(globalPlaybackState));
+};
+
+const setGlobalPlaybackState = (nextState: GlobalPlaybackState): void => {
+  globalPlaybackState = nextState;
+  notifyGlobalPlaybackListeners();
+};
+
+const getNextPlaybackRequestId = (): number => {
+  playbackRequestCounter += 1;
+  return playbackRequestCounter;
+};
+
+const subscribeToGlobalPlayback = (
+  listener: (state: GlobalPlaybackState) => void,
+): (() => void) => {
+  globalPlaybackListeners.add(listener);
+  return () => {
+    globalPlaybackListeners.delete(listener);
+  };
+};
 
 /**
  * Hook that provides play/stop toggle functionality with a single active playback state.
@@ -13,8 +57,29 @@ import { stopAllAudio } from '../../../domain/audio/audio';
  *   </IconButton>
  */
 export function usePlaybackToggle() {
-  const [playingId, setPlayingId] = useState<string | number | null>(null);
+  const instancePrefixRef = useRef(`playback-${(playbackInstanceCounter += 1)}`);
+  const [globalState, setGlobalState] = useState<GlobalPlaybackState>(() =>
+    getGlobalPlaybackState(),
+  );
+  const scopedIdMapRef = useRef(new Map<string, string | number>());
   const autoResetTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return subscribeToGlobalPlayback(setGlobalState);
+  }, []);
+
+  const toScopedKey = useCallback((id: string | number): string => {
+    const scopedKey = `${instancePrefixRef.current}::${String(id)}`;
+    scopedIdMapRef.current.set(scopedKey, id);
+    return scopedKey;
+  }, []);
+
+  const localActiveId = globalState.key
+    ? (scopedIdMapRef.current.get(globalState.key) ?? null)
+    : null;
+
+  const playingId = globalState.phase === 'playing' ? localActiveId : null;
+  const initializingId = globalState.phase === 'initializing' ? localActiveId : null;
 
   const clearAutoResetTimeout = useCallback(() => {
     if (autoResetTimeoutRef.current) {
@@ -24,7 +89,7 @@ export function usePlaybackToggle() {
   }, []);
 
   const scheduleAutoReset = useCallback(
-    (id: string | number, autoResetAfterMs?: number) => {
+    (scopedKey: string, requestId: number, autoResetAfterMs?: number) => {
       clearAutoResetTimeout();
 
       if (!autoResetAfterMs || autoResetAfterMs <= 0) {
@@ -32,42 +97,96 @@ export function usePlaybackToggle() {
       }
 
       autoResetTimeoutRef.current = setTimeout(() => {
-        setPlayingId((current) => (current === id ? null : current));
+        const currentState = getGlobalPlaybackState();
+        if (currentState.key !== scopedKey || currentState.requestId !== requestId) {
+          return;
+        }
+
+        setGlobalPlaybackState({
+          key: null,
+          phase: 'idle',
+          requestId: getNextPlaybackRequestId(),
+        });
         autoResetTimeoutRef.current = null;
       }, autoResetAfterMs);
     },
     [clearAutoResetTimeout],
   );
 
+  useEffect(() => {
+    return () => {
+      clearAutoResetTimeout();
+    };
+  }, [clearAutoResetTimeout]);
+
+  const cancelActivePlayback = useCallback(() => {
+    const requestId = getNextPlaybackRequestId();
+    stopAllAudio();
+    clearAutoResetTimeout();
+    setGlobalPlaybackState({ key: null, phase: 'idle', requestId });
+  }, [clearAutoResetTimeout]);
+
   const handlePlayToggle = useCallback(
-    (id: string | number, playCallback: () => void, autoResetAfterMs?: number) => {
-      if (playingId === id) {
-        stopAllAudio();
-        clearAutoResetTimeout();
-        setPlayingId(null);
+    async (
+      id: string | number,
+      playCallback: () => void | Promise<void>,
+      autoResetAfterMs?: number,
+    ) => {
+      const scopedKey = toScopedKey(id);
+      const currentState = getGlobalPlaybackState();
+
+      if (currentState.key === scopedKey && currentState.phase !== 'idle') {
+        cancelActivePlayback();
         return;
       }
 
-      if (playingId !== null) {
+      if (currentState.phase !== 'idle') {
         stopAllAudio();
+        clearAutoResetTimeout();
       }
 
-      setPlayingId(id);
+      const requestId = getNextPlaybackRequestId();
+      setGlobalPlaybackState({
+        key: scopedKey,
+        phase: 'initializing',
+        requestId,
+      });
 
       try {
-        playCallback();
-        scheduleAutoReset(id, autoResetAfterMs);
+        await Promise.resolve(playCallback());
+
+        const stateAfterInit = getGlobalPlaybackState();
+        if (stateAfterInit.key !== scopedKey || stateAfterInit.requestId !== requestId) {
+          return;
+        }
+
+        setGlobalPlaybackState({
+          key: scopedKey,
+          phase: 'playing',
+          requestId,
+        });
+        scheduleAutoReset(scopedKey, requestId, autoResetAfterMs);
       } catch {
+        const stateAfterError = getGlobalPlaybackState();
+        if (stateAfterError.key !== scopedKey || stateAfterError.requestId !== requestId) {
+          return;
+        }
+
         clearAutoResetTimeout();
-        setPlayingId(null);
+        setGlobalPlaybackState({
+          key: null,
+          phase: 'idle',
+          requestId: getNextPlaybackRequestId(),
+        });
       }
     },
-    [clearAutoResetTimeout, playingId, scheduleAutoReset],
+    [cancelActivePlayback, clearAutoResetTimeout, scheduleAutoReset, toScopedKey],
   );
 
   return {
-    isPlaying: playingId !== null,
+    isPlaying: playingId !== null || initializingId !== null,
     playingId,
+    initializingId,
     handlePlayToggle,
   };
 }

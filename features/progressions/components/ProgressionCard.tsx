@@ -16,11 +16,16 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import StopIcon from '@mui/icons-material/Stop';
 
 import type { Progression } from '../../../lib/types';
 import { playProgression } from '../../../domain/audio/audio';
 import type { AudioInstrument } from '../../../domain/audio/audio';
 import { getTagChipSx } from '../../../lib/tagMetadata';
+import {
+  getProgressionAutoResetMs,
+  usePlaybackToggle,
+} from '../../generator/hooks/usePlaybackToggle';
 
 type ProgressionCardProps = {
   progression: Progression;
@@ -44,6 +49,10 @@ export default function ProgressionCard({
   instrument,
 }: ProgressionCardProps) {
   const [copied, setCopied] = useState(false);
+  const { playingId, initializingId, handlePlayToggle } = usePlaybackToggle();
+  const playId = `progression-card-${progression.id}`;
+  const isPlaying = playingId === playId;
+  const isInitializingAudio = initializingId === playId;
 
   const canPlay = Array.isArray(progression.pianoVoicings) && progression.pianoVoicings.length > 0;
 
@@ -63,18 +72,14 @@ export default function ProgressionCard({
       return;
     }
 
-    try {
-      await playProgression(
-        progression.pianoVoicings!,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        { instrument },
-      );
-    } catch (error) {
-      console.error('Failed to play progression:', error);
-    }
+    await handlePlayToggle(
+      playId,
+      () =>
+        playProgression(progression.pianoVoicings!, undefined, undefined, undefined, undefined, {
+          instrument,
+        }),
+      getProgressionAutoResetMs(progression.pianoVoicings?.length ?? 0, 100),
+    );
   };
 
   return (
@@ -148,11 +153,19 @@ export default function ProgressionCard({
               <Button
                 size="small"
                 variant="outlined"
-                startIcon={<PlayArrowIcon />}
+                startIcon={
+                  isInitializingAudio ? (
+                    <CircularProgress size={16} color="inherit" />
+                  ) : isPlaying ? (
+                    <StopIcon />
+                  ) : (
+                    <PlayArrowIcon />
+                  )
+                }
                 onClick={handlePlay}
                 disabled={!canPlay}
               >
-                Play
+                {isInitializingAudio ? 'Initializing...' : isPlaying ? 'Stop' : 'Play'}
               </Button>
 
               {onOpen && (

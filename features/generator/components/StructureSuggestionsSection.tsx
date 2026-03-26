@@ -155,7 +155,7 @@ export default function StructureSuggestionsSection({
   genre,
   showTitle = true,
 }: StructureSuggestionsSectionProps) {
-  const { playingId, handlePlayToggle } = usePlaybackToggle();
+  const { playingId, initializingId, handlePlayToggle } = usePlaybackToggle();
 
   const arrangementVoicings = structureSuggestions.flatMap((section, index) => {
     const idea =
@@ -189,11 +189,12 @@ export default function StructureSuggestionsSection({
               playTitle="Play arrangement"
               stopTitle="Stop arrangement"
               isPlaying={playingId === 'arrangement'}
+              isInitializing={initializingId === 'arrangement'}
               disabled={arrangementVoicings.length === 0}
               onClick={() => {
-                handlePlayToggle(
+                void handlePlayToggle(
                   'arrangement',
-                  () => {
+                  () =>
                     playProgression(arrangementVoicings, tempoBpm, playbackStyle, attack, decay, {
                       humanize,
                       gate,
@@ -204,8 +205,7 @@ export default function StructureSuggestionsSection({
                       timeSignature,
                       metronomeEnabled,
                       metronomeVolume,
-                    });
-                  },
+                    }),
                   getProgressionAutoResetMs(arrangementVoicings.length, tempoBpm),
                 );
               }}
@@ -268,11 +268,12 @@ export default function StructureSuggestionsSection({
                     playTitle="Play section"
                     stopTitle="Stop"
                     isPlaying={playingId === `section-${index}`}
+                    isInitializing={initializingId === `section-${index}`}
                     disabled={sectionVoicings.length === 0}
                     onClick={() => {
-                      handlePlayToggle(
+                      void handlePlayToggle(
                         `section-${index}`,
-                        () => {
+                        () =>
                           playProgression(sectionVoicings, tempoBpm, playbackStyle, attack, decay, {
                             humanize,
                             gate,
@@ -283,8 +284,7 @@ export default function StructureSuggestionsSection({
                             timeSignature,
                             metronomeEnabled,
                             metronomeVolume,
-                          });
-                        },
+                          }),
                         getProgressionAutoResetMs(sectionVoicings.length, tempoBpm),
                       );
                     }}

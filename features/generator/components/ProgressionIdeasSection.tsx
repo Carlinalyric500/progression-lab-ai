@@ -148,7 +148,7 @@ export default function ProgressionIdeasSection({
   guitarVoicingByChord,
   onRequestSaveProgression,
 }: ProgressionIdeasSectionProps) {
-  const { playingId, handlePlayToggle } = usePlaybackToggle();
+  const { playingId, initializingId, handlePlayToggle } = usePlaybackToggle();
 
   return (
     <Box component="section" id="progressions">
@@ -208,10 +208,11 @@ export default function ProgressionIdeasSection({
                   <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap">
                     <PlaybackToggleButton
                       isPlaying={playingId === idea.label}
-                      onClick={() =>
-                        handlePlayToggle(
+                      isInitializing={initializingId === idea.label}
+                      onClick={() => {
+                        void handlePlayToggle(
                           idea.label,
-                          () => {
+                          () =>
                             playProgression(
                               idea.pianoVoicings,
                               tempoBpm,
@@ -229,11 +230,10 @@ export default function ProgressionIdeasSection({
                                 metronomeEnabled,
                                 metronomeVolume,
                               },
-                            );
-                          },
+                            ),
                           getProgressionAutoResetMs(idea.pianoVoicings.length, tempoBpm),
-                        )
-                      }
+                        );
+                      }}
                     />
                     <MidiDownloadButton
                       variant="outlined"
