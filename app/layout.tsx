@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 
 import AppWrapper from '../components/AppWrapper';
 import AppThemeProvider from '../components/AppThemeProvider';
+import { AppSnackbarProvider } from '../components/providers/AppSnackbarProvider';
 import { AuthProvider } from '../components/providers/AuthProvider';
 import type { Metadata } from 'next';
 
@@ -57,9 +58,11 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     <html lang="en">
       <body>
         <AppThemeProvider>
-          <AuthProvider>
-            <AppWrapper>{children}</AppWrapper>
-          </AuthProvider>
+          <AppSnackbarProvider>
+            <AuthProvider>
+              <AppWrapper>{children}</AppWrapper>
+            </AuthProvider>
+          </AppSnackbarProvider>
         </AppThemeProvider>
       </body>
     </html>
