@@ -7,13 +7,21 @@ import {
   validateAuthCredentials,
   verifyPassword,
 } from '../../../../lib/auth';
+import { createRateLimitResponse } from '../../../../lib/rateLimiting';
 import { prisma } from '../../../../lib/prisma';
 
 /**
  * Authenticates a user and returns user profile with session cookie.
+ * Includes rate limiting (5 attempts per 15 minutes) to prevent brute force attacks.
  */
 export async function POST(request: NextRequest) {
   try {
+    // Check rate limit first
+    const rateLimitResponse = createRateLimitResponse(request);
+    if (rateLimitResponse) {
+      return rateLimitResponse;
+    }
+
     const credentials = normalizeAuthCredentials(await request.json());
     const validationError = validateAuthCredentials(credentials);
 

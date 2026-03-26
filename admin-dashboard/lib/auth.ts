@@ -60,6 +60,30 @@ export function normalizeAuthPayload(payload: AuthRequestPayload) {
   };
 }
 
+/**
+ * Validates admin auth payload
+ * Prevents obviously invalid input without leaking timing information
+ */
+export function validateAdminAuthPayload(payload: { email: string; password: string }): boolean {
+  // Basic email format check
+  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailPattern.test(payload.email)) {
+    return false;
+  }
+
+  // Password must be present and reasonable length
+  if (!payload.password || payload.password.length < 6 || payload.password.length > 512) {
+    return false;
+  }
+
+  // Email length check
+  if (payload.email.length > 254) {
+    return false;
+  }
+
+  return true;
+}
+
 export function verifyPassword(password: string, storedHash: string): boolean {
   const [scheme, salt, hash] = storedHash.split('$');
 

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import { getAdminUserFromRequest, maskEmail } from '../../../../lib/adminAccess';
+import { checkCsrfToken } from '../../../../lib/csrf';
 import { prisma } from '../../../../lib/prisma';
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -74,6 +75,12 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
+    // Check CSRF token for state-changing operation
+    const csrfError = checkCsrfToken(request);
+    if (csrfError) {
+      return csrfError;
+    }
+
     const adminUser = await getAdminUserFromRequest(request);
     if (!adminUser) {
       return NextResponse.json({ message: 'Forbidden' }, { status: 403 });

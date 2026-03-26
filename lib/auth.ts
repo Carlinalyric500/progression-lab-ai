@@ -77,6 +77,7 @@ export function normalizeAuthCredentials(payload: AuthRequestPayload): Normalize
 
 /**
  * Validates shared login/register credential requirements.
+ * Provides early rejection of obviously invalid input.
  */
 export function validateAuthCredentials(
   credentials: Pick<NormalizedAuthCredentials, 'email' | 'password'>,
@@ -86,11 +87,24 @@ export function validateAuthCredentials(
     return 'Email and password are required';
   }
 
-  if (
-    options?.minPasswordLength !== undefined &&
-    credentials.password.length < options.minPasswordLength
-  ) {
-    return `Password must be at least ${options.minPasswordLength} characters`;
+  // Basic email format validation (RFC 5322 simplified)
+  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailPattern.test(credentials.email)) {
+    return 'Invalid email format';
+  }
+
+  const minLength = options?.minPasswordLength ?? 6;
+  if (credentials.password.length < minLength) {
+    return `Password must be at least ${minLength} characters`;
+  }
+
+  // Prevent excessively long inputs that could cause DOS
+  if (credentials.email.length > 254) {
+    return 'Email is too long';
+  }
+
+  if (credentials.password.length > 512) {
+    return 'Password is too long';
   }
 
   return null;
