@@ -1,0 +1,112 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+import { Box, Divider, Stack, Typography } from '@mui/material';
+import { createAppTheme } from '../../lib/theme';
+
+<Meta title="Design System/Theme Swatches" />
+
+export const lightTheme = createAppTheme('light', 'default');
+export const darkTheme = createAppTheme('dark', 'default');
+
+export const Swatch = ({ name, value }) => {
+  return (
+    <Box
+      sx={{
+        width: { xs: '100%', sm: 200 },
+        minWidth: { xs: '100%', sm: 200 },
+        flexShrink: 0,
+      }}
+    >
+      <Box
+        sx={{
+          borderRadius: 1,
+          border: '1px solid',
+          borderColor: 'divider',
+          overflow: 'hidden',
+          background: String(value),
+          height: 72,
+        }}
+      />
+      <Typography
+        variant="caption"
+        sx={{ mt: 1, display: 'block', color: '#F3F4F6', fontWeight: 700, lineHeight: 1.25 }}
+      >
+        {name}
+      </Typography>
+      <Typography
+        variant="caption"
+        sx={{
+          mt: 0.5,
+          display: 'block',
+          color: '#D1D5DB',
+          fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
+          lineHeight: 1.25,
+          wordBreak: 'break-word',
+        }}
+      >
+        {String(value)}
+      </Typography>
+    </Box>
+  );
+};
+
+export const SwatchGroup = ({ title, tokens }) => (
+  <Box sx={{ mb: 3 }}>
+    <Typography variant="subtitle1" sx={{ mb: 1.25, fontWeight: 700 }}>
+      {title}
+    </Typography>
+    <Stack
+      direction="row"
+      spacing={1.5}
+      useFlexGap
+      flexWrap="wrap"
+      sx={{
+        '& > *': {
+          width: { xs: '100%', sm: 'auto' },
+        },
+      }}
+    >
+      {Object.entries(tokens).map(([key, value]) => {
+        if (Array.isArray(value)) {
+          return value.map((entry, index) => (
+            <Swatch key={`${key}-${index}`} name={`${key}[${index}]`} value={entry} />
+          ));
+        }
+
+        return <Swatch key={key} name={key} value={value} />;
+      })}
+    </Stack>
+  </Box>
+);
+
+export const ModeBlock = ({ mode, theme }) => (
+  <Box sx={{ mb: 5 }}>
+    <Typography variant="h5" sx={{ mb: 2, textTransform: 'capitalize' }}>
+      {mode} mode
+    </Typography>
+
+    <SwatchGroup
+      title="Core Palette"
+      tokens={{
+        primary: theme.palette.primary.main,
+        backgroundDefault: theme.palette.background.default,
+        backgroundPaper: theme.palette.background.paper,
+        textPrimary: theme.palette.text.primary,
+        textSecondary: theme.palette.text.secondary,
+      }}
+    />
+
+    <SwatchGroup title="Surface Tokens" tokens={theme.palette.appColors.surface} />
+    <SwatchGroup title="Accent Tokens" tokens={theme.palette.appColors.accent} />
+    <SwatchGroup title="Tag Tokens" tokens={theme.palette.appColors.tags} />
+  </Box>
+);
+
+# Theme Swatches
+
+This docs page renders the real tokens from `lib/themeTokens.ts`.
+
+<ModeBlock mode="light" theme={lightTheme} />
+
+<Divider sx={{ my: 4 }} />
+
+<ModeBlock mode="dark" theme={darkTheme} />
