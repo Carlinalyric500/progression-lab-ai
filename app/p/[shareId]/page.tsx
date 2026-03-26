@@ -55,17 +55,23 @@ export default function SharedProgressionPage() {
   };
 
   const handlePlay = async () => {
-    if (!progression?.pianoVoicings?.length) {
+    const currentProgression = progression;
+    if (!currentProgression) {
+      return;
+    }
+
+    const voicings = currentProgression.pianoVoicings;
+    if (!voicings?.length) {
       return;
     }
 
     await handlePlayToggle(
-      `shared-page-${progression.id}`,
+      `shared-page-${currentProgression.id}`,
       () =>
-        playProgression(progression.pianoVoicings, undefined, undefined, undefined, undefined, {
+        playProgression(voicings, undefined, undefined, undefined, undefined, {
           instrument,
         }),
-      getProgressionAutoResetMs(progression.pianoVoicings.length, 100),
+      getProgressionAutoResetMs(voicings.length, 100),
     );
   };
 
