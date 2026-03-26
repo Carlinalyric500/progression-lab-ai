@@ -4,7 +4,7 @@
 
 Production: [https://progression-lab-ai.vercel.app/](https://progression-lab-ai.vercel.app/)
 
-Storybook DOcs: [https://storybook-progression-lab-ai.vercel.app](https://storybook-progression-lab-ai.vercel.app/)
+Storybook Docs: [https://storybook-progression-lab-ai.vercel.app](https://storybook-progression-lab-ai.vercel.app/)
 
 <img width="1221" height="1310" alt="image" src="https://github.com/user-attachments/assets/3bfbfba4-b2d5-4e60-9a86-8bdb4765ed48" />
 
