@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 
-import AppThemeProvider from './AppThemeProvider';
+import AppThemeProvider from './providers/AppThemeProvider';
 import { AppSnackbarProvider } from './providers/AppSnackbarProvider';
 import { AuthProvider } from './providers/AuthProvider';
 import AppWrapper from './AppWrapper';
