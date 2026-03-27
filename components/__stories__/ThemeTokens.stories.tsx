@@ -315,7 +315,7 @@ export const DarkDry: Story = {
 };
 
 export const AllCombinations: StoryObj<typeof ThemeTokensMatrix> = {
-  render: () => <ThemeTokensMatrix mode="dark" preset="default" />,
+  render: () => <ThemeTokensMatrix />,
   parameters: {
     controls: { disable: true },
   },
