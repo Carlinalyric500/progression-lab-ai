@@ -21,7 +21,12 @@ import StopIcon from '@mui/icons-material/Stop';
 import { alpha, useTheme } from '@mui/material/styles';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
-import { playChordPattern, stopAllAudio } from '../../../domain/audio/audio';
+import {
+  playChordPattern,
+  playMetronomeClick,
+  startAudio,
+  stopAllAudio,
+} from '../../../domain/audio/audio';
 import { createPianoVoicingFromChordSymbol } from '../../../domain/music/chordVoicing';
 import { CHORD_OPTIONS } from '../../../lib/formOptions';
 import PlaybackSettingsButton from './PlaybackSettingsButton';
@@ -132,6 +137,7 @@ export default function GeneratedChordGridDialog({
     timeSignature,
     padLatchMode,
     metronomeEnabled,
+    metronomeVolume,
   } = settings;
 
   const [activePadKey, setActivePadKey] = useState<string | null>(null);
@@ -140,6 +146,7 @@ export default function GeneratedChordGridDialog({
   const [editingPadKey, setEditingPadKey] = useState<string | null>(null);
   const [isSequencerPlaying, setIsSequencerPlaying] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
+  const [isCountInActive, setIsCountInActive] = useState(false);
   const [isLoopEnabled, setIsLoopEnabled] = useState(true);
   const [loopLengthBars, setLoopLengthBars] = useState<(typeof LOOP_LENGTH_OPTIONS)[number]>(1);
   const [currentStep, setCurrentStep] = useState(0);
@@ -147,6 +154,8 @@ export default function GeneratedChordGridDialog({
   const [saveArrangementDialogOpen, setSaveArrangementDialogOpen] = useState(false);
   const activePadTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
   const sequencerIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const countInIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const countInStartTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const currentStepRef = useRef(0);
   const eventsByStepRef = useRef<Map<number, ArrangementEvent[]>>(new Map());
   const totalStepsRef = useRef(0);
@@ -178,6 +187,14 @@ export default function GeneratedChordGridDialog({
         clearInterval(sequencerIntervalRef.current);
       }
 
+      if (countInIntervalRef.current) {
+        clearInterval(countInIntervalRef.current);
+      }
+
+      if (countInStartTimeoutRef.current) {
+        clearTimeout(countInStartTimeoutRef.current);
+      }
+
       if (beatPulseTimeoutRef.current) {
         clearTimeout(beatPulseTimeoutRef.current);
       }
@@ -196,8 +213,19 @@ export default function GeneratedChordGridDialog({
         sequencerIntervalRef.current = null;
       }
 
+      if (countInIntervalRef.current) {
+        clearInterval(countInIntervalRef.current);
+        countInIntervalRef.current = null;
+      }
+
+      if (countInStartTimeoutRef.current) {
+        clearTimeout(countInStartTimeoutRef.current);
+        countInStartTimeoutRef.current = null;
+      }
+
       setIsSequencerPlaying(false);
       setIsRecording(false);
+      setIsCountInActive(false);
       setCurrentStep(0);
       currentStepRef.current = 0;
     }
@@ -318,8 +346,19 @@ export default function GeneratedChordGridDialog({
       sequencerIntervalRef.current = null;
     }
 
+    if (countInIntervalRef.current) {
+      clearInterval(countInIntervalRef.current);
+      countInIntervalRef.current = null;
+    }
+
+    if (countInStartTimeoutRef.current) {
+      clearTimeout(countInStartTimeoutRef.current);
+      countInStartTimeoutRef.current = null;
+    }
+
     setIsSequencerPlaying(false);
     setIsRecording(false);
+    setIsCountInActive(false);
     setCurrentStep(0);
     currentStepRef.current = 0;
     setIsBeatPulseVisible(false);
@@ -331,6 +370,21 @@ export default function GeneratedChordGridDialog({
     }
 
     stopAllAudio();
+  };
+
+  const pulseBeatIndicator = (beatNumber: number, isDownbeat: boolean) => {
+    setCurrentBeatInBar(beatNumber);
+    setIsDownbeatPulse(isDownbeat);
+    setIsBeatPulseVisible(true);
+
+    if (beatPulseTimeoutRef.current) {
+      clearTimeout(beatPulseTimeoutRef.current);
+    }
+
+    beatPulseTimeoutRef.current = setTimeout(() => {
+      setIsBeatPulseVisible(false);
+      beatPulseTimeoutRef.current = null;
+    }, 120);
   };
 
   const startSequencer = () => {
@@ -346,7 +400,7 @@ export default function GeneratedChordGridDialog({
     setCurrentStep(0);
     setIsSequencerPlaying(true);
 
-    sequencerIntervalRef.current = setInterval(() => {
+    const runSequencerStep = () => {
       const stepIndex = currentStepRef.current;
       setCurrentStep(stepIndex);
 
@@ -354,18 +408,8 @@ export default function GeneratedChordGridDialog({
         const beatInBar = Math.floor(stepIndex / STEPS_PER_BEAT) % beatsPerBarRef.current;
         const isDownbeat = beatInBar === 0;
 
-        setCurrentBeatInBar(beatInBar + 1);
-        setIsDownbeatPulse(isDownbeat);
-        setIsBeatPulseVisible(true);
-
-        if (beatPulseTimeoutRef.current) {
-          clearTimeout(beatPulseTimeoutRef.current);
-        }
-
-        beatPulseTimeoutRef.current = setTimeout(() => {
-          setIsBeatPulseVisible(false);
-          beatPulseTimeoutRef.current = null;
-        }, 120);
+        pulseBeatIndicator(beatInBar + 1, isDownbeat);
+        void playMetronomeClick(metronomeVolume, isDownbeat);
       }
 
       const events = eventsByStepRef.current.get(stepIndex) ?? [];
@@ -393,6 +437,12 @@ export default function GeneratedChordGridDialog({
       }
 
       currentStepRef.current = nextStep;
+    };
+
+    runSequencerStep();
+
+    sequencerIntervalRef.current = setInterval(() => {
+      runSequencerStep();
     }, stepDurationMs);
   };
 
@@ -406,16 +456,52 @@ export default function GeneratedChordGridDialog({
   };
 
   const handleRecordToggle = () => {
+    if (isCountInActive) {
+      stopSequencer();
+      return;
+    }
+
     if (isRecording) {
       setIsRecording(false);
       return;
     }
 
-    if (!isSequencerPlaying) {
-      startSequencer();
-    }
+    stopSequencer();
+    setCurrentBeatInBar(1);
+    setIsCountInActive(true);
 
-    setIsRecording(true);
+    void startAudio().then(() => {
+      let beatIndex = 0;
+      const stepDurationMs = 60_000 / tempoBpm;
+
+      const runCountInBeat = () => {
+        const beatNumber = beatIndex + 1;
+        const isDownbeat = beatIndex === 0;
+
+        pulseBeatIndicator(beatNumber, isDownbeat);
+        void playMetronomeClick(metronomeVolume, isDownbeat);
+
+        beatIndex += 1;
+
+        if (beatIndex >= beatsPerBar) {
+          if (countInIntervalRef.current) {
+            clearInterval(countInIntervalRef.current);
+            countInIntervalRef.current = null;
+          }
+
+          countInStartTimeoutRef.current = setTimeout(() => {
+            countInStartTimeoutRef.current = null;
+            setIsCountInActive(false);
+            setCurrentBeatInBar(1);
+            startSequencer();
+            setIsRecording(true);
+          }, stepDurationMs);
+        }
+      };
+
+      runCountInBeat();
+      countInIntervalRef.current = setInterval(runCountInBeat, stepDurationMs);
+    });
   };
 
   const clearRecordedEvents = () => {
@@ -589,13 +675,17 @@ export default function GeneratedChordGridDialog({
           </Button>
           <Button
             size="small"
-            variant={isRecording ? 'contained' : 'outlined'}
-            color={isRecording ? 'error' : 'primary'}
+            variant={isRecording || isCountInActive ? 'contained' : 'outlined'}
+            color={isRecording || isCountInActive ? 'error' : 'primary'}
             onClick={handleRecordToggle}
             startIcon={<FiberManualRecordIcon fontSize="small" />}
             sx={{ textTransform: 'none', fontWeight: 600 }}
           >
-            {isRecording ? 'Recording' : 'Record'}
+            {isCountInActive
+              ? `Count-in ${currentBeatInBar}/${beatsPerBar}`
+              : isRecording
+                ? 'Recording'
+                : 'Record'}
           </Button>
           <Button
             size="small"
@@ -666,7 +756,8 @@ export default function GeneratedChordGridDialog({
             <DeleteOutlineIcon fontSize="small" />
           </IconButton>
           <Typography variant="caption" color="text.secondary" sx={{ ml: 'auto' }}>
-            Step {currentStep + 1}/{totalSteps} • {arrangementEvents.length} event
+            {isCountInActive ? 'Count-in active' : `Step ${currentStep + 1}/${totalSteps}`} •{' '}
+            {arrangementEvents.length} event
             {arrangementEvents.length === 1 ? '' : 's'}
           </Typography>
         </Box>
