@@ -9,6 +9,10 @@ export type AdminUser = {
   role: 'ADMIN' | 'AUDITOR';
 };
 
+function isAdminRole(role: string): role is AdminUser['role'] {
+  return role === 'ADMIN' || role === 'AUDITOR';
+}
+
 export async function getAdminUserFromRequest(request: NextRequest): Promise<AdminUser | null> {
   const session = getSessionFromRequest(request);
   if (!session) {
@@ -24,11 +28,15 @@ export async function getAdminUserFromRequest(request: NextRequest): Promise<Adm
     },
   });
 
-  if (!user || (user.role !== 'ADMIN' && user.role !== 'AUDITOR')) {
+  if (!user || !isAdminRole(user.role)) {
     return null;
   }
 
-  return user;
+  return {
+    id: user.id,
+    email: user.email,
+    role: user.role,
+  };
 }
 
 export function maskEmail(email: string): string {
