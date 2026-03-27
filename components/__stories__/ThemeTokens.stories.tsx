@@ -9,6 +9,7 @@ import type { ThemePreset } from '../../lib/themeMode';
 type ThemeTokensPreviewProps = {
   mode: 'light' | 'dark';
   preset: ThemePreset;
+  hideCorePalette?: boolean;
 };
 
 type TokenEntry = {
@@ -124,7 +125,7 @@ function TokenGroup({ title, children }: { title: string; children: ReactNode })
   );
 }
 
-function ThemeTokensPreview({ mode, preset }: ThemeTokensPreviewProps) {
+function ThemeTokensPreview({ mode, preset, hideCorePalette = false }: ThemeTokensPreviewProps) {
   const [searchFilter, setSearchFilter] = useState('');
   const tokens = getThemeTokens(mode, preset);
   const palette = tokens.palette;
@@ -177,16 +178,23 @@ function ThemeTokensPreview({ mode, preset }: ThemeTokensPreviewProps) {
           </Typography>
         )}
 
-        <TokenGroup title="Core Palette">
-          <TokenSwatch label="primary.main" value={getColorValue(palette?.primary)} />
-          <TokenSwatch
-            label="background.default"
-            value={getColorValue(palette?.background?.default)}
-          />
-          <TokenSwatch label="background.paper" value={getColorValue(palette?.background?.paper)} />
-        </TokenGroup>
+        {!hideCorePalette && (
+          <>
+            <TokenGroup title="Core Palette">
+              <TokenSwatch label="primary.main" value={getColorValue(palette?.primary)} />
+              <TokenSwatch
+                label="background.default"
+                value={getColorValue(palette?.background?.default)}
+              />
+              <TokenSwatch
+                label="background.paper"
+                value={getColorValue(palette?.background?.paper)}
+              />
+            </TokenGroup>
 
-        <Divider />
+            <Divider />
+          </>
+        )}
 
         {filterTokens(surfaceTokens).length > 0 && (
           <>
@@ -259,7 +267,11 @@ function ThemeTokensMatrix() {
       >
         {combinations.map((combination) => (
           <Box key={`${combination.mode}-${combination.preset}`}>
-            <ThemeTokensPreview mode={combination.mode} preset={combination.preset} />
+            <ThemeTokensPreview
+              mode={combination.mode}
+              preset={combination.preset}
+              hideCorePalette
+            />
           </Box>
         ))}
       </Box>
