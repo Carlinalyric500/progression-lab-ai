@@ -22,6 +22,7 @@
     "test:watch": "jest --watch",
     "db:push": "prisma db push",
     "db:generate": "prisma generate",
+    "db:recover:vercel-migration": "bash ./scripts/recover-vercel-prisma-migration.sh",
     "db:seed": "node prisma/seed-admin.js",
     "db:studio": "prisma studio",
     "prepare": "husky",
