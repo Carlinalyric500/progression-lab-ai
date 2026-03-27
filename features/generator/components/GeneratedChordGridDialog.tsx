@@ -8,6 +8,7 @@ import {
   DialogContent,
   DialogTitle,
   IconButton,
+  Tooltip,
   Typography,
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
@@ -15,10 +16,8 @@ import AvTimerIcon from '@mui/icons-material/AvTimer';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 import LoopIcon from '@mui/icons-material/Loop';
-import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import SaveIcon from '@mui/icons-material/Save';
-import StopIcon from '@mui/icons-material/Stop';
-import { alpha, useTheme } from '@mui/material/styles';
+import { alpha, type Theme, useTheme } from '@mui/material/styles';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
 import {
@@ -30,6 +29,7 @@ import {
 import { createPianoVoicingFromChordSymbol } from '../../../domain/music/chordVoicing';
 import { CHORD_OPTIONS } from '../../../lib/formOptions';
 import PlaybackSettingsButton from './PlaybackSettingsButton';
+import PlaybackToggleButton from './PlaybackToggleButton';
 import SelectField from '../../../components/ui/SelectField';
 import { stopGlobalPlayback } from '../hooks/usePlaybackToggle';
 import SaveArrangementDialog from '../../arrangements/components/SaveArrangementDialog';
@@ -56,12 +56,31 @@ type ChordGridEntry = {
 };
 
 const STEPS_PER_BEAT = 4;
-const LOOP_LENGTH_OPTIONS = [1, 2, 4] as const;
+const LOOP_LENGTH_OPTIONS = [1, 2, 3, 4, 5, 6, 7, 8] as const;
 
 const getBeatsPerBar = (signature: TimeSignature): number => {
   const numerator = Number.parseInt(signature.split('/')[0], 10);
   return Number.isFinite(numerator) && numerator > 0 ? numerator : 4;
 };
+
+const getTransportIconButtonSx =
+  (isActive: boolean, tone: 'primary' | 'error' = 'primary') =>
+  (theme: Theme) => {
+    const palette = tone === 'error' ? theme.palette.error : theme.palette.primary;
+
+    return {
+      borderWidth: 1.5,
+      borderStyle: 'solid',
+      borderRadius: 1,
+      color: isActive ? theme.palette.common.white : palette.main,
+      borderColor: isActive ? palette.main : alpha(palette.main, 0.9),
+      backgroundColor: isActive ? palette.main : 'transparent',
+      '&:hover': {
+        borderColor: palette.main,
+        backgroundColor: isActive ? palette.dark : alpha(palette.main, 0.08),
+      },
+    };
+  };
 
 /**
  * Props for the generated chord grid playground dialog.
@@ -658,53 +677,54 @@ export default function GeneratedChordGridDialog({
             alignItems: 'center',
           }}
         >
-          <Button
-            size="small"
-            variant={isSequencerPlaying ? 'contained' : 'outlined'}
+          <PlaybackToggleButton
+            isPlaying={isSequencerPlaying}
             onClick={handleSequencerPlayToggle}
-            startIcon={
-              isSequencerPlaying ? (
-                <StopIcon fontSize="small" />
-              ) : (
-                <PlayArrowIcon fontSize="small" />
-              )
+          />
+          <Tooltip
+            title={
+              isCountInActive
+                ? `Count-in ${currentBeatInBar}/${beatsPerBar}`
+                : isRecording
+                  ? 'Stop recording'
+                  : 'Record arrangement'
             }
-            sx={{ textTransform: 'none', fontWeight: 600 }}
           >
-            {isSequencerPlaying ? 'Stop' : 'Play'}
-          </Button>
-          <Button
-            size="small"
-            variant={isRecording || isCountInActive ? 'contained' : 'outlined'}
-            color={isRecording || isCountInActive ? 'error' : 'primary'}
-            onClick={handleRecordToggle}
-            startIcon={<FiberManualRecordIcon fontSize="small" />}
-            sx={{ textTransform: 'none', fontWeight: 600 }}
-          >
-            {isCountInActive
-              ? `Count-in ${currentBeatInBar}/${beatsPerBar}`
-              : isRecording
-                ? 'Recording'
-                : 'Record'}
-          </Button>
-          <Button
-            size="small"
-            variant={isLoopEnabled ? 'contained' : 'outlined'}
-            onClick={() => setIsLoopEnabled((previous) => !previous)}
-            startIcon={<LoopIcon fontSize="small" />}
-            sx={{ textTransform: 'none', fontWeight: 600 }}
-          >
-            Loop
-          </Button>
-          <Button
-            size="small"
-            variant={metronomeEnabled ? 'contained' : 'outlined'}
-            onClick={() => onSettingsChange.onMetronomeEnabledChange(!metronomeEnabled)}
-            startIcon={<AvTimerIcon fontSize="small" />}
-            sx={{ textTransform: 'none', fontWeight: 600 }}
-          >
-            Metronome
-          </Button>
+            <IconButton
+              size="small"
+              aria-label={
+                isCountInActive
+                  ? `Count-in ${currentBeatInBar} of ${beatsPerBar}`
+                  : isRecording
+                    ? 'Stop recording'
+                    : 'Record arrangement'
+              }
+              onClick={handleRecordToggle}
+              sx={getTransportIconButtonSx(isRecording || isCountInActive, 'error')}
+            >
+              <FiberManualRecordIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title={isLoopEnabled ? 'Disable loop' : 'Enable loop'}>
+            <IconButton
+              size="small"
+              aria-label={isLoopEnabled ? 'Disable loop' : 'Enable loop'}
+              onClick={() => setIsLoopEnabled((previous) => !previous)}
+              sx={getTransportIconButtonSx(isLoopEnabled)}
+            >
+              <LoopIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title={metronomeEnabled ? 'Disable metronome' : 'Enable metronome'}>
+            <IconButton
+              size="small"
+              aria-label={metronomeEnabled ? 'Disable metronome' : 'Enable metronome'}
+              onClick={() => onSettingsChange.onMetronomeEnabledChange(!metronomeEnabled)}
+              sx={getTransportIconButtonSx(metronomeEnabled)}
+            >
+              <AvTimerIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
             <Box
               sx={{
@@ -729,24 +749,6 @@ export default function GeneratedChordGridDialog({
               Beat {currentBeatInBar}/{beatsPerBar}
             </Typography>
           </Box>
-          <SelectField
-            label="Length"
-            value={String(loopLengthBars)}
-            size="small"
-            onChange={(event) => {
-              const nextValue = Number.parseInt(event.target.value, 10);
-              if (LOOP_LENGTH_OPTIONS.includes(nextValue as (typeof LOOP_LENGTH_OPTIONS)[number])) {
-                setLoopLengthBars(nextValue as (typeof LOOP_LENGTH_OPTIONS)[number]);
-                setCurrentStep(0);
-                currentStepRef.current = 0;
-              }
-            }}
-            options={LOOP_LENGTH_OPTIONS.map((value) => ({
-              value: String(value),
-              label: `${value} bar${value > 1 ? 's' : ''}`,
-            }))}
-            sx={{ minWidth: 128 }}
-          />
           <IconButton
             aria-label="Clear recording"
             size="small"
@@ -755,7 +757,39 @@ export default function GeneratedChordGridDialog({
           >
             <DeleteOutlineIcon fontSize="small" />
           </IconButton>
-          <Typography variant="caption" color="text.secondary" sx={{ ml: 'auto' }}>
+          <Box
+            sx={{
+              ml: { xs: 0, sm: 'auto' },
+              width: { xs: '100%', sm: 'auto' },
+              minWidth: { sm: 144 },
+            }}
+          >
+            <SelectField
+              label="Length"
+              value={String(loopLengthBars)}
+              size="small"
+              onChange={(event) => {
+                const nextValue = Number.parseInt(event.target.value, 10);
+                if (
+                  LOOP_LENGTH_OPTIONS.includes(nextValue as (typeof LOOP_LENGTH_OPTIONS)[number])
+                ) {
+                  setLoopLengthBars(nextValue as (typeof LOOP_LENGTH_OPTIONS)[number]);
+                  setCurrentStep(0);
+                  currentStepRef.current = 0;
+                }
+              }}
+              options={LOOP_LENGTH_OPTIONS.map((value) => ({
+                value: String(value),
+                label: `${value} bar${value > 1 ? 's' : ''}`,
+              }))}
+              sx={{ minWidth: { xs: '100%', sm: 144 } }}
+            />
+          </Box>
+          <Typography
+            variant="caption"
+            color="text.secondary"
+            sx={{ width: '100%', textAlign: 'right' }}
+          >
             {isCountInActive ? 'Count-in active' : `Step ${currentStep + 1}/${totalSteps}`} •{' '}
             {arrangementEvents.length} event
             {arrangementEvents.length === 1 ? '' : 's'}
