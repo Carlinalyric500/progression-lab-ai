@@ -1,5 +1,7 @@
 import type { AdminUser, ProgressionDetail, ProgressionRow } from './types';
 
+import { createCsrfHeaders } from '../../lib/csrfClient';
+
 async function readErrorMessage(response: Response, fallback: string) {
   try {
     const body = (await response.json()) as { message?: string };
@@ -34,7 +36,11 @@ export async function login(credentials: { email: string; password: string }): P
 }
 
 export async function logout(): Promise<void> {
-  await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
+  await fetch('/api/auth/logout', {
+    method: 'POST',
+    credentials: 'include',
+    headers: createCsrfHeaders(),
+  });
 }
 
 export async function fetchProgressions(params: {
@@ -79,6 +85,7 @@ export async function deleteProgression(id: string): Promise<void> {
   const response = await fetch(`/api/progressions/${id}`, {
     method: 'DELETE',
     credentials: 'include',
+    headers: createCsrfHeaders(),
   });
 
   if (!response.ok) {

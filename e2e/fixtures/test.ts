@@ -28,6 +28,13 @@ class ApiMocker {
     });
   }
 
+  async expectLogoutWithCsrf(token: string) {
+    await this.page.route('**/api/auth/logout', async (route) => {
+      await expect(route.request().headers()['x-csrf-token']).toBe(token);
+      await fulfillJson(route, { ok: true });
+    });
+  }
+
   async mockGeneratorSuccess(response: ChordSuggestionResponse = generatorResponse) {
     await this.page.route('**/api/chord-suggestions', async (route) => {
       await fulfillJson(route, response);

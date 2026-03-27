@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import { getSessionFromRequest } from '../../../../lib/auth';
+import { checkCsrfToken } from '../../../../lib/csrf';
 import { prisma } from '../../../../lib/prisma';
 import type { UpdateProgressionRequest } from '../../../../lib/types';
 
@@ -29,7 +30,7 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
     return NextResponse.json(progression);
   } catch (error) {
     console.error('Failed to fetch progression:', error);
-    return NextResponse.json({ message: 'Failed to fetch progression', error }, { status: 500 });
+    return NextResponse.json({ message: 'Failed to fetch progression' }, { status: 500 });
   }
 }
 
@@ -38,6 +39,11 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
  */
 export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
+    const csrfError = checkCsrfToken(request);
+    if (csrfError) {
+      return csrfError;
+    }
+
     const session = getSessionFromRequest(request);
     if (!session) {
       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
@@ -77,7 +83,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
     return NextResponse.json(progression);
   } catch (error) {
     console.error('Failed to update progression:', error);
-    return NextResponse.json({ message: 'Failed to update progression', error }, { status: 500 });
+    return NextResponse.json({ message: 'Failed to update progression' }, { status: 500 });
   }
 }
 
@@ -89,6 +95,11 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
+    const csrfError = checkCsrfToken(_request);
+    if (csrfError) {
+      return csrfError;
+    }
+
     const session = getSessionFromRequest(_request);
     if (!session) {
       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
@@ -109,6 +120,6 @@ export async function DELETE(
     return new NextResponse(null, { status: 204 });
   } catch (error) {
     console.error('Failed to delete progression:', error);
-    return NextResponse.json({ message: 'Failed to delete progression', error }, { status: 500 });
+    return NextResponse.json({ message: 'Failed to delete progression' }, { status: 500 });
   }
 }

@@ -1,6 +1,7 @@
 import OpenAI from 'openai';
 import { NextRequest, NextResponse } from 'next/server';
 
+import { createRateLimitResponse } from '../../../lib/rateLimiting';
 import type { ChordSuggestionResponse, PianoVoicing } from '../../../lib/types';
 import { NOTE_TO_SEMITONE } from '../../../lib/noteToSemitone';
 import { chordSuggestionInstructions } from './instructions';
@@ -12,6 +13,23 @@ const client = new OpenAI({
 
 const CHORD_ROOT_PATTERN = /^([A-G](?:#|b)?)/;
 const NOTE_PATTERN = /^([A-G](?:#|b)?)(-?\d+)$/;
+const MAX_REQUEST_BODY_BYTES = 8 * 1024;
+const MAX_SEED_CHORDS = 8;
+const MAX_TEXT_FIELD_LENGTH = 200;
+const CHORD_SUGGESTION_RATE_LIMIT = {
+  maxAttempts: 10,
+  windowMs: 15 * 60 * 1000,
+};
+
+type ChordSuggestionRequestBody = {
+  seedChords?: unknown;
+  mood?: unknown;
+  mode?: unknown;
+  genre?: unknown;
+  styleReference?: unknown;
+  instrument?: unknown;
+  adventurousness?: unknown;
+};
 
 /**
  * Returns chord-root pitch class from a chord symbol, or null when unknown.
@@ -180,29 +198,84 @@ function normalizeChordSuggestionResponse(
   };
 }
 
+function normalizeTextField(value: unknown, fieldName: string): string {
+  if (typeof value !== 'string') {
+    throw new Error(`${fieldName} must be a string`);
+  }
+
+  const normalized = value.trim();
+  if (normalized.length > MAX_TEXT_FIELD_LENGTH) {
+    throw new Error(`${fieldName} is too long`);
+  }
+
+  return normalized;
+}
+
+function parseRequestBody(rawBody: string): ChordSuggestionRequestBody {
+  if (Buffer.byteLength(rawBody, 'utf8') > MAX_REQUEST_BODY_BYTES) {
+    throw new Error('Request body is too large');
+  }
+
+  try {
+    return JSON.parse(rawBody) as ChordSuggestionRequestBody;
+  } catch {
+    throw new Error('Request body must be valid JSON');
+  }
+}
+
+function buildModelInput(body: ChordSuggestionRequestBody): string {
+  const seedChords = Array.isArray(body.seedChords)
+    ? body.seedChords.filter((value): value is string => typeof value === 'string')
+    : [];
+
+  if (seedChords.length > MAX_SEED_CHORDS) {
+    throw new Error('Too many seed chords');
+  }
+
+  const normalizedSeedChords = seedChords
+    .map((chord) => chord.trim())
+    .filter((chord) => chord.length > 0)
+    .slice(0, MAX_SEED_CHORDS);
+
+  return JSON.stringify({
+    seedChords: normalizedSeedChords,
+    mood: normalizeTextField(body.mood ?? '', 'Mood'),
+    mode: normalizeTextField(body.mode ?? '', 'Mode'),
+    genre: normalizeTextField(body.genre ?? '', 'Genre'),
+    styleReference:
+      typeof body.styleReference === 'string' && body.styleReference.trim().length > 0
+        ? normalizeTextField(body.styleReference, 'Style reference')
+        : null,
+    instrument:
+      body.instrument === 'piano' || body.instrument === 'guitar' || body.instrument === 'both'
+        ? body.instrument
+        : 'both',
+    adventurousness:
+      body.adventurousness === 'safe' ||
+      body.adventurousness === 'balanced' ||
+      body.adventurousness === 'adventurous'
+        ? body.adventurousness
+        : 'balanced',
+  });
+}
+
 /**
  * Generates chord suggestions, progression ideas, and structure ideas via OpenAI.
  */
 export async function POST(req: NextRequest) {
   try {
-    if (!process.env.OPENAI_API_KEY) {
-      return NextResponse.json({ error: 'Missing OPENAI_API_KEY' }, { status: 500 });
+    const rateLimitResponse = createRateLimitResponse(req, CHORD_SUGGESTION_RATE_LIMIT);
+    if (rateLimitResponse) {
+      return rateLimitResponse;
     }
 
-    const body = await req.json();
+    if (!process.env.OPENAI_API_KEY) {
+      return NextResponse.json({ error: 'Chord suggestions are unavailable' }, { status: 503 });
+    }
 
-    const input = JSON.stringify({
-      seedChords: body.seedChords ?? [],
-      mood: body.mood ?? '',
-      mode: body.mode ?? '',
-      genre: body.genre ?? '',
-      styleReference:
-        typeof body.styleReference === 'string' && body.styleReference.trim().length > 0
-          ? body.styleReference.trim()
-          : null,
-      instrument: body.instrument ?? 'both',
-      adventurousness: body.adventurousness ?? 'balanced',
-    });
+    const rawBody = await req.text();
+    const body = parseRequestBody(rawBody);
+    const input = buildModelInput(body);
 
     const response = await client.responses.create({
       model: process.env.OPENAI_MODEL || 'gpt-5.4',
@@ -222,28 +295,36 @@ export async function POST(req: NextRequest) {
 
     if (!raw) {
       console.error('Empty output_text from OpenAI response:', response);
-      return NextResponse.json({ error: 'OpenAI returned empty output' }, { status: 500 });
+      return NextResponse.json({ error: 'Failed to generate chord suggestions' }, { status: 502 });
     }
 
     let parsed;
     try {
       parsed = normalizeChordSuggestionResponse(JSON.parse(raw) as ChordSuggestionResponse);
     } catch (parseError) {
-      console.error('Failed to parse output_text:', raw);
       console.error(parseError);
-      return NextResponse.json({ error: 'Model returned invalid JSON', raw }, { status: 500 });
+      return NextResponse.json({ error: 'Failed to generate chord suggestions' }, { status: 502 });
     }
 
     return NextResponse.json(parsed);
   } catch (error) {
     console.error('chord-suggestions route error:', error);
 
-    return NextResponse.json(
-      {
-        error: 'Failed to generate chord suggestions',
-        details: error instanceof Error ? error.message : 'Unknown error',
-      },
-      { status: 500 },
-    );
+    if (error instanceof Error) {
+      if (error.message === 'Request body is too large') {
+        return NextResponse.json({ error: error.message }, { status: 413 });
+      }
+
+      if (
+        error.message === 'Request body must be valid JSON' ||
+        error.message.endsWith('must be a string') ||
+        error.message.endsWith('is too long') ||
+        error.message === 'Too many seed chords'
+      ) {
+        return NextResponse.json({ error: error.message }, { status: 400 });
+      }
+    }
+
+    return NextResponse.json({ error: 'Failed to generate chord suggestions' }, { status: 500 });
   }
 }

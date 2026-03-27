@@ -5,8 +5,17 @@ const { randomBytes, scryptSync } = require('crypto');
 const prisma = new PrismaClient();
 
 const adminEmail = process.env.ADMIN_SEED_EMAIL || 'demo@progressionlab.ai';
-const adminPassword = process.env.ADMIN_SEED_PASSWORD || 'Admin123!ChangeMe';
 const adminName = process.env.ADMIN_SEED_NAME || 'Demo Admin';
+
+function getRequiredAdminPassword() {
+  const password = process.env.ADMIN_SEED_PASSWORD && process.env.ADMIN_SEED_PASSWORD.trim();
+
+  if (!password) {
+    throw new Error('ADMIN_SEED_PASSWORD must be set before running the admin seed');
+  }
+
+  return password;
+}
 
 function hashPassword(password) {
   const salt = randomBytes(16).toString('hex');
@@ -15,6 +24,8 @@ function hashPassword(password) {
 }
 
 async function main() {
+  const adminPassword = getRequiredAdminPassword();
+
   await prisma.user.upsert({
     where: { email: adminEmail },
     update: {
@@ -30,9 +41,11 @@ async function main() {
     },
   });
 
-  console.log('Admin seed completed');
-  console.log(`Login email: ${adminEmail}`);
-  console.log(`Login password: ${adminPassword}`);
+  console.log('✅ Admin seed completed successfully');
+  console.log(`📧 Admin email: ${adminEmail}`);
+  console.log(
+    '⚠️ Password not logged to console for security - use environment variable provided during deployment',
+  );
 }
 
 main()

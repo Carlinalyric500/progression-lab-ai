@@ -1,6 +1,7 @@
 /** @jest-environment node */
 
 var mockCreate = jest.fn();
+var mockCreateRateLimitResponse = jest.fn();
 
 jest.mock('openai', () => {
   return jest.fn().mockImplementation(() => ({
@@ -9,6 +10,10 @@ jest.mock('openai', () => {
     },
   }));
 });
+
+jest.mock('../../../../lib/rateLimiting', () => ({
+  createRateLimitResponse: (...args: unknown[]) => mockCreateRateLimitResponse(...args),
+}));
 
 import { POST } from '../route';
 
@@ -70,6 +75,8 @@ describe('POST /api/chord-suggestions', () => {
 
   beforeEach(() => {
     mockCreate.mockReset();
+    mockCreateRateLimitResponse.mockReset();
+    mockCreateRateLimitResponse.mockReturnValue(null);
     console.error = jest.fn();
   });
 
@@ -86,11 +93,11 @@ describe('POST /api/chord-suggestions', () => {
   it('returns 500 when OPENAI_API_KEY is missing', async () => {
     delete process.env.OPENAI_API_KEY;
 
-    const response = await POST({ json: async () => ({}) } as never);
+    const response = await POST({ text: async () => '{}' } as never);
     const body = await response.json();
 
-    expect(response.status).toBe(500);
-    expect(body).toEqual({ error: 'Missing OPENAI_API_KEY' });
+    expect(response.status).toBe(503);
+    expect(body).toEqual({ error: 'Chord suggestions are unavailable' });
   });
 
   it('returns parsed model response when OpenAI responds with valid JSON', async () => {
@@ -100,15 +107,16 @@ describe('POST /api/chord-suggestions', () => {
     });
 
     const response = await POST({
-      json: async () => ({
-        seedChords: ['Fmaj7', 'F#m7'],
-        mood: 'dreamy',
-        mode: 'lydian',
-        genre: 'piano house',
-        styleReference: 'Barry Harris',
-        instrument: 'both',
-        adventurousness: 'balanced',
-      }),
+      text: async () =>
+        JSON.stringify({
+          seedChords: ['Fmaj7', 'F#m7'],
+          mood: 'dreamy',
+          mode: 'lydian',
+          genre: 'piano house',
+          styleReference: 'Barry Harris',
+          instrument: 'both',
+          adventurousness: 'balanced',
+        }),
     } as never);
 
     const body = await response.json();
@@ -142,17 +150,17 @@ describe('POST /api/chord-suggestions', () => {
     );
   });
 
-  it('returns 500 when the model returns invalid JSON', async () => {
+  it('returns 502 when the model returns invalid JSON', async () => {
     process.env.OPENAI_API_KEY = 'test-key';
     mockCreate.mockResolvedValue({
       output_text: '{invalid json',
     });
 
-    const response = await POST({ json: async () => ({}) } as never);
+    const response = await POST({ text: async () => '{}' } as never);
     const body = await response.json();
 
-    expect(response.status).toBe(500);
-    expect(body.error).toBe('Model returned invalid JSON');
+    expect(response.status).toBe(502);
+    expect(body.error).toBe('Failed to generate chord suggestions');
   });
 
   it('pulls add9 color tones closer to the root in piano voicings', async () => {
@@ -188,15 +196,16 @@ describe('POST /api/chord-suggestions', () => {
     });
 
     const response = await POST({
-      json: async () => ({
-        seedChords: ['Fmaj7'],
-        mood: 'smooth',
-        mode: 'ionian',
-        genre: 'pop r&b',
-        styleReference: null,
-        instrument: 'both',
-        adventurousness: 'balanced',
-      }),
+      text: async () =>
+        JSON.stringify({
+          seedChords: ['Fmaj7'],
+          mood: 'smooth',
+          mode: 'ionian',
+          genre: 'pop r&b',
+          styleReference: null,
+          instrument: 'both',
+          adventurousness: 'balanced',
+        }),
     } as never);
 
     const body = await response.json();
@@ -239,15 +248,16 @@ describe('POST /api/chord-suggestions', () => {
     });
 
     const response = await POST({
-      json: async () => ({
-        seedChords: ['Cmaj7'],
-        mood: 'uplifting',
-        mode: 'ionian',
-        genre: 'pop',
-        styleReference: null,
-        instrument: 'both',
-        adventurousness: 'balanced',
-      }),
+      text: async () =>
+        JSON.stringify({
+          seedChords: ['Cmaj7'],
+          mood: 'uplifting',
+          mode: 'ionian',
+          genre: 'pop',
+          styleReference: null,
+          instrument: 'both',
+          adventurousness: 'balanced',
+        }),
     } as never);
 
     const body = await response.json();
@@ -255,5 +265,27 @@ describe('POST /api/chord-suggestions', () => {
     expect(response.status).toBe(200);
     expect(body.nextChordSuggestions[0].pianoVoicing.rightHand).toEqual(['D4', 'G4', 'A4']);
     expect(body.progressionIdeas[0].pianoVoicings[0].rightHand).toEqual(['D4', 'G4', 'A4']);
+  });
+
+  it('returns 400 when the request body is invalid JSON', async () => {
+    process.env.OPENAI_API_KEY = 'test-key';
+
+    const response = await POST({ text: async () => '{bad json' } as never);
+    const body = await response.json();
+
+    expect(response.status).toBe(400);
+    expect(body).toEqual({ error: 'Request body must be valid JSON' });
+    expect(mockCreate).not.toHaveBeenCalled();
+  });
+
+  it('returns 413 when the request body is too large', async () => {
+    process.env.OPENAI_API_KEY = 'test-key';
+
+    const response = await POST({ text: async () => 'x'.repeat(9000) } as never);
+    const body = await response.json();
+
+    expect(response.status).toBe(413);
+    expect(body).toEqual({ error: 'Request body is too large' });
+    expect(mockCreate).not.toHaveBeenCalled();
   });
 });

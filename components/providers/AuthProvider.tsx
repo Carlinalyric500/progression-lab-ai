@@ -2,6 +2,8 @@
 
 import { createContext, useContext, useEffect, useState, ReactNode, useCallback } from 'react';
 
+import { createCsrfHeaders } from '../../lib/csrfClient';
+
 /**
  * Authenticated user shape returned by /api/auth/me.
  */
@@ -133,7 +135,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const logout = async () => {
-    await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
+    await fetch('/api/auth/logout', {
+      method: 'POST',
+      credentials: 'include',
+      headers: createCsrfHeaders(),
+    });
     setIsAuthenticated(false);
     setUser(null);
     sessionStorage.removeItem(AUTH_CACHE_KEY);

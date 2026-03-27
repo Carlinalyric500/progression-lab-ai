@@ -19,7 +19,14 @@ async function main() {
     if (user.passwordHash) {
       const [scheme, salt, hash] = user.passwordHash.split('$');
       if (scheme === 'scrypt' && salt && hash) {
-        const candidate = scryptSync('Admin123!ChangeMe', salt, 64).toString('hex');
+        // NOTE: This script should not use hardcoded passwords. Use ADMIN_SEED_PASSWORD env var instead.
+        const adminPassword = process.env.ADMIN_SEED_PASSWORD_CHECK;
+        if (!adminPassword) {
+          throw new Error(
+            'Set ADMIN_SEED_PASSWORD_CHECK environment variable to verify admin password',
+          );
+        }
+        const candidate = scryptSync(adminPassword, salt, 64).toString('hex');
         const candidateBuffer = Buffer.from(candidate, 'hex');
         const hashBuffer = Buffer.from(hash, 'hex');
         passwordMatches =

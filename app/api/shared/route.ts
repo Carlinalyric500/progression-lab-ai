@@ -72,9 +72,6 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(filteredProgressions);
   } catch (error) {
     console.error('Failed to fetch public progressions:', error);
-    return NextResponse.json(
-      { message: 'Failed to fetch public progressions', error },
-      { status: 500 },
-    );
+    return NextResponse.json({ message: 'Failed to fetch public progressions' }, { status: 500 });
   }
 }

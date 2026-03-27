@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 const CSRF_COOKIE_NAME = 'csrf-token';
 const CSRF_HEADER_NAME = 'x-csrf-token';
+const CSRF_TOKEN_PATTERN = /^[a-f0-9]{64}$/i;
 
 /**
  * Generates a cryptographically secure CSRF token
@@ -54,6 +55,31 @@ export function setCsrfToken(response: NextResponse, token: string): void {
     sameSite: 'lax',
     path: '/',
     maxAge: 60 * 60 * 24, // 24 hours
+  });
+}
+
+/**
+ * Ensures the response sets a CSRF token cookie, reusing a valid request token when possible.
+ */
+export function issueCsrfToken(response: NextResponse, request?: NextRequest): string {
+  const existingToken = request ? getCsrfToken(request) : null;
+  const token =
+    existingToken && CSRF_TOKEN_PATTERN.test(existingToken) ? existingToken : generateCsrfToken();
+
+  setCsrfToken(response, token);
+  return token;
+}
+
+/**
+ * Clears the CSRF token cookie on a response.
+ */
+export function clearCsrfToken(response: NextResponse): void {
+  response.cookies.set(CSRF_COOKIE_NAME, '', {
+    httpOnly: false,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+    path: '/',
+    maxAge: 0,
   });
 }
 

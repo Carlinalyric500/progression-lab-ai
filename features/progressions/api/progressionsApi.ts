@@ -1,5 +1,7 @@
 import type { CreateProgressionRequest, UpdateProgressionRequest } from '../types';
 
+import { createCsrfHeaders } from '../../../lib/csrfClient';
+
 async function readErrorMessage(response: Response, fallback: string) {
   try {
     const body = (await response.json()) as { message?: string };
@@ -12,9 +14,9 @@ async function readErrorMessage(response: Response, fallback: string) {
 export async function createProgression(payload: CreateProgressionRequest) {
   const response = await fetch('/api/progressions', {
     method: 'POST',
-    headers: {
+    headers: createCsrfHeaders({
       'Content-Type': 'application/json',
-    },
+    }),
     body: JSON.stringify(payload),
   });
 
@@ -48,9 +50,9 @@ export async function getProgression(id: string) {
 export async function updateProgression(id: string, payload: UpdateProgressionRequest) {
   const response = await fetch(`/api/progressions/${id}`, {
     method: 'PUT',
-    headers: {
+    headers: createCsrfHeaders({
       'Content-Type': 'application/json',
-    },
+    }),
     body: JSON.stringify(payload),
   });
 
@@ -64,6 +66,7 @@ export async function updateProgression(id: string, payload: UpdateProgressionRe
 export async function deleteProgression(id: string) {
   const response = await fetch(`/api/progressions/${id}`, {
     method: 'DELETE',
+    headers: createCsrfHeaders(),
   });
 
   if (!response.ok) {

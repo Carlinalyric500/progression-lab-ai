@@ -7,6 +7,7 @@ import {
   setSessionCookie,
   validateAuthCredentials,
 } from '../../../../lib/auth';
+import { issueCsrfToken } from '../../../../lib/csrf';
 import { prisma } from '../../../../lib/prisma';
 
 /**
@@ -53,6 +54,7 @@ export async function POST(request: NextRequest) {
     );
 
     setSessionCookie(response, createSessionToken(user.id, user.email, user.role));
+    issueCsrfToken(response, request);
     return response;
   } catch (error) {
     console.error('Registration failed:', error);

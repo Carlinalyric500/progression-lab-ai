@@ -7,6 +7,7 @@ import {
   validateAdminAuthPayload,
   verifyPassword,
 } from '../../../../lib/auth';
+import { issueCsrfToken } from '../../../../lib/csrf';
 import { createRateLimitResponse } from '../../../../lib/rateLimiting';
 import { prisma } from '../../../../lib/prisma';
 
@@ -51,6 +52,7 @@ export async function POST(request: NextRequest) {
     });
 
     setSessionCookie(response, createSessionToken(user.id, user.email, user.role));
+    issueCsrfToken(response, request);
     return response;
   } catch (error) {
     console.error('Admin login failed:', error);

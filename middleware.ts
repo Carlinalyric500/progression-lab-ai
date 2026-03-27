@@ -31,31 +31,35 @@ export function middleware() {
   // Prevent MIME-type sniffing
   response.headers.set('X-Content-Type-Options', 'nosniff');
 
+  // Disable client-side caching for sensitive responses
+  response.headers.set('Cache-Control', 'no-store, must-revalidate, max-age=0');
+
   // Enable XSS protection in older browsers
   response.headers.set('X-XSS-Protection', '1; mode=block');
 
   // Referrer policy for privacy
   response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
 
-  // Permissions policy (formerly Feature-Policy)
+  // Permissions policy - restrict access to sensitive browser APIs
   response.headers.set(
     'Permissions-Policy',
-    'geolocation=(), microphone=(), camera=(), payment=()',
+    'geolocation=(), microphone=(), camera=(), payment=(), usb=(), magnetometer=(), gyroscope=(), accelerometer=()',
   );
 
   // Content Security Policy - restrictive by default
-  // Adjust based on your actual resource sources
+  // Note: Avoiding unsafe-inline for scripts to prevent XSS; inline styles are acceptable
   const csp = [
     "default-src 'self'",
-    "script-src 'self' 'unsafe-inline' 'unsafe-eval'", // Adjust for your needs
+    "script-src 'self'", // No inline scripts; use external files or service workers
     "worker-src 'self' blob:",
-    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com", // MUI requires unsafe-inline for styles
     "img-src 'self' data: https:",
     "font-src 'self' data: https://fonts.gstatic.com",
     `connect-src 'self' ${sentryConnectSources.join(' ')}`,
     "frame-ancestors 'self'",
     "base-uri 'self'",
     "form-action 'self'",
+    "object-src 'none'",
   ].join('; ');
 
   response.headers.set('Content-Security-Policy', csp);

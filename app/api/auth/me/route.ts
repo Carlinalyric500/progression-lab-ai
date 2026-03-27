@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import { getSessionFromRequest } from '../../../../lib/auth';
+import { issueCsrfToken } from '../../../../lib/csrf';
 import { prisma } from '../../../../lib/prisma';
 
 /**
@@ -27,5 +28,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
   }
 
-  return NextResponse.json({ user });
+  const response = NextResponse.json({ user });
+  issueCsrfToken(response, request);
+  return response;
 }

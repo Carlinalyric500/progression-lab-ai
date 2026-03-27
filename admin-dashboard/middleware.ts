@@ -31,6 +31,9 @@ export function middleware() {
   // Prevent MIME-type sniffing
   response.headers.set('X-Content-Type-Options', 'nosniff');
 
+  // Disable client-side caching for admin panel (sensitive data)
+  response.headers.set('Cache-Control', 'no-store, must-revalidate, max-age=0');
+
   // Enable XSS protection in older browsers
   response.headers.set('X-XSS-Protection', '1; mode=block');
 
@@ -40,21 +43,23 @@ export function middleware() {
   // Permissions policy - restrictive for admin panel
   response.headers.set(
     'Permissions-Policy',
-    'geolocation=(), microphone=(), camera=(), payment=()',
+    'geolocation=(), microphone=(), camera=(), payment=(), usb=(), magnetometer=(), gyroscope=(), accelerometer=()',
   );
 
   // Strict Content Security Policy for admin panel
+  // Note: Avoiding unsafe-inline for scripts to prevent XSS; inline styles unavoidable with MUI
   const csp = [
     "default-src 'self'",
-    "script-src 'self' 'unsafe-inline'", // MUI requires unsafe-inline
+    "script-src 'self'", // No inline scripts for admin panel; use external files
     "worker-src 'self' blob:",
-    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com", // MUI requires unsafe-inline
+    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com", // MUI requires unsafe-inline for styles
     "img-src 'self' data:",
     "font-src 'self' data: https://fonts.gstatic.com",
     `connect-src 'self' ${sentryConnectSources.join(' ')}`,
     "frame-ancestors 'none'", // Prevent embedding in any frame
     "base-uri 'self'",
     "form-action 'self'",
+    "object-src 'none'",
   ].join('; ');
 
   response.headers.set('Content-Security-Policy', csp);

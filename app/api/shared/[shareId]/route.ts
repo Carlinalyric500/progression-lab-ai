@@ -25,9 +25,6 @@ export async function GET(
     return NextResponse.json(progression);
   } catch (error) {
     console.error('Failed to fetch shared progression:', error);
-    return NextResponse.json(
-      { message: 'Failed to fetch shared progression', error },
-      { status: 500 },
-    );
+    return NextResponse.json({ message: 'Failed to fetch shared progression' }, { status: 500 });
   }
 }
