@@ -152,6 +152,13 @@ const getTransportIconButtonSx =
 /**
  * Props for the generated chord grid playground dialog.
  */
+type PendingArrangementLoad = {
+  /** Unique value that changes each time a load is triggered (use arrangement id or a counter). */
+  key: string;
+  events: import('../../../lib/types').ArrangementEvent[];
+  loopLengthBars: number;
+};
+
 type GeneratedChordGridDialogProps = {
   open: boolean;
   onClose: () => void;
@@ -160,6 +167,10 @@ type GeneratedChordGridDialogProps = {
   onSettingsChange: PlaybackSettingsChangeHandlers;
   onTempoBpmChange: (value: number) => void;
   chords: ChordGridEntry[];
+  /** When non-null, the dialog seeds its timeline from this value on mount / key change. */
+  pendingLoad?: PendingArrangementLoad | null;
+  /** Called after an arrangement is successfully saved, so callers can refresh lists. */
+  onSaveSuccess?: () => void;
 };
 
 /**
@@ -205,6 +216,8 @@ export default function GeneratedChordGridDialog({
   onSettingsChange,
   onTempoBpmChange,
   chords,
+  pendingLoad = null,
+  onSaveSuccess,
 }: GeneratedChordGridDialogProps) {
   const theme = useTheme();
   const { appColors } = theme.palette;
@@ -295,6 +308,34 @@ export default function GeneratedChordGridDialog({
     setEditableChords(chords);
     setEditingPadKey(null);
   }, [chords, open]);
+
+  // Seed timeline from a loaded arrangement whenever the load key changes.
+  useEffect(() => {
+    if (!pendingLoad) {
+      return;
+    }
+
+    const clampedBars = Math.max(
+      1,
+      Math.min(
+        8,
+        LOOP_LENGTH_OPTIONS.includes(
+          pendingLoad.loopLengthBars as (typeof LOOP_LENGTH_OPTIONS)[number],
+        )
+          ? (pendingLoad.loopLengthBars as (typeof LOOP_LENGTH_OPTIONS)[number])
+          : 1,
+      ),
+    ) as (typeof LOOP_LENGTH_OPTIONS)[number];
+
+    setArrangementEvents(pendingLoad.events);
+    setLoopLengthBars(clampedBars);
+    setCurrentStep(0);
+    currentStepRef.current = 0;
+    setIsRecording(false);
+    setIsSequencerPlaying(false);
+    setIsCountInActive(false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pendingLoad?.key]);
 
   useEffect(() => {
     if (!open) {
@@ -1223,6 +1264,7 @@ export default function GeneratedChordGridDialog({
       <SaveArrangementDialog
         open={saveArrangementDialogOpen}
         onClose={() => setSaveArrangementDialogOpen(false)}
+        onSuccess={onSaveSuccess}
         timeline={timeline}
         playbackSnapshot={playbackSnapshot}
         sourceChords={editableChords}
