@@ -101,9 +101,12 @@ export default function LanguageSwitcher({ fullWidth = false }: LanguageSwitcher
           sx={{
             p: 1,
             display: 'grid',
-            gridTemplateColumns: 'repeat(6, minmax(0, 1fr))',
+            gridTemplateColumns: {
+              xs: 'repeat(4, minmax(0, 1fr))',
+              sm: 'repeat(6, minmax(0, 1fr))',
+            },
             gap: 0.5,
-            width: 252,
+            width: { xs: 172, sm: 252 },
             maxWidth: 'calc(100vw - 24px)',
           }}
         >
