@@ -13,12 +13,23 @@ type LanguageSwitcherProps = {
 
 const FLAG_BY_LOCALE: Record<string, string> = {
   en: 'GB',
+  'en-GB': 'GB',
   es: 'ES',
+  'es-ES': 'ES',
+  'es-GQ': 'GQ',
   fr: 'FR',
   el: 'GR',
   de: 'DE',
+  'sv-SE': 'SE',
+  'da-DK': 'DK',
+  'nb-NO': 'NO',
+  'fi-FI': 'FI',
+  'is-IS': 'IS',
   it: 'IT',
   'pt-BR': 'BR',
+  'pt-PT': 'PT',
+  'pt-AO': 'AO',
+  'pt-MZ': 'MZ',
   nl: 'NL',
   pl: 'PL',
   tr: 'TR',
@@ -28,6 +39,8 @@ const FLAG_BY_LOCALE: Record<string, string> = {
   'zh-TW': 'TW',
   hi: 'IN',
   ar: 'SA',
+  'ar-EG': 'EG',
+  'ar-MA': 'MA',
   he: 'IL',
 };
 

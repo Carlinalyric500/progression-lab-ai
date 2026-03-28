@@ -1,0 +1,217 @@
+{
+  "header": {
+    "description": "Skriv inn noen akkorder, en stemning og en skala. Fa ideer til progresjoner, strukturforslag og enkle diagrammer for gitar og piano."
+  },
+  "status": {
+    "loadingSuggestions": "Laster forslag...",
+    "loadingProgressionIdeas": "Laster progresjonsideer...",
+    "loadingStructureSuggestions": "Laster strukturforslag..."
+  },
+  "errors": {
+    "selectMode": "Velg eller skriv inn en modus / skala.",
+    "selectGenre": "Velg eller skriv inn en sjanger.",
+    "requestFailed": "Kunne ikke generere forslag."
+  },
+  "form": {
+    "seedChords": {
+      "label": "Startakkorder",
+      "placeholder": "Fmaj7, F#m7",
+      "required": "Startakkorder er obligatorisk",
+      "atLeastOne": "Skriv inn minst en akkord"
+    },
+    "mood": {
+      "label": "Stemning",
+      "placeholder": "drommende, mork, hapefull",
+      "required": "Stemning er obligatorisk"
+    },
+    "mode": {
+      "label": "Modus / skala",
+      "placeholder": "jonisk, dorisk, harmonisk moll",
+      "required": "Modus / skala er obligatorisk"
+    },
+    "genre": {
+      "label": "Sjanger",
+      "placeholder": "piano house, jazz, indie pop",
+      "required": "Sjanger er obligatorisk"
+    },
+    "styleReference": {
+      "label": "Stilreferanse (valgfritt)",
+      "placeholder": "Barry Harris, Bill Evans, osv.",
+      "helperText": "Bruk en artist, laerer eller harmoniskole som stilistisk referanse."
+    },
+    "adventurousness": {
+      "label": "Utforskningsgrad",
+      "placeholder": "trygg, balansert, overraskende"
+    },
+    "actions": {
+      "randomizeInputs": "Tilfeldiggjor input",
+      "generateIdeas": "Generer ideer",
+      "generating": "Genererer..."
+    }
+  },
+  "optionGroups": {
+    "mode": {
+      "majorDiatonic": "Dur / Diatonisk",
+      "minorModal": "Moll / Modal",
+      "pentatonicBlues": "Pentatonisk / Blues",
+      "extendedColors": "Utvidede farger",
+      "symmetricAdvanced": "Symmetrisk / Avansert",
+      "other": "Annet"
+    },
+    "genre": {
+      "danceClub": "Dance / Club",
+      "popSongwriter": "Pop / Songwriter",
+      "urbanGroove": "Urban / Groove",
+      "jazzHarmony": "Jazz / Harmoni",
+      "atmosphericCinematic": "Atmosfaerisk / Filmatisk",
+      "bandAcoustic": "Band / Akustisk",
+      "other": "Annet"
+    },
+    "adventurousness": {
+      "riskProfile": "Risikoprofil"
+    }
+  },
+  "styleReferenceGroups": {
+    "jazzPianoIcons": "Ikoner innen jazzpiano",
+    "modernHarmonyVoices": "Moderne harmonistemmer",
+    "educatorsAndMethods": "Pedagoger og metoder"
+  },
+  "options": {
+    "mode": {
+      "ionian": "Jonisk (Dur)",
+      "dorian": "Dorisk",
+      "phrygian": "Frygisk",
+      "lydian": "Lydisk",
+      "mixolydian": "Miksolydisk",
+      "aeolian": "Eolisk (Naturlig moll)",
+      "locrian": "Lokrisk",
+      "majorPentatonic": "Dur-pentatonisk",
+      "minorPentatonic": "Moll-pentatonisk",
+      "harmonicMinor": "Harmonisk moll",
+      "melodicMinor": "Melodisk moll",
+      "blues": "Blues",
+      "wholeTone": "Heltoneskala",
+      "diminished": "Forminsket",
+      "chromatic": "Kromatisk",
+      "custom": "Tilpasset"
+    },
+    "genre": {
+      "house": "House",
+      "pianoHouse": "Piano House",
+      "deepHouse": "Deep House",
+      "discoHouse": "Disco House",
+      "techHouse": "Tech House",
+      "funkDisco": "Funk / Disco",
+      "pop": "Pop",
+      "indiePop": "Indie Pop",
+      "rnbNeoSoul": "R&B / Neo Soul",
+      "jazz": "Jazz",
+      "loFi": "Lo-fi",
+      "ambient": "Ambient",
+      "cinematic": "Filmatisk",
+      "edm": "EDM",
+      "afroHouse": "Afro House",
+      "progressiveHouse": "Progressive House",
+      "hipHop": "Hip-Hop",
+      "rock": "Rock",
+      "folk": "Folk",
+      "custom": "Tilpasset"
+    },
+    "mood": {
+      "dreamy": "Drommende",
+      "dark": "Mork",
+      "hopeful": "Hapefull",
+      "energetic": "Energisk",
+      "melancholic": "Melankolsk",
+      "happy": "Glad",
+      "sad": "Trist",
+      "angry": "Sint",
+      "calm": "Rolig",
+      "uplifting": "Opploftende",
+      "emotional": "Folelsesladet",
+      "peaceful": "Fredelig",
+      "intense": "Intens",
+      "mellow": "Myk",
+      "bright": "Lys",
+      "moody": "Stemningsfull",
+      "somber": "Dyster",
+      "playful": "Leken",
+      "dramatic": "Dramatisk",
+      "romantic": "Romantisk",
+      "mysterious": "Mystisk",
+      "ethereal": "Eterisk",
+      "groovy": "Groovy",
+      "chill": "Avslappet",
+      "epic": "Episk",
+      "whimsical": "Lunefull",
+      "nostalgic": "Nostalgisk",
+      "vibrant": "Livlig",
+      "soulful": "Sjelfull",
+      "ambient": "Ambient",
+      "hypnotic": "Hypnotisk"
+    },
+    "adventurousness": {
+      "safe": "Trygg",
+      "balanced": "Balansert",
+      "surprising": "Overraskende"
+    }
+  },
+  "ui": {
+    "buttons": {
+      "save": "Lagre",
+      "settings": "Innstillinger",
+      "pads": "Pads",
+      "piano": "Piano",
+      "guitar": "Gitar",
+      "playChord": "Spill akkord",
+      "stopChord": "Stopp akkord",
+      "playSection": "Spill del",
+      "stop": "Stopp",
+      "playArrangement": "Spill arrangement",
+      "stopArrangement": "Stopp arrangement",
+      "saveArrangement": "Lagre arrangement",
+      "edit": "Rediger"
+    },
+    "sectionTitles": {
+      "nextChordSuggestions": "Forslag til neste akkord",
+      "progressionIdeas": "Progresjonsideer",
+      "structureSuggestions": "Strukturforslag"
+    },
+    "labels": {
+      "commonChordExamples": "Vanlige akkordeksempler",
+      "harmonicSource": "Harmonisk kilde: {{label}}"
+    },
+    "messages": {
+      "noGuitarDiagram": "Ingen gitardiagram tilgjengelig.",
+      "noPianoVoicing": "Ingen pianostemme tilgjengelig."
+    },
+    "settingsDialog": {
+      "title": "Avspillingsinnstillinger"
+    },
+    "chordGrid": {
+      "title": "Akkordlekeplass",
+      "closeAriaLabel": "Lukk akkordlekeplass",
+      "selectPadThenChord": "Velg en pad, og velg deretter en akkord",
+      "padChordLabel": "Pad-akkord",
+      "countInTooltip": "Innslag {{current}}/{{total}}",
+      "countInAriaLabel": "Innslag {{current}} av {{total}}",
+      "stopRecording": "Stopp opptak",
+      "recordArrangement": "Ta opp arrangement",
+      "disableLoop": "Deaktiver loop",
+      "enableLoop": "Aktiver loop",
+      "disableMetronome": "Deaktiver metronom",
+      "enableMetronome": "Aktiver metronom",
+      "beatCounter": "Taktslag {{current}}/{{total}}",
+      "clearRecording": "Tom opptak",
+      "lengthLabel": "Lengde",
+      "oneBar": "1 takt",
+      "multipleBars": "{{count}} takter",
+      "countInActive": "Innslag aktiv",
+      "stepSummary": "Steg {{current}}/{{total}}",
+      "eventSingular": "{{count}} hendelse",
+      "eventPlural": "{{count}} hendelser",
+      "keyboardHelp": "Tastatur: pads bruker 1-0 og deretter A-Z, Mellomrom spiller/stopper sporet, Shift veksler opptak.",
+      "noPianoVoicings": "Ingen genererte pianostemmer tilgjengelig."
+    }
+  }
+}
