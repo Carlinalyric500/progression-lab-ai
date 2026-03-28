@@ -23,6 +23,7 @@ import { deleteArrangement, getMyArrangements } from '../api/arrangementsApi';
 type Props = {
   onLoad: (arrangement: Arrangement) => void;
   refreshSignal?: number;
+  onAvailabilityChange?: (hasAny: boolean) => void;
 };
 
 function timeAgo(dateStr: string | Date): string {
@@ -36,7 +37,7 @@ function timeAgo(dateStr: string | Date): string {
   return `${days}d ago`;
 }
 
-export default function ArrangementsList({ onLoad, refreshSignal }: Props) {
+export default function ArrangementsList({ onLoad, refreshSignal, onAvailabilityChange }: Props) {
   const theme = useTheme();
   const { showError, showSuccess } = useAppSnackbar();
   const isDarkMode = theme.palette.mode === 'dark';
@@ -51,12 +52,13 @@ export default function ArrangementsList({ onLoad, refreshSignal }: Props) {
     try {
       const data = (await getMyArrangements()) as Arrangement[];
       setArrangements(data);
+      onAvailabilityChange?.(data.length > 0);
     } catch (err) {
       setFetchError((err as Error).message || 'Failed to load arrangements');
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [onAvailabilityChange]);
 
   useEffect(() => {
     void load();
@@ -67,7 +69,11 @@ export default function ArrangementsList({ onLoad, refreshSignal }: Props) {
       setDeletingId(id);
       try {
         await deleteArrangement(id);
-        setArrangements((prev) => prev.filter((a) => a.id !== id));
+        setArrangements((prev) => {
+          const next = prev.filter((a) => a.id !== id);
+          onAvailabilityChange?.(next.length > 0);
+          return next;
+        });
         showSuccess(`Deleted "${title}"`);
       } catch (err) {
         showError((err as Error).message || 'Failed to delete arrangement');
@@ -75,7 +81,7 @@ export default function ArrangementsList({ onLoad, refreshSignal }: Props) {
         setDeletingId(null);
       }
     },
-    [showError, showSuccess],
+    [onAvailabilityChange, showError, showSuccess],
   );
 
   if (isLoading) {

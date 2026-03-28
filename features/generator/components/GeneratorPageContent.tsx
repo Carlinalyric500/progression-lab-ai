@@ -166,6 +166,7 @@ export default function GeneratorPageContent() {
     loopLengthBars: number;
   } | null>(null);
   const [arrangementsRefreshSignal, setArrangementsRefreshSignal] = useState(0);
+  const [showArrangementsSection, setShowArrangementsSection] = useState(true);
   const [isArrangementsExpanded, setIsArrangementsExpanded] = useState(false);
   const [isNextSectionExpanded, setIsNextSectionExpanded] = useState(true);
   const [visibleNextSuggestionsCount, setVisibleNextSuggestionsCount] = useState(0);
@@ -633,37 +634,45 @@ export default function GeneratorPageContent() {
       <Stack spacing={3}>
         <GeneratorHeader />
 
-        <Accordion
-          expanded={isArrangementsExpanded}
-          onChange={(_, expanded) => {
-            setIsArrangementsExpanded(expanded);
-          }}
-          disableGutters
-          elevation={0}
-          sx={{
-            border: (theme) => `1px solid ${alpha(theme.palette.divider, 0.5)}`,
-            borderRadius: '8px !important',
-            '&:before': { display: 'none' },
-            backgroundColor: 'background.paper',
-          }}
-        >
-          <AccordionSummary
-            expandIcon={<ExpandMoreIcon />}
-            sx={{ px: 2, minHeight: 48, '& .MuiAccordionSummary-content': { my: 1 } }}
+        {showArrangementsSection ? (
+          <Accordion
+            expanded={isArrangementsExpanded}
+            onChange={(_, expanded) => {
+              setIsArrangementsExpanded(expanded);
+            }}
+            disableGutters
+            elevation={0}
+            sx={{
+              border: (theme) => `1px solid ${alpha(theme.palette.divider, 0.5)}`,
+              borderRadius: '8px !important',
+              '&:before': { display: 'none' },
+              backgroundColor: 'background.paper',
+            }}
           >
-            <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
-              My Arrangements
-            </Typography>
-          </AccordionSummary>
-          <AccordionDetails sx={{ px: 2, pb: 2, pt: 0 }}>
-            <ArrangementsList
-              onLoad={(arrangement) => {
-                handleLoadArrangement(arrangement);
-              }}
-              refreshSignal={arrangementsRefreshSignal}
-            />
-          </AccordionDetails>
-        </Accordion>
+            <AccordionSummary
+              expandIcon={<ExpandMoreIcon />}
+              sx={{ px: 2, minHeight: 48, '& .MuiAccordionSummary-content': { my: 1 } }}
+            >
+              <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
+                My Arrangements
+              </Typography>
+            </AccordionSummary>
+            <AccordionDetails sx={{ px: 2, pb: 2, pt: 0 }}>
+              <ArrangementsList
+                onLoad={(arrangement) => {
+                  handleLoadArrangement(arrangement);
+                }}
+                refreshSignal={arrangementsRefreshSignal}
+                onAvailabilityChange={(hasAny) => {
+                  setShowArrangementsSection(hasAny);
+                  if (!hasAny) {
+                    setIsArrangementsExpanded(false);
+                  }
+                }}
+              />
+            </AccordionDetails>
+          </Accordion>
+        ) : null}
 
         <GeneratorFormCard
           control={control}
@@ -885,7 +894,10 @@ export default function GeneratorPageContent() {
                     chords={generatedChordGridEntries}
                     onTempoBpmChange={handleTempoBpmChange}
                     pendingLoad={pendingArrangementLoad}
-                    onSaveSuccess={() => setArrangementsRefreshSignal((prev) => prev + 1)}
+                    onSaveSuccess={() => {
+                      setShowArrangementsSection(true);
+                      setArrangementsRefreshSignal((prev) => prev + 1);
+                    }}
                   />
                 </>
               );
