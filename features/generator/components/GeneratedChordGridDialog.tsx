@@ -10,6 +10,7 @@ import {
   IconButton,
   Tooltip,
   Typography,
+  useMediaQuery,
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import AvTimerIcon from '@mui/icons-material/AvTimer';
@@ -151,6 +152,13 @@ const getTransportIconButtonSx =
 /**
  * Props for the generated chord grid playground dialog.
  */
+type PendingArrangementLoad = {
+  /** Unique value that changes each time a load is triggered (use arrangement id or a counter). */
+  key: string;
+  events: import('../../../lib/types').ArrangementEvent[];
+  loopLengthBars: number;
+};
+
 type GeneratedChordGridDialogProps = {
   open: boolean;
   onClose: () => void;
@@ -159,6 +167,10 @@ type GeneratedChordGridDialogProps = {
   onSettingsChange: PlaybackSettingsChangeHandlers;
   onTempoBpmChange: (value: number) => void;
   chords: ChordGridEntry[];
+  /** When non-null, the dialog seeds its timeline from this value on mount / key change. */
+  pendingLoad?: PendingArrangementLoad | null;
+  /** Called after an arrangement is successfully saved, so callers can refresh lists. */
+  onSaveSuccess?: () => void;
 };
 
 /**
@@ -204,6 +216,8 @@ export default function GeneratedChordGridDialog({
   onSettingsChange,
   onTempoBpmChange,
   chords,
+  pendingLoad = null,
+  onSaveSuccess,
 }: GeneratedChordGridDialogProps) {
   const theme = useTheme();
   const { appColors } = theme.palette;
@@ -251,6 +265,10 @@ export default function GeneratedChordGridDialog({
   const [isBeatPulseVisible, setIsBeatPulseVisible] = useState(false);
   const [isDownbeatPulse, setIsDownbeatPulse] = useState(false);
   const [currentBeatInBar, setCurrentBeatInBar] = useState(1);
+  const [hasDetectedHardwareKeyboardInput, setHasDetectedHardwareKeyboardInput] = useState(false);
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const isDesktopKeyboardUi = useMediaQuery('(hover: hover) and (pointer: fine)');
+  const showKeyboardHints = isDesktopKeyboardUi || hasDetectedHardwareKeyboardInput;
   const padStyles = {
     body: {
       bg: appColors.surface.chordPadBodyGradient,
@@ -290,6 +308,34 @@ export default function GeneratedChordGridDialog({
     setEditableChords(chords);
     setEditingPadKey(null);
   }, [chords, open]);
+
+  // Seed timeline from a loaded arrangement whenever the load key changes.
+  useEffect(() => {
+    if (!pendingLoad) {
+      return;
+    }
+
+    const clampedBars = Math.max(
+      1,
+      Math.min(
+        8,
+        LOOP_LENGTH_OPTIONS.includes(
+          pendingLoad.loopLengthBars as (typeof LOOP_LENGTH_OPTIONS)[number],
+        )
+          ? (pendingLoad.loopLengthBars as (typeof LOOP_LENGTH_OPTIONS)[number])
+          : 1,
+      ),
+    ) as (typeof LOOP_LENGTH_OPTIONS)[number];
+
+    setArrangementEvents(pendingLoad.events);
+    setLoopLengthBars(clampedBars);
+    setCurrentStep(0);
+    currentStepRef.current = 0;
+    setIsRecording(false);
+    setIsSequencerPlaying(false);
+    setIsCountInActive(false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pendingLoad?.key]);
 
   useEffect(() => {
     if (!open) {
@@ -691,6 +737,10 @@ export default function GeneratedChordGridDialog({
     }
 
     const onWindowKeyDown = (event: KeyboardEvent) => {
+      if (!isDesktopKeyboardUi && !hasDetectedHardwareKeyboardInput) {
+        setHasDetectedHardwareKeyboardInput(true);
+      }
+
       if (event.defaultPrevented || event.repeat || isTypingTarget(event.target)) {
         return;
       }
@@ -730,6 +780,8 @@ export default function GeneratedChordGridDialog({
   }, [
     handleRecordToggle,
     handleSequencerPlayToggle,
+    hasDetectedHardwareKeyboardInput,
+    isDesktopKeyboardUi,
     onPadPress,
     open,
     padHotkeyMap,
@@ -791,6 +843,7 @@ export default function GeneratedChordGridDialog({
       onClose={onClose}
       maxWidth={false}
       fullWidth
+      fullScreen={isMobile}
       sx={{
         '& .MuiDialog-container': {
           justifyContent: 'center',
@@ -800,12 +853,12 @@ export default function GeneratedChordGridDialog({
       PaperProps={{
         sx: {
           width: '100%',
-          maxWidth: 800,
+          maxWidth: isMobile ? '100%' : 800,
           paddingTop: 2,
-          borderRadius: 2,
+          borderRadius: isMobile ? 0 : 2,
           color: 'common.white',
           background: appColors.surface.chordPlaygroundDialogGradient,
-          border: `1px solid ${appColors.surface.chordPlaygroundDialogBorder}`,
+          border: isMobile ? 'none' : `1px solid ${appColors.surface.chordPlaygroundDialogBorder}`,
         },
       }}
     >
@@ -1102,7 +1155,7 @@ export default function GeneratedChordGridDialog({
                   },
                 }}
               >
-                {hotkeyLabel ? (
+                {showKeyboardHints && hotkeyLabel ? (
                   <Box
                     component="span"
                     sx={{
@@ -1141,9 +1194,11 @@ export default function GeneratedChordGridDialog({
           })}
         </Box>
 
-        <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
-          Keyboard: pads use 1-0 then A-Z, Space plays/stops the track, Shift toggles record.
-        </Typography>
+        {showKeyboardHints ? (
+          <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
+            Keyboard: pads use 1-0 then A-Z, Space plays/stops the track, Shift toggles record.
+          </Typography>
+        ) : null}
 
         {editableChords.length === 0 ? (
           <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
@@ -1203,35 +1258,13 @@ export default function GeneratedChordGridDialog({
           >
             Save arrangement
           </Button>
-          <Button
-            size="small"
-            variant="outlined"
-            onClick={() => {
-              stopSequencer();
-              stopAllAudio();
-            }}
-            sx={(theme) => ({
-              borderWidth: 1.5,
-              color: theme.palette.primary.main,
-              borderColor: alpha(theme.palette.primary.main, 0.9),
-              backgroundColor: 'transparent',
-              textTransform: 'none',
-              fontWeight: 600,
-              '&:hover': {
-                borderColor: theme.palette.primary.main,
-                backgroundColor: alpha(theme.palette.primary.main, 0.08),
-                borderWidth: 1.5,
-              },
-            })}
-          >
-            Stop audio
-          </Button>
         </Box>
       </DialogActions>
 
       <SaveArrangementDialog
         open={saveArrangementDialogOpen}
         onClose={() => setSaveArrangementDialogOpen(false)}
+        onSuccess={onSaveSuccess}
         timeline={timeline}
         playbackSnapshot={playbackSnapshot}
         sourceChords={editableChords}

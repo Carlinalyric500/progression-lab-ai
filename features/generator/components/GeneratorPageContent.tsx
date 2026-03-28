@@ -19,6 +19,7 @@ import {
 } from '@mui/material';
 
 import SaveProgressionDialog from '../../progressions/components/SaveProgressionDialog';
+import ArrangementsList from '../../arrangements/components/ArrangementsList';
 import GeneratorFormCard from './GeneratorFormCard';
 import GeneratedChordGridDialog from './GeneratedChordGridDialog';
 import GeneratorHeader from './GeneratorHeader';
@@ -38,6 +39,7 @@ import {
   STYLE_REFERENCE_OPTIONS,
 } from '../../../lib/formOptions';
 import type {
+  Arrangement,
   ChordItem,
   ChordSuggestionResponse,
   GeneratorSnapshot,
@@ -158,6 +160,14 @@ export default function GeneratorPageContent() {
   } = playbackSettings;
 
   const [isGeneratedChordGridOpen, setIsGeneratedChordGridOpen] = useState(false);
+  const [pendingArrangementLoad, setPendingArrangementLoad] = useState<{
+    key: string;
+    events: Arrangement['timeline']['events'];
+    loopLengthBars: number;
+  } | null>(null);
+  const [arrangementsRefreshSignal, setArrangementsRefreshSignal] = useState(0);
+  const [showArrangementsSection, setShowArrangementsSection] = useState(true);
+  const [isArrangementsExpanded, setIsArrangementsExpanded] = useState(false);
   const [isNextSectionExpanded, setIsNextSectionExpanded] = useState(true);
   const [visibleNextSuggestionsCount, setVisibleNextSuggestionsCount] = useState(0);
   const [visibleProgressionIdeasCount, setVisibleProgressionIdeasCount] = useState(0);
@@ -165,6 +175,32 @@ export default function GeneratorPageContent() {
   const autoRandomizedOnFirstLoad = useRef(false);
   const progressiveRevealTimerRef = useRef<number | null>(null);
   const { showError } = useAppSnackbar();
+
+  const handleLoadArrangement = useCallback(
+    (arrangement: Arrangement) => {
+      const snap = arrangement.playbackSnapshot;
+      handleTempoBpmChange(snap.tempoBpm);
+      playbackSettingsSetters.setTimeSignature(snap.timeSignature);
+      playbackSettingsSetters.setPadPattern(snap.padPattern);
+      playbackSettingsSetters.setPlaybackStyle(snap.playbackStyle);
+      playbackSettingsSetters.setInstrument(snap.instrument);
+      playbackSettingsSetters.setOctaveShift(snap.octaveShift);
+      playbackSettingsSetters.setAttack(snap.attack);
+      playbackSettingsSetters.setDecay(snap.decay);
+      playbackSettingsSetters.setPadVelocity(snap.padVelocity);
+      playbackSettingsSetters.setHumanize(snap.humanize);
+      playbackSettingsSetters.setGate(snap.gate);
+      playbackSettingsSetters.setInversionRegister(snap.inversionRegister);
+
+      setPendingArrangementLoad({
+        key: arrangement.id,
+        events: arrangement.timeline.events,
+        loopLengthBars: arrangement.timeline.loopLengthBars,
+      });
+      setIsGeneratedChordGridOpen(true);
+    },
+    [handleTempoBpmChange, playbackSettingsSetters],
+  );
 
   const { isRestoringState, hasRestoredSessionData, cacheGeneratorResult } =
     useGeneratorSessionCache({
@@ -598,6 +634,46 @@ export default function GeneratorPageContent() {
       <Stack spacing={3}>
         <GeneratorHeader />
 
+        {showArrangementsSection ? (
+          <Accordion
+            expanded={isArrangementsExpanded}
+            onChange={(_, expanded) => {
+              setIsArrangementsExpanded(expanded);
+            }}
+            disableGutters
+            elevation={0}
+            sx={{
+              border: (theme) => `1px solid ${alpha(theme.palette.divider, 0.5)}`,
+              borderRadius: '8px !important',
+              '&:before': { display: 'none' },
+              backgroundColor: 'background.paper',
+            }}
+          >
+            <AccordionSummary
+              expandIcon={<ExpandMoreIcon />}
+              sx={{ px: 2, minHeight: 48, '& .MuiAccordionSummary-content': { my: 1 } }}
+            >
+              <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
+                My Arrangements
+              </Typography>
+            </AccordionSummary>
+            <AccordionDetails sx={{ px: 2, pb: 2, pt: 0 }}>
+              <ArrangementsList
+                onLoad={(arrangement) => {
+                  handleLoadArrangement(arrangement);
+                }}
+                refreshSignal={arrangementsRefreshSignal}
+                onAvailabilityChange={(hasAny) => {
+                  setShowArrangementsSection(hasAny);
+                  if (!hasAny) {
+                    setIsArrangementsExpanded(false);
+                  }
+                }}
+              />
+            </AccordionDetails>
+          </Accordion>
+        ) : null}
+
         <GeneratorFormCard
           control={control}
           handleSubmit={handleSubmit}
@@ -817,6 +893,11 @@ export default function GeneratorPageContent() {
                     onSettingsChange={playbackSettingsChangeHandlers}
                     chords={generatedChordGridEntries}
                     onTempoBpmChange={handleTempoBpmChange}
+                    pendingLoad={pendingArrangementLoad}
+                    onSaveSuccess={() => {
+                      setShowArrangementsSection(true);
+                      setArrangementsRefreshSignal((prev) => prev + 1);
+                    }}
                   />
                 </>
               );
