@@ -1,0 +1,217 @@
+{
+  "header": {
+    "description": "Εισαγάγετε μερικές συγχορδίες, μια διάθεση και έναν τρόπο. Λάβετε ιδέες για προόδους, προτάσεις δομής και απλά διαγράμματα κιθάρας/πιάνου."
+  },
+  "status": {
+    "loadingSuggestions": "Φόρτωση προτάσεων...",
+    "loadingProgressionIdeas": "Φόρτωση ιδεών προόδου...",
+    "loadingStructureSuggestions": "Φόρτωση προτάσεων δομής..."
+  },
+  "errors": {
+    "selectMode": "Παρακαλώ επιλέξτε ή εισαγάγετε έναν τρόπο / κλίμακα.",
+    "selectGenre": "Παρακαλώ επιλέξτε ή εισαγάγετε ένα είδος.",
+    "requestFailed": "Δεν ήταν δυνατή η δημιουργία προτάσεων."
+  },
+  "form": {
+    "seedChords": {
+      "label": "Αρχικές συγχορδίες",
+      "placeholder": "Fmaj7, F#m7",
+      "required": "Οι αρχικές συγχορδίες είναι υποχρεωτικές",
+      "atLeastOne": "Παρακαλώ εισαγάγετε τουλάχιστον μία συγχορδία"
+    },
+    "mood": {
+      "label": "Διάθεση",
+      "placeholder": "ονειρική, σκοτεινή, αισιόδοξη",
+      "required": "Η διάθεση είναι υποχρεωτική"
+    },
+    "mode": {
+      "label": "Τρόπος / κλίμακα",
+      "placeholder": "ιωνικός, δωρικός, αρμονικός ελάσσων",
+      "required": "Ο τρόπος / η κλίμακα είναι υποχρεωτικά"
+    },
+    "genre": {
+      "label": "Είδος",
+      "placeholder": "piano house, jazz, indie pop",
+      "required": "Το είδος είναι υποχρεωτικό"
+    },
+    "styleReference": {
+      "label": "Στιλιστική αναφορά (προαιρετικό)",
+      "placeholder": "Barry Harris, Bill Evans, κ.λπ.",
+      "helperText": "Χρησιμοποιήστε έναν μουσικό, δάσκαλο ή σχολή αρμονίας ως στιλιστικό οδηγό."
+    },
+    "adventurousness": {
+      "label": "Τολμηρότητα",
+      "placeholder": "ασφαλής, ισορροπημένη, απρόσμενη"
+    },
+    "actions": {
+      "randomizeInputs": "Τυχαιοποίηση εισόδων",
+      "generateIdeas": "Δημιουργία ιδεών",
+      "generating": "Δημιουργία..."
+    }
+  },
+  "optionGroups": {
+    "mode": {
+      "majorDiatonic": "Μείζονα / Διατονικά",
+      "minorModal": "Ελάσσονα / Τροπικά",
+      "pentatonicBlues": "Πεντατονικά / Blues",
+      "extendedColors": "Επεκταμένα χρώματα",
+      "symmetricAdvanced": "Συμμετρικά / Προχωρημένα",
+      "other": "Άλλο"
+    },
+    "genre": {
+      "danceClub": "Dance / Club",
+      "popSongwriter": "Pop / Τραγουδοποιός",
+      "urbanGroove": "Urban / Groove",
+      "jazzHarmony": "Jazz / Αρμονία",
+      "atmosphericCinematic": "Ατμοσφαιρικό / Κινηματογραφικό",
+      "bandAcoustic": "Συγκρότημα / Ακουστικό",
+      "other": "Άλλο"
+    },
+    "adventurousness": {
+      "riskProfile": "Προφίλ ρίσκου"
+    }
+  },
+  "styleReferenceGroups": {
+    "jazzPianoIcons": "Εμβληματικοί τζαζ πιανίστες",
+    "modernHarmonyVoices": "Σύγχρονες αρμονικές φωνές",
+    "educatorsAndMethods": "Εκπαιδευτικοί και μέθοδοι"
+  },
+  "options": {
+    "mode": {
+      "ionian": "Ιωνικός (Μείζονα)",
+      "dorian": "Δωρικός",
+      "phrygian": "Φρύγιος",
+      "lydian": "Λύδιος",
+      "mixolydian": "Μιξολύδιος",
+      "aeolian": "Αιολικός (Φυσικός ελάσσων)",
+      "locrian": "Λόκριος",
+      "majorPentatonic": "Μείζονα πεντατονική",
+      "minorPentatonic": "Ελάσσονα πεντατονική",
+      "harmonicMinor": "Αρμονικός ελάσσων",
+      "melodicMinor": "Μελωδικός ελάσσων",
+      "blues": "Blues",
+      "wholeTone": "Ολότονη",
+      "diminished": "Μειωμένη",
+      "chromatic": "Χρωματική",
+      "custom": "Προσαρμοσμένο"
+    },
+    "genre": {
+      "house": "House",
+      "pianoHouse": "Piano House",
+      "deepHouse": "Deep House",
+      "discoHouse": "Disco House",
+      "techHouse": "Tech House",
+      "funkDisco": "Funk / Disco",
+      "pop": "Pop",
+      "indiePop": "Indie Pop",
+      "rnbNeoSoul": "R&B / Neo Soul",
+      "jazz": "Jazz",
+      "loFi": "Lo-fi",
+      "ambient": "Ambient",
+      "cinematic": "Κινηματογραφικό",
+      "edm": "EDM",
+      "afroHouse": "Afro House",
+      "progressiveHouse": "Progressive House",
+      "hipHop": "Hip-Hop",
+      "rock": "Rock",
+      "folk": "Folk",
+      "custom": "Προσαρμοσμένο"
+    },
+    "mood": {
+      "dreamy": "Ονειρικό",
+      "dark": "Σκοτεινό",
+      "hopeful": "Ελπιδοφόρο",
+      "energetic": "Ενεργητικό",
+      "melancholic": "Μελαγχολικό",
+      "happy": "Χαρούμενο",
+      "sad": "Λυπημένο",
+      "angry": "Θυμωμένο",
+      "calm": "Ήρεμο",
+      "uplifting": "Ανεβαστικό",
+      "emotional": "Συναισθηματικό",
+      "peaceful": "Γαλήνιο",
+      "intense": "Έντονο",
+      "mellow": "Απαλό",
+      "bright": "Φωτεινό",
+      "moody": "Ατμοσφαιρικό",
+      "somber": "Ζοφερό",
+      "playful": "Παιχνιδιάρικο",
+      "dramatic": "Δραματικό",
+      "romantic": "Ρομαντικό",
+      "mysterious": "Μυστηριώδες",
+      "ethereal": "Αιθέριο",
+      "groovy": "Groovy",
+      "chill": "Χαλαρό",
+      "epic": "Επικό",
+      "whimsical": "Παραμυθένιο",
+      "nostalgic": "Νοσταλγικό",
+      "vibrant": "Ζωντανό",
+      "soulful": "Με ψυχή",
+      "ambient": "Ambient",
+      "hypnotic": "Υπνωτικό"
+    },
+    "adventurousness": {
+      "safe": "Ασφαλής",
+      "balanced": "Ισορροπημένη",
+      "surprising": "Απρόσμενη"
+    }
+  },
+  "ui": {
+    "buttons": {
+      "save": "Αποθήκευση",
+      "settings": "Ρυθμίσεις",
+      "pads": "Pads",
+      "piano": "Πιάνο",
+      "guitar": "Κιθάρα",
+      "playChord": "Αναπαραγωγή συγχορδίας",
+      "stopChord": "Διακοπή συγχορδίας",
+      "playSection": "Αναπαραγωγή ενότητας",
+      "stop": "Διακοπή",
+      "playArrangement": "Αναπαραγωγή διάταξης",
+      "stopArrangement": "Διακοπή διάταξης",
+      "saveArrangement": "Αποθήκευση διάταξης",
+      "edit": "Επεξεργασία"
+    },
+    "sectionTitles": {
+      "nextChordSuggestions": "Προτάσεις επόμενης συγχορδίας",
+      "progressionIdeas": "Ιδέες προόδου",
+      "structureSuggestions": "Προτάσεις δομής"
+    },
+    "labels": {
+      "commonChordExamples": "Συνηθισμένα παραδείγματα συγχορδιών",
+      "harmonicSource": "Αρμονική πηγή: {{label}}"
+    },
+    "messages": {
+      "noGuitarDiagram": "Δεν υπάρχει διαθέσιμο διάγραμμα κιθάρας.",
+      "noPianoVoicing": "Δεν υπάρχει διαθέσιμη φωνή πιάνου."
+    },
+    "settingsDialog": {
+      "title": "Ρυθμίσεις αναπαραγωγής"
+    },
+    "chordGrid": {
+      "title": "Παιχνιδότοπος συγχορδιών",
+      "closeAriaLabel": "Κλείσιμο παιχνιδότοπου συγχορδιών",
+      "selectPadThenChord": "Επιλέξτε pad και μετά συγχορδία",
+      "padChordLabel": "Συγχορδία pad",
+      "keyboardHelp": "Πληκτρολόγιο: τα pads χρησιμοποιούν 1-0 και μετά A-Z· το Space αναπαράγει ή σταματά το track και το Shift ενεργοποιεί ή απενεργοποιεί την εγγραφή.",
+      "noPianoVoicings": "Δεν υπάρχουν διαθέσιμες παραγόμενες φωνές πιάνου.",
+      "countInTooltip": "Μέτρημα {{current}}/{{total}}",
+      "countInAriaLabel": "Μέτρημα {{current}} από {{total}}",
+      "stopRecording": "Διακοπή εγγραφής",
+      "recordArrangement": "Εγγραφή διάταξης",
+      "disableLoop": "Απενεργοποίηση loop",
+      "enableLoop": "Ενεργοποίηση loop",
+      "disableMetronome": "Απενεργοποίηση μετρονόμου",
+      "enableMetronome": "Ενεργοποίηση μετρονόμου",
+      "beatCounter": "Χτύπος {{current}}/{{total}}",
+      "clearRecording": "Καθαρισμός εγγραφής",
+      "lengthLabel": "Διάρκεια",
+      "oneBar": "1 μέτρο",
+      "multipleBars": "{{count}} μέτρα",
+      "countInActive": "Το μέτρημα είναι ενεργό",
+      "stepSummary": "Βήμα {{current}}/{{total}}",
+      "eventSingular": "{{count}} συμβάν",
+      "eventPlural": "{{count}} συμβάντα"
+    }
+  }
+}

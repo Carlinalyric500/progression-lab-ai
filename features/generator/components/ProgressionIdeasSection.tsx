@@ -1,6 +1,7 @@
 'use client';
 
 import { Box, Button, Divider, Stack, Typography } from '@mui/material';
+import { useTranslation } from 'react-i18next';
 
 import GuitarChordDiagram from './GuitarChordDiagram';
 import PianoChordDiagram from './PianoChordDiagram';
@@ -148,6 +149,7 @@ export default function ProgressionIdeasSection({
   guitarVoicingByChord,
   onRequestSaveProgression,
 }: ProgressionIdeasSectionProps) {
+  const { t } = useTranslation('generator');
   const { playingId, initializingId, handlePlayToggle } = usePlaybackToggle();
 
   return (
@@ -161,7 +163,7 @@ export default function ProgressionIdeasSection({
           sx={{ mb: 2 }}
         >
           <Typography variant="h5" component="h2">
-            Progression ideas
+            {t('ui.sectionTitles.progressionIdeas')}
           </Typography>
         </Stack>
       ) : null}
@@ -284,7 +286,7 @@ export default function ProgressionIdeasSection({
                           });
                         }}
                       >
-                        Save
+                        {t('ui.buttons.save')}
                       </Button>
                     ) : null}
                   </Stack>
@@ -356,8 +358,8 @@ export default function ProgressionIdeasSection({
 
                             <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap">
                               <PlaybackToggleButton
-                                playTitle="Play chord"
-                                stopTitle="Stop chord"
+                                playTitle={t('ui.buttons.playChord')}
+                                stopTitle={t('ui.buttons.stopChord')}
                                 isPlaying={playingId === `${idea.label}-${chord}-${index}-piano`}
                                 isInitializing={
                                   initializingId === `${idea.label}-${chord}-${index}-piano`
@@ -394,7 +396,7 @@ export default function ProgressionIdeasSection({
                           (suggestedGuitarVoicing || fallbackGuitarDiagram) ? (
                           <Stack spacing={1} sx={{ pt: 1 }}>
                             <Typography variant="body2" sx={{ fontWeight: 700 }}>
-                              Common Chord Examples
+                              {t('ui.labels.commonChordExamples')}
                             </Typography>
                             <Typography variant="body2">
                               {chord}:{' '}
@@ -436,8 +438,8 @@ export default function ProgressionIdeasSection({
                             {voicing ? (
                               <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap">
                                 <PlaybackToggleButton
-                                  playTitle="Play chord"
-                                  stopTitle="Stop chord"
+                                  playTitle={t('ui.buttons.playChord')}
+                                  stopTitle={t('ui.buttons.stopChord')}
                                   isPlaying={playingId === `${idea.label}-${chord}-${index}-guitar`}
                                   isInitializing={
                                     initializingId === `${idea.label}-${chord}-${index}-guitar`
@@ -473,11 +475,11 @@ export default function ProgressionIdeasSection({
                           </Stack>
                         ) : progressionDiagramInstrument === 'guitar' ? (
                           <Typography variant="body2" color="text.secondary">
-                            No guitar diagram available.
+                            {t('ui.messages.noGuitarDiagram')}
                           </Typography>
                         ) : (
                           <Typography variant="body2" color="text.secondary">
-                            No piano voicing available.
+                            {t('ui.messages.noPianoVoicing')}
                           </Typography>
                         )}
                       </Stack>

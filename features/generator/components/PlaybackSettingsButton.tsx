@@ -39,6 +39,7 @@ import {
   Typography,
 } from '@mui/material';
 import { useCallback, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { playChordVoicing } from '../../../domain/audio/audio';
 import type { AudioInstrument, PlaybackRegister, PlaybackStyle } from '../../../domain/audio/audio';
@@ -84,6 +85,7 @@ export default function PlaybackSettingsButton({
   previewVoicing,
   position = 'inline',
 }: PlaybackSettingsButtonProps) {
+  const { t } = useTranslation('generator');
   const {
     playbackStyle,
     attack,
@@ -179,12 +181,12 @@ export default function PlaybackSettingsButton({
           onClick={() => setIsSettingsOpen(true)}
           sx={getSettingsTriggerButtonSx(position)}
         >
-          {PLAYBACK_SETTINGS_COPY.triggerButtonLabel}
+          {t('ui.buttons.settings')}
         </Button>
       </Box>
 
       <Dialog open={isSettingsOpen} onClose={closeDialog} maxWidth="md" fullWidth>
-        <DialogTitle>{PLAYBACK_SETTINGS_COPY.dialogTitle}</DialogTitle>
+        <DialogTitle>{t('ui.settingsDialog.title')}</DialogTitle>
         <DialogContent>
           <Stack spacing={2.5}>
             <Box>

@@ -1,0 +1,217 @@
+{
+  "header": {
+    "description": "أدخل بعض الأوتار، وحالة مزاجية، ومقامًا. واحصل على أفكار للتتابعات، واقتراحات للبنية، ومخططات بسيطة للغيتار والبيانو."
+  },
+  "status": {
+    "loadingSuggestions": "جارٍ تحميل الاقتراحات...",
+    "loadingProgressionIdeas": "جارٍ تحميل أفكار التتابع...",
+    "loadingStructureSuggestions": "جارٍ تحميل اقتراحات البنية..."
+  },
+  "errors": {
+    "selectMode": "يرجى اختيار أو إدخال مقام / سلم.",
+    "selectGenre": "يرجى اختيار أو إدخال نوع موسيقي.",
+    "requestFailed": "تعذر إنشاء الاقتراحات."
+  },
+  "form": {
+    "seedChords": {
+      "label": "الأوتار الأساسية",
+      "placeholder": "Fmaj7, F#m7",
+      "required": "الأوتار الأساسية مطلوبة",
+      "atLeastOne": "يرجى إدخال وتر واحد على الأقل"
+    },
+    "mood": {
+      "label": "الحالة المزاجية",
+      "placeholder": "حالم، داكن، مفعم بالأمل",
+      "required": "الحالة المزاجية مطلوبة"
+    },
+    "mode": {
+      "label": "المقام / السلم",
+      "placeholder": "أيوني، دوري، صغير هارموني",
+      "required": "المقام / السلم مطلوب"
+    },
+    "genre": {
+      "label": "النوع",
+      "placeholder": "piano house, jazz, indie pop",
+      "required": "النوع مطلوب"
+    },
+    "styleReference": {
+      "label": "مرجع أسلوبي (اختياري)",
+      "placeholder": "Barry Harris, Bill Evans, إلخ",
+      "helperText": "استخدم عازفًا أو معلّمًا أو مدرسة هارمونية كمرجع أسلوبي."
+    },
+    "adventurousness": {
+      "label": "الجرأة",
+      "placeholder": "آمن، متوازن، مفاجئ"
+    },
+    "actions": {
+      "randomizeInputs": "عشوائية المدخلات",
+      "generateIdeas": "إنشاء أفكار",
+      "generating": "جارٍ الإنشاء..."
+    }
+  },
+  "optionGroups": {
+    "mode": {
+      "majorDiatonic": "كبير / دياتوني",
+      "minorModal": "صغير / مقامي",
+      "pentatonicBlues": "خماسي / بلوز",
+      "extendedColors": "ألوان موسعة",
+      "symmetricAdvanced": "متماثل / متقدم",
+      "other": "أخرى"
+    },
+    "genre": {
+      "danceClub": "رقص / نادٍ",
+      "popSongwriter": "بوب / كاتب أغانٍ",
+      "urbanGroove": "حضري / Groove",
+      "jazzHarmony": "جاز / هارموني",
+      "atmosphericCinematic": "جوي / سينمائي",
+      "bandAcoustic": "فرقة / أكوستيك",
+      "other": "أخرى"
+    },
+    "adventurousness": {
+      "riskProfile": "ملف المخاطرة"
+    }
+  },
+  "styleReferenceGroups": {
+    "jazzPianoIcons": "أيقونات بيانو الجاز",
+    "modernHarmonyVoices": "أصوات الهارموني الحديثة",
+    "educatorsAndMethods": "المعلمون والمناهج"
+  },
+  "options": {
+    "mode": {
+      "ionian": "أيوني (كبير)",
+      "dorian": "دوري",
+      "phrygian": "فريجي",
+      "lydian": "ليدي",
+      "mixolydian": "ميكسوليدي",
+      "aeolian": "أيولي (صغير طبيعي)",
+      "locrian": "لوكري",
+      "majorPentatonic": "خماسي كبير",
+      "minorPentatonic": "خماسي صغير",
+      "harmonicMinor": "صغير هارموني",
+      "melodicMinor": "صغير ميلودي",
+      "blues": "بلوز",
+      "wholeTone": "كامل النغمات",
+      "diminished": "مخفض",
+      "chromatic": "كروماتي",
+      "custom": "مخصص"
+    },
+    "genre": {
+      "house": "هاوس",
+      "pianoHouse": "بيانو هاوس",
+      "deepHouse": "ديب هاوس",
+      "discoHouse": "ديسكو هاوس",
+      "techHouse": "تيك هاوس",
+      "funkDisco": "فانك / ديسكو",
+      "pop": "بوب",
+      "indiePop": "إندي بوب",
+      "rnbNeoSoul": "R&B / نيو سول",
+      "jazz": "جاز",
+      "loFi": "لو-فاي",
+      "ambient": "أمبينت",
+      "cinematic": "سينمائي",
+      "edm": "EDM",
+      "afroHouse": "أفرو هاوس",
+      "progressiveHouse": "بروغريسيف هاوس",
+      "hipHop": "هيب هوب",
+      "rock": "روك",
+      "folk": "فولك",
+      "custom": "مخصص"
+    },
+    "mood": {
+      "dreamy": "حالم",
+      "dark": "داكن",
+      "hopeful": "مفعم بالأمل",
+      "energetic": "حيوي",
+      "melancholic": "كئيب",
+      "happy": "سعيد",
+      "sad": "حزين",
+      "angry": "غاضب",
+      "calm": "هادئ",
+      "uplifting": "باعث على التفاؤل",
+      "emotional": "عاطفي",
+      "peaceful": "مسالم",
+      "intense": "مكثف",
+      "mellow": "سلس",
+      "bright": "مشرق",
+      "moody": "مزاجي",
+      "somber": "كئيب الطابع",
+      "playful": "مرح",
+      "dramatic": "درامي",
+      "romantic": "رومانسي",
+      "mysterious": "غامض",
+      "ethereal": "أثيري",
+      "groovy": "إيقاعي",
+      "chill": "مسترخٍ",
+      "epic": "ملحمي",
+      "whimsical": "غريب الأطوار",
+      "nostalgic": "حنيني",
+      "vibrant": "نابض",
+      "soulful": "مفعم بالروح",
+      "ambient": "محيطي",
+      "hypnotic": "تنويمي"
+    },
+    "adventurousness": {
+      "safe": "آمن",
+      "balanced": "متوازن",
+      "surprising": "مفاجئ"
+    }
+  },
+  "ui": {
+    "buttons": {
+      "save": "حفظ",
+      "settings": "الإعدادات",
+      "pads": "Pads",
+      "piano": "بيانو",
+      "guitar": "غيتار",
+      "playChord": "تشغيل الوتر",
+      "stopChord": "إيقاف الوتر",
+      "playSection": "تشغيل القسم",
+      "stop": "إيقاف",
+      "playArrangement": "تشغيل التوزيع",
+      "stopArrangement": "إيقاف التوزيع",
+      "saveArrangement": "حفظ التوزيع",
+      "edit": "تعديل"
+    },
+    "sectionTitles": {
+      "nextChordSuggestions": "اقتراحات الوتر التالي",
+      "progressionIdeas": "أفكار التتابع",
+      "structureSuggestions": "اقتراحات البنية"
+    },
+    "labels": {
+      "commonChordExamples": "أمثلة شائعة للأوتار",
+      "harmonicSource": "المصدر الهارموني: {{label}}"
+    },
+    "messages": {
+      "noGuitarDiagram": "لا يتوفر مخطط غيتار.",
+      "noPianoVoicing": "لا يتوفر توزيع بيانو."
+    },
+    "settingsDialog": {
+      "title": "إعدادات التشغيل"
+    },
+    "chordGrid": {
+      "title": "مساحة الأوتار",
+      "closeAriaLabel": "إغلاق مساحة الأوتار",
+      "selectPadThenChord": "اختر pad ثم اختر وتراً",
+      "padChordLabel": "وتر الـ pad",
+      "keyboardHelp": "لوحة المفاتيح: تستخدم الـ pads الأزرار 1-0 ثم A-Z؛ ويقوم مفتاح المسافة بتشغيل المسار أو إيقافه، بينما يقوم Shift بتبديل التسجيل.",
+      "noPianoVoicings": "لا تتوفر توزيعات بيانو مولدة.",
+      "countInTooltip": "العد التمهيدي {{current}}/{{total}}",
+      "countInAriaLabel": "العد التمهيدي {{current}} من {{total}}",
+      "stopRecording": "إيقاف التسجيل",
+      "recordArrangement": "تسجيل التوزيع",
+      "disableLoop": "تعطيل التكرار",
+      "enableLoop": "تفعيل التكرار",
+      "disableMetronome": "تعطيل المترونوم",
+      "enableMetronome": "تفعيل المترونوم",
+      "beatCounter": "النبضة {{current}}/{{total}}",
+      "clearRecording": "مسح التسجيل",
+      "lengthLabel": "الطول",
+      "oneBar": "مازورة واحدة",
+      "multipleBars": "{{count}} موازير",
+      "countInActive": "العد التمهيدي نشط",
+      "stepSummary": "الخطوة {{current}}/{{total}}",
+      "eventSingular": "{{count}} حدث",
+      "eventPlural": "{{count}} أحداث"
+    }
+  }
+}

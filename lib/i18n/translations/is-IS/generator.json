@@ -1,0 +1,217 @@
+{
+  "header": {
+    "description": "Settu inn nokkra hljoma, stemningu og skala. Faedu hugmyndir ad progressionum, tillogur ad uppbyggingu og einfold gitar/piano skema."
+  },
+  "status": {
+    "loadingSuggestions": "Hle inn tillogum...",
+    "loadingProgressionIdeas": "Hle inn progression-hugmyndum...",
+    "loadingStructureSuggestions": "Hle inn tillogum ad byggingu..."
+  },
+  "errors": {
+    "selectMode": "Veldu eda sladu inn ham / skala.",
+    "selectGenre": "Veldu eda sladu inn genre.",
+    "requestFailed": "Ekki tokst ad bua til tillogur."
+  },
+  "form": {
+    "seedChords": {
+      "label": "Upphafshljomar",
+      "placeholder": "Fmaj7, F#m7",
+      "required": "Upphafshljomar eru skyldugir",
+      "atLeastOne": "Skradu inn ad minnsta kosti einn hljom"
+    },
+    "mood": {
+      "label": "Stemning",
+      "placeholder": "draumkennd, dokk, vongod",
+      "required": "Stemning er skyldug"
+    },
+    "mode": {
+      "label": "Hamur / skali",
+      "placeholder": "joniskur, doriskur, harmonisk moll",
+      "required": "Hamur / skali er skyldugur"
+    },
+    "genre": {
+      "label": "Genre",
+      "placeholder": "piano house, jazz, indie pop",
+      "required": "Genre er skyldug"
+    },
+    "styleReference": {
+      "label": "Stilvidmid (valfrjals)",
+      "placeholder": "Barry Harris, Bill Evans, o.s.frv.",
+      "helperText": "Notadu flytjanda, kennara eda harmoniskola sem stillegt vidmid."
+    },
+    "adventurousness": {
+      "label": "Dirfska",
+      "placeholder": "oruggt, jafnvaegi, ovant"
+    },
+    "actions": {
+      "randomizeInputs": "Slembiraeda inntak",
+      "generateIdeas": "Bua til hugmyndir",
+      "generating": "By til..."
+    }
+  },
+  "optionGroups": {
+    "mode": {
+      "majorDiatonic": "Dur / Diatonisk",
+      "minorModal": "Moll / Modal",
+      "pentatonicBlues": "Pentatonisk / Blues",
+      "extendedColors": "Utvikadir litir",
+      "symmetricAdvanced": "Samhverft / Avansert",
+      "other": "Annad"
+    },
+    "genre": {
+      "danceClub": "Dance / Club",
+      "popSongwriter": "Pop / Songwriter",
+      "urbanGroove": "Urban / Groove",
+      "jazzHarmony": "Jazz / Harmonia",
+      "atmosphericCinematic": "Andrumsloft / Kvikmyndalegt",
+      "bandAcoustic": "Hljomsveit / Akustiskt",
+      "other": "Annad"
+    },
+    "adventurousness": {
+      "riskProfile": "Ahattusnid"
+    }
+  },
+  "styleReferenceGroups": {
+    "jazzPianoIcons": "Jazz piano ikon",
+    "modernHarmonyVoices": "Nutimalegar harmoniraddir",
+    "educatorsAndMethods": "Kennarar og adferdir"
+  },
+  "options": {
+    "mode": {
+      "ionian": "Joniskur (Dur)",
+      "dorian": "Doriskur",
+      "phrygian": "Frygiskur",
+      "lydian": "Lydiskur",
+      "mixolydian": "Mixolydiskur",
+      "aeolian": "Aeoliskur (Natturlegur moll)",
+      "locrian": "Lokriskur",
+      "majorPentatonic": "Dur pentatoniskur",
+      "minorPentatonic": "Moll pentatoniskur",
+      "harmonicMinor": "Harmonisk moll",
+      "melodicMinor": "Melodisk moll",
+      "blues": "Blues",
+      "wholeTone": "Heiltuna skali",
+      "diminished": "Minnkadur",
+      "chromatic": "Kromatiskur",
+      "custom": "Sersnidinn"
+    },
+    "genre": {
+      "house": "House",
+      "pianoHouse": "Piano House",
+      "deepHouse": "Deep House",
+      "discoHouse": "Disco House",
+      "techHouse": "Tech House",
+      "funkDisco": "Funk / Disco",
+      "pop": "Pop",
+      "indiePop": "Indie Pop",
+      "rnbNeoSoul": "R&B / Neo Soul",
+      "jazz": "Jazz",
+      "loFi": "Lo-fi",
+      "ambient": "Ambient",
+      "cinematic": "Kvikmyndalegt",
+      "edm": "EDM",
+      "afroHouse": "Afro House",
+      "progressiveHouse": "Progressive House",
+      "hipHop": "Hip-Hop",
+      "rock": "Rock",
+      "folk": "Folk",
+      "custom": "Sersnidinn"
+    },
+    "mood": {
+      "dreamy": "Draumkennd",
+      "dark": "Dokk",
+      "hopeful": "Vongod",
+      "energetic": "Orkumikil",
+      "melancholic": "Melankolisk",
+      "happy": "Glad",
+      "sad": "Sorgmaedd",
+      "angry": "Reid",
+      "calm": "Roleg",
+      "uplifting": "Upplyftandi",
+      "emotional": "Tilfinningarik",
+      "peaceful": "Fridsael",
+      "intense": "Mikil",
+      "mellow": "Mjuk",
+      "bright": "Bjort",
+      "moody": "Stemningsrik",
+      "somber": "Dapur",
+      "playful": "Leikandi",
+      "dramatic": "Drama",
+      "romantic": "Romantisk",
+      "mysterious": "Dularfull",
+      "ethereal": "Lett",
+      "groovy": "Groovy",
+      "chill": "Afsloppud",
+      "epic": "Episk",
+      "whimsical": "Skondin",
+      "nostalgic": "Nostalgisk",
+      "vibrant": "Lifleg",
+      "soulful": "Salfull",
+      "ambient": "Ambient",
+      "hypnotic": "Daleidandi"
+    },
+    "adventurousness": {
+      "safe": "Oruggt",
+      "balanced": "Jafnvaegt",
+      "surprising": "Ovont"
+    }
+  },
+  "ui": {
+    "buttons": {
+      "save": "Vista",
+      "settings": "Stillingar",
+      "pads": "Pads",
+      "piano": "Piano",
+      "guitar": "Gitar",
+      "playChord": "Spila hljom",
+      "stopChord": "Stoppa hljom",
+      "playSection": "Spila kafla",
+      "stop": "Stoppa",
+      "playArrangement": "Spila utsetningu",
+      "stopArrangement": "Stoppa utsetningu",
+      "saveArrangement": "Vista utsetningu",
+      "edit": "Breyta"
+    },
+    "sectionTitles": {
+      "nextChordSuggestions": "Tillogur ad naesta hljomi",
+      "progressionIdeas": "Progression hugmyndir",
+      "structureSuggestions": "Tillogur ad byggingu"
+    },
+    "labels": {
+      "commonChordExamples": "Algeng hljoma daemi",
+      "harmonicSource": "Harmonisk uppspretta: {{label}}"
+    },
+    "messages": {
+      "noGuitarDiagram": "Ekkert gitar-skema tiltakt.",
+      "noPianoVoicing": "Engin piano-rodun tiltak."
+    },
+    "settingsDialog": {
+      "title": "Afspilunarstillingar"
+    },
+    "chordGrid": {
+      "title": "Hljoma leiksvadi",
+      "closeAriaLabel": "Loka hljoma leiksvadi",
+      "selectPadThenChord": "Veldu pad og svo hljom",
+      "padChordLabel": "Pad hljomur",
+      "countInTooltip": "Innslattur {{current}}/{{total}}",
+      "countInAriaLabel": "Innslattur {{current}} af {{total}}",
+      "stopRecording": "Stoppa upptoku",
+      "recordArrangement": "Taka upp utsetningu",
+      "disableLoop": "Afvirkja loop",
+      "enableLoop": "Virkja loop",
+      "disableMetronome": "Afvirkja metrnome",
+      "enableMetronome": "Virkja metrnome",
+      "beatCounter": "Slag {{current}}/{{total}}",
+      "clearRecording": "Hreinsa upptoku",
+      "lengthLabel": "Lengd",
+      "oneBar": "1 taktur",
+      "multipleBars": "{{count}} taktar",
+      "countInActive": "Innslattur virkur",
+      "stepSummary": "Skref {{current}}/{{total}}",
+      "eventSingular": "{{count}} atburdur",
+      "eventPlural": "{{count}} atburdir",
+      "keyboardHelp": "Lykilbord: pads nota 1-0 svo A-Z, bilslatti spilar/stoppar track, Shift skiptir upptoku.",
+      "noPianoVoicings": "Engar bunnar piano-rodanir tiltakar."
+    }
+  }
+}

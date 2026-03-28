@@ -6,6 +6,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import GridViewIcon from '@mui/icons-material/GridView';
 import SaveIcon from '@mui/icons-material/Save';
 import { alpha } from '@mui/material/styles';
+import { useTranslation } from 'react-i18next';
 import {
   Accordion,
   AccordionDetails,
@@ -26,6 +27,7 @@ import GeneratorHeader from './GeneratorHeader';
 import InstrumentToggle from './InstrumentToggle';
 import PlaybackSettingsButton from './PlaybackSettingsButton';
 import RestoringState from './RestoringState';
+import { useAppLocale } from '../../../components/providers/LocaleProvider';
 import { useAppSnackbar } from '../../../components/providers/AppSnackbarProvider';
 import usePlaybackSettings from '../hooks/usePlaybackSettings';
 import useGeneratorSessionCache from '../hooks/useGeneratorSessionCache';
@@ -84,6 +86,8 @@ function pickRandomUnique<T>(items: T[], count: number): T[] {
 }
 
 export default function GeneratorPageContent() {
+  const { t } = useTranslation('generator');
+  const { locale } = useAppLocale();
   const {
     control,
     handleSubmit,
@@ -207,6 +211,7 @@ export default function GeneratorPageContent() {
       reset,
       setData,
       setIsLoadedFromSavedProgression,
+      locale,
       playbackSettings,
       playbackSettingsSetters,
     });
@@ -415,12 +420,12 @@ export default function GeneratorPageContent() {
     const resolvedGenre = formData.genre.trim();
 
     if (!resolvedMode) {
-      setError('Please select or enter a mode / scale.');
+      setError(t('errors.selectMode'));
       return;
     }
 
     if (!resolvedGenre) {
-      setError('Please select or enter a genre.');
+      setError(t('errors.selectGenre'));
       return;
     }
 
@@ -441,6 +446,7 @@ export default function GeneratorPageContent() {
           styleReference: formData.styleReference.trim() || null,
           instrument: 'both',
           adventurousness: formData.adventurousness,
+          language: locale,
         }),
       });
 
@@ -453,8 +459,9 @@ export default function GeneratorPageContent() {
       cacheGeneratorResult(formData, json);
     } catch (err) {
       console.error(err);
-      setError('Could not generate suggestions.');
-      showError('Could not generate suggestions.');
+      const errorMessage = t('errors.requestFailed');
+      setError(errorMessage);
+      showError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -542,7 +549,7 @@ export default function GeneratorPageContent() {
     {
       key: 'next',
       shouldRender: !isLoadedFromSavedProgression,
-      fallbackLabel: 'Loading suggestions...',
+      fallbackLabel: t('status.loadingSuggestions'),
       render: (isCollapsibleLayout: boolean) => (
         <NextChordSuggestionsSection
           suggestions={visibleNextChordSuggestions}
@@ -567,7 +574,7 @@ export default function GeneratorPageContent() {
     {
       key: 'progressions',
       shouldRender: true,
-      fallbackLabel: 'Loading progression ideas...',
+      fallbackLabel: t('status.loadingProgressionIdeas'),
       render: () => (
         <ProgressionIdeasSection
           progressionIdeas={visibleProgressionIdeas}
@@ -596,7 +603,7 @@ export default function GeneratorPageContent() {
     {
       key: 'structure',
       shouldRender: !isLoadedFromSavedProgression,
-      fallbackLabel: 'Loading structure suggestions...',
+      fallbackLabel: t('status.loadingStructureSuggestions'),
       render: () => (
         <StructureSuggestionsSection
           structureSuggestions={visibleStructureSuggestions}
@@ -751,7 +758,7 @@ export default function GeneratorPageContent() {
                           },
                         }}
                       >
-                        Save
+                        {t('ui.buttons.save')}
                       </Button>
                       <PlaybackSettingsButton
                         settings={playbackSettings}
@@ -782,7 +789,7 @@ export default function GeneratorPageContent() {
                             },
                           }}
                         >
-                          Pads
+                          {t('ui.buttons.pads')}
                         </Button>
                       ) : null}
                       <InstrumentToggle

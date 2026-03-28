@@ -1,0 +1,217 @@
+{
+  "header": {
+    "description": "Ingresa algunos acordes, un estado de animo y un modo. Recibe ideas de progresion, sugerencias de estructura y diagramas simples de guitarra y piano."
+  },
+  "status": {
+    "loadingSuggestions": "Cargando sugerencias...",
+    "loadingProgressionIdeas": "Cargando ideas de progresion...",
+    "loadingStructureSuggestions": "Cargando sugerencias de estructura..."
+  },
+  "errors": {
+    "selectMode": "Selecciona o escribe un modo / escala.",
+    "selectGenre": "Selecciona o escribe un genero.",
+    "requestFailed": "No se pudieron generar sugerencias."
+  },
+  "form": {
+    "seedChords": {
+      "label": "Acordes base",
+      "placeholder": "Fmaj7, F#m7",
+      "required": "Los acordes base son obligatorios",
+      "atLeastOne": "Ingresa al menos un acorde"
+    },
+    "mood": {
+      "label": "Estado de animo",
+      "placeholder": "sonador, oscuro, esperanzador",
+      "required": "El estado de animo es obligatorio"
+    },
+    "mode": {
+      "label": "Modo / escala",
+      "placeholder": "jonico, dorico, menor armonica",
+      "required": "El modo / escala es obligatorio"
+    },
+    "genre": {
+      "label": "Genero",
+      "placeholder": "piano house, jazz, indie pop",
+      "required": "El genero es obligatorio"
+    },
+    "styleReference": {
+      "label": "Referencia de estilo (opcional)",
+      "placeholder": "Barry Harris, Bill Evans, etc.",
+      "helperText": "Usa un interprete, docente o escuela armonica como guia estilistica."
+    },
+    "adventurousness": {
+      "label": "Atrevimiento",
+      "placeholder": "seguro, equilibrado, sorprendente"
+    },
+    "actions": {
+      "randomizeInputs": "Aleatorizar entradas",
+      "generateIdeas": "Generar ideas",
+      "generating": "Generando..."
+    }
+  },
+  "optionGroups": {
+    "mode": {
+      "majorDiatonic": "Mayor / Diatonico",
+      "minorModal": "Menor / Modal",
+      "pentatonicBlues": "Pentatonico / Blues",
+      "extendedColors": "Colores extendidos",
+      "symmetricAdvanced": "Simetrico / Avanzado",
+      "other": "Otro"
+    },
+    "genre": {
+      "danceClub": "Baile / Club",
+      "popSongwriter": "Pop / Cancion",
+      "urbanGroove": "Urbano / Groove",
+      "jazzHarmony": "Jazz / Armonia",
+      "atmosphericCinematic": "Atmosferico / Cinematico",
+      "bandAcoustic": "Banda / Acustico",
+      "other": "Otro"
+    },
+    "adventurousness": {
+      "riskProfile": "Perfil de riesgo"
+    }
+  },
+  "styleReferenceGroups": {
+    "jazzPianoIcons": "Iconos del piano jazz",
+    "modernHarmonyVoices": "Voces modernas de la armonia",
+    "educatorsAndMethods": "Educadores y metodos"
+  },
+  "options": {
+    "mode": {
+      "ionian": "Jonico (Mayor)",
+      "dorian": "Dorico",
+      "phrygian": "Frigio",
+      "lydian": "Lidio",
+      "mixolydian": "Mixolidio",
+      "aeolian": "Eolio (Menor natural)",
+      "locrian": "Locrio",
+      "majorPentatonic": "Pentatonica mayor",
+      "minorPentatonic": "Pentatonica menor",
+      "harmonicMinor": "Menor armonica",
+      "melodicMinor": "Menor melodica",
+      "blues": "Blues",
+      "wholeTone": "Tonos enteros",
+      "diminished": "Disminuida",
+      "chromatic": "Cromatica",
+      "custom": "Personalizado"
+    },
+    "genre": {
+      "house": "House",
+      "pianoHouse": "Piano House",
+      "deepHouse": "Deep House",
+      "discoHouse": "Disco House",
+      "techHouse": "Tech House",
+      "funkDisco": "Funk / Disco",
+      "pop": "Pop",
+      "indiePop": "Indie Pop",
+      "rnbNeoSoul": "R&B / Neo Soul",
+      "jazz": "Jazz",
+      "loFi": "Lo-fi",
+      "ambient": "Ambient",
+      "cinematic": "Cinematico",
+      "edm": "EDM",
+      "afroHouse": "Afro House",
+      "progressiveHouse": "Progressive House",
+      "hipHop": "Hip-Hop",
+      "rock": "Rock",
+      "folk": "Folk",
+      "custom": "Personalizado"
+    },
+    "mood": {
+      "dreamy": "Sonador",
+      "dark": "Oscuro",
+      "hopeful": "Esperanzador",
+      "energetic": "Energetico",
+      "melancholic": "Melancolico",
+      "happy": "Feliz",
+      "sad": "Triste",
+      "angry": "Enojado",
+      "calm": "Calmado",
+      "uplifting": "Inspirador",
+      "emotional": "Emotivo",
+      "peaceful": "Pacifico",
+      "intense": "Intenso",
+      "mellow": "Suave",
+      "bright": "Brillante",
+      "moody": "Atmosferico",
+      "somber": "Sombrio",
+      "playful": "Jugueton",
+      "dramatic": "Dramatico",
+      "romantic": "Romantico",
+      "mysterious": "Misterioso",
+      "ethereal": "Etereo",
+      "groovy": "Groovy",
+      "chill": "Relajado",
+      "epic": "Epico",
+      "whimsical": "Caprichoso",
+      "nostalgic": "Nostalgico",
+      "vibrant": "Vibrante",
+      "soulful": "Con alma",
+      "ambient": "Ambiental",
+      "hypnotic": "Hipnotico"
+    },
+    "adventurousness": {
+      "safe": "Seguro",
+      "balanced": "Equilibrado",
+      "surprising": "Sorprendente"
+    }
+  },
+  "ui": {
+    "buttons": {
+      "save": "Guardar",
+      "settings": "Configuracion",
+      "pads": "Pads",
+      "piano": "Piano",
+      "guitar": "Guitarra",
+      "playChord": "Reproducir acorde",
+      "stopChord": "Detener acorde",
+      "playSection": "Reproducir seccion",
+      "stop": "Detener",
+      "playArrangement": "Reproducir arreglo",
+      "stopArrangement": "Detener arreglo",
+      "saveArrangement": "Guardar arreglo",
+      "edit": "Editar"
+    },
+    "sectionTitles": {
+      "nextChordSuggestions": "Sugerencias del siguiente acorde",
+      "progressionIdeas": "Ideas de progresion",
+      "structureSuggestions": "Sugerencias de estructura"
+    },
+    "labels": {
+      "commonChordExamples": "Ejemplos comunes de acordes",
+      "harmonicSource": "Fuente armonica: {{label}}"
+    },
+    "messages": {
+      "noGuitarDiagram": "No hay un diagrama de guitarra disponible.",
+      "noPianoVoicing": "No hay una disposicion de piano disponible."
+    },
+    "settingsDialog": {
+      "title": "Configuracion de reproduccion"
+    },
+    "chordGrid": {
+      "title": "Laboratorio de acordes",
+      "closeAriaLabel": "Cerrar laboratorio de acordes",
+      "selectPadThenChord": "Selecciona un pad y luego un acorde",
+      "padChordLabel": "Acorde del pad",
+      "keyboardHelp": "Teclado: los pads usan 1-0 y luego A-Z; la barra espaciadora reproduce o detiene la pista y Shift activa o desactiva la grabacion.",
+      "noPianoVoicings": "No hay disposiciones de piano generadas disponibles.",
+      "countInTooltip": "Cuenta previa {{current}}/{{total}}",
+      "countInAriaLabel": "Cuenta previa {{current}} de {{total}}",
+      "stopRecording": "Detener grabacion",
+      "recordArrangement": "Grabar arreglo",
+      "disableLoop": "Desactivar bucle",
+      "enableLoop": "Activar bucle",
+      "disableMetronome": "Desactivar metronomo",
+      "enableMetronome": "Activar metronomo",
+      "beatCounter": "Pulso {{current}}/{{total}}",
+      "clearRecording": "Borrar grabacion",
+      "lengthLabel": "Duracion",
+      "oneBar": "1 compas",
+      "multipleBars": "{{count}} compases",
+      "countInActive": "Cuenta previa activa",
+      "stepSummary": "Paso {{current}}/{{total}}",
+      "eventSingular": "{{count}} evento",
+      "eventPlural": "{{count}} eventos"
+    }
+  }
+}

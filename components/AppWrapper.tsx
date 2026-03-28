@@ -5,6 +5,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 import GitHubIcon from '@mui/icons-material/GitHub';
 import LinkedInIcon from '@mui/icons-material/LinkedIn';
 import Link from 'next/link';
+import { useTranslation } from 'react-i18next';
 import {
   AppBar,
   Box,
@@ -23,6 +24,7 @@ import {
 import { useEffect, useMemo, useState } from 'react';
 
 import ThemeModeToggle from './ui/ThemeModeToggle';
+import LanguageSwitcher from './ui/LanguageSwitcher';
 import { useAuth } from './providers/AuthProvider';
 
 type Props = {
@@ -34,13 +36,6 @@ type NavItem = {
   href: string;
   sectionId?: ResultSectionId;
 };
-
-const NAV_ITEMS = [
-  { label: 'Generator', href: '/#generator' },
-  { label: 'Suggestions', href: '/#suggestions', sectionId: 'suggestions' },
-  { label: 'Progressions', href: '/#progressions', sectionId: 'progressions' },
-  { label: 'Structure', href: '/#structure', sectionId: 'structure' },
-] satisfies NavItem[];
 
 const RESULT_SECTION_IDS = ['suggestions', 'progressions', 'structure'] as const;
 type ResultSectionId = (typeof RESULT_SECTION_IDS)[number];
@@ -71,10 +66,30 @@ function StorybookIcon() {
 }
 
 export default function AppWrapper({ children }: Props) {
+  const { t } = useTranslation(['common', 'nav']);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [availableSections, setAvailableSections] = useState<ResultSectionId[]>([]);
   const { isAuthenticated, isLoading, logout } = useAuth();
   const pathname = usePathname();
+
+  const navItems = useMemo(
+    () =>
+      [
+        { label: t('generator', { ns: 'nav' }), href: '/#generator' },
+        {
+          label: t('suggestions', { ns: 'nav' }),
+          href: '/#suggestions',
+          sectionId: 'suggestions',
+        },
+        {
+          label: t('progressions', { ns: 'nav' }),
+          href: '/#progressions',
+          sectionId: 'progressions',
+        },
+        { label: t('structure', { ns: 'nav' }), href: '/#structure', sectionId: 'structure' },
+      ] satisfies NavItem[],
+    [t],
+  );
 
   useEffect(() => {
     if (pathname !== '/') {
@@ -122,10 +137,8 @@ export default function AppWrapper({ children }: Props) {
   }, [pathname]);
 
   const visibleNavItems = useMemo(() => {
-    return NAV_ITEMS.filter(
-      (item) => !item.sectionId || availableSections.includes(item.sectionId),
-    );
-  }, [availableSections]);
+    return navItems.filter((item) => !item.sectionId || availableSections.includes(item.sectionId));
+  }, [availableSections, navItems]);
 
   return (
     <Box
@@ -176,21 +189,22 @@ export default function AppWrapper({ children }: Props) {
                 </Button>
               ))}
               <Button component={Link} href="/progressions?view=public" color="inherit">
-                My Progressions
+                {t('myProgressions', { ns: 'nav' })}
               </Button>
               {isLoading ? (
                 <Button color="inherit" disabled sx={{ minWidth: 80 }}>
-                  ...
+                  {t('loadingEllipsis', { ns: 'common' })}
                 </Button>
               ) : isAuthenticated ? (
                 <Button onClick={logout} color="inherit">
-                  Logout
+                  {t('logout', { ns: 'nav' })}
                 </Button>
               ) : (
                 <Button component={Link} href="/auth" color="inherit">
-                  Login
+                  {t('login', { ns: 'nav' })}
                 </Button>
               )}
+              <LanguageSwitcher />
               <ThemeModeToggle />
             </Box>
 
@@ -198,7 +212,7 @@ export default function AppWrapper({ children }: Props) {
               <ThemeModeToggle />
               <IconButton
                 color="inherit"
-                aria-label="Open navigation menu"
+                aria-label={t('openNavigationMenu', { ns: 'common' })}
                 onClick={() => setMobileOpen(true)}
               >
                 <MenuIcon />
@@ -210,6 +224,9 @@ export default function AppWrapper({ children }: Props) {
 
       <Drawer anchor="right" open={mobileOpen} onClose={() => setMobileOpen(false)}>
         <Box sx={{ width: 280, pt: 2 }} role="presentation">
+          <Box sx={{ px: 2, pb: 2 }}>
+            <LanguageSwitcher fullWidth />
+          </Box>
           <List>
             {visibleNavItems.map((item) => (
               <ListItemButton
@@ -226,11 +243,11 @@ export default function AppWrapper({ children }: Props) {
               href="/progressions?view=public"
               onClick={() => setMobileOpen(false)}
             >
-              <ListItemText primary="My Progressions" />
+              <ListItemText primary={t('myProgressions', { ns: 'nav' })} />
             </ListItemButton>
             {isLoading ? (
               <ListItemButton disabled>
-                <ListItemText primary="..." />
+                <ListItemText primary={t('loadingEllipsis', { ns: 'common' })} />
               </ListItemButton>
             ) : isAuthenticated ? (
               <ListItemButton
@@ -239,11 +256,11 @@ export default function AppWrapper({ children }: Props) {
                   void logout();
                 }}
               >
-                <ListItemText primary="Logout" />
+                <ListItemText primary={t('logout', { ns: 'nav' })} />
               </ListItemButton>
             ) : (
               <ListItemButton component={Link} href="/auth" onClick={() => setMobileOpen(false)}>
-                <ListItemText primary="Login" />
+                <ListItemText primary={t('login', { ns: 'nav' })} />
               </ListItemButton>
             )}
           </List>

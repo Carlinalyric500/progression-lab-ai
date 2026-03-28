@@ -1,0 +1,217 @@
+{
+  "header": {
+    "description": "输入几个和弦、一种情绪和一个调式。即可获得和弦进行灵感、结构建议以及简单的吉他/钢琴图示。"
+  },
+  "status": {
+    "loadingSuggestions": "正在加载建议...",
+    "loadingProgressionIdeas": "正在加载进行想法...",
+    "loadingStructureSuggestions": "正在加载结构建议..."
+  },
+  "errors": {
+    "selectMode": "请选择或输入调式 / 音阶。",
+    "selectGenre": "请选择或输入风格。",
+    "requestFailed": "无法生成建议。"
+  },
+  "form": {
+    "seedChords": {
+      "label": "起始和弦",
+      "placeholder": "Fmaj7, F#m7",
+      "required": "起始和弦为必填项",
+      "atLeastOne": "请至少输入一个和弦"
+    },
+    "mood": {
+      "label": "情绪",
+      "placeholder": "梦幻、深沉、充满希望",
+      "required": "情绪为必填项"
+    },
+    "mode": {
+      "label": "调式 / 音阶",
+      "placeholder": "ionian、dorian、和声小调",
+      "required": "调式 / 音阶为必填项"
+    },
+    "genre": {
+      "label": "风格",
+      "placeholder": "piano house、jazz、indie pop",
+      "required": "风格为必填项"
+    },
+    "styleReference": {
+      "label": "风格参考（可选）",
+      "placeholder": "Barry Harris、Bill Evans 等",
+      "helperText": "可使用演奏者、教师或和声学派作为风格参考。"
+    },
+    "adventurousness": {
+      "label": "冒险程度",
+      "placeholder": "稳妥、平衡、惊喜"
+    },
+    "actions": {
+      "randomizeInputs": "随机输入",
+      "generateIdeas": "生成灵感",
+      "generating": "生成中..."
+    }
+  },
+  "optionGroups": {
+    "mode": {
+      "majorDiatonic": "大调 / 自然音阶",
+      "minorModal": "小调 / 调式",
+      "pentatonicBlues": "五声音阶 / 布鲁斯",
+      "extendedColors": "扩展色彩",
+      "symmetricAdvanced": "对称 / 进阶",
+      "other": "其他"
+    },
+    "genre": {
+      "danceClub": "舞曲 / 夜店",
+      "popSongwriter": "流行 / 唱作",
+      "urbanGroove": "都市 / Groove",
+      "jazzHarmony": "爵士 / 和声",
+      "atmosphericCinematic": "氛围 / 电影感",
+      "bandAcoustic": "乐队 / 原声",
+      "other": "其他"
+    },
+    "adventurousness": {
+      "riskProfile": "风险画像"
+    }
+  },
+  "styleReferenceGroups": {
+    "jazzPianoIcons": "爵士钢琴经典",
+    "modernHarmonyVoices": "现代和声语汇",
+    "educatorsAndMethods": "教育者与方法"
+  },
+  "options": {
+    "mode": {
+      "ionian": "Ionian（大调）",
+      "dorian": "Dorian",
+      "phrygian": "Phrygian",
+      "lydian": "Lydian",
+      "mixolydian": "Mixolydian",
+      "aeolian": "Aeolian（自然小调）",
+      "locrian": "Locrian",
+      "majorPentatonic": "大调五声音阶",
+      "minorPentatonic": "小调五声音阶",
+      "harmonicMinor": "和声小调",
+      "melodicMinor": "旋律小调",
+      "blues": "布鲁斯",
+      "wholeTone": "全音音阶",
+      "diminished": "减音音阶",
+      "chromatic": "半音音阶",
+      "custom": "自定义"
+    },
+    "genre": {
+      "house": "House",
+      "pianoHouse": "Piano House",
+      "deepHouse": "Deep House",
+      "discoHouse": "Disco House",
+      "techHouse": "Tech House",
+      "funkDisco": "Funk / Disco",
+      "pop": "Pop",
+      "indiePop": "Indie Pop",
+      "rnbNeoSoul": "R&B / Neo Soul",
+      "jazz": "Jazz",
+      "loFi": "Lo-fi",
+      "ambient": "Ambient",
+      "cinematic": "电影感",
+      "edm": "EDM",
+      "afroHouse": "Afro House",
+      "progressiveHouse": "Progressive House",
+      "hipHop": "Hip-Hop",
+      "rock": "Rock",
+      "folk": "Folk",
+      "custom": "自定义"
+    },
+    "mood": {
+      "dreamy": "梦幻",
+      "dark": "黑暗",
+      "hopeful": "充满希望",
+      "energetic": "充满活力",
+      "melancholic": "忧郁",
+      "happy": "快乐",
+      "sad": "悲伤",
+      "angry": "愤怒",
+      "calm": "平静",
+      "uplifting": "振奋",
+      "emotional": "感性",
+      "peaceful": "宁静",
+      "intense": "强烈",
+      "mellow": "柔和",
+      "bright": "明亮",
+      "moody": "氛围感",
+      "somber": "阴郁",
+      "playful": "俏皮",
+      "dramatic": "戏剧化",
+      "romantic": "浪漫",
+      "mysterious": "神秘",
+      "ethereal": "空灵",
+      "groovy": "律动感强",
+      "chill": "松弛",
+      "epic": "史诗感",
+      "whimsical": "奇趣",
+      "nostalgic": "怀旧",
+      "vibrant": "鲜活",
+      "soulful": "富有灵魂感",
+      "ambient": "氛围",
+      "hypnotic": "催眠感"
+    },
+    "adventurousness": {
+      "safe": "稳妥",
+      "balanced": "平衡",
+      "surprising": "惊喜"
+    }
+  },
+  "ui": {
+    "buttons": {
+      "save": "保存",
+      "settings": "设置",
+      "pads": "打击垫",
+      "piano": "钢琴",
+      "guitar": "吉他",
+      "playChord": "播放和弦",
+      "stopChord": "停止和弦",
+      "playSection": "播放段落",
+      "stop": "停止",
+      "playArrangement": "播放编排",
+      "stopArrangement": "停止编排",
+      "saveArrangement": "保存编排",
+      "edit": "编辑"
+    },
+    "sectionTitles": {
+      "nextChordSuggestions": "下一个和弦建议",
+      "progressionIdeas": "进行想法",
+      "structureSuggestions": "结构建议"
+    },
+    "labels": {
+      "commonChordExamples": "常见和弦示例",
+      "harmonicSource": "和声来源：{{label}}"
+    },
+    "messages": {
+      "noGuitarDiagram": "没有可用的吉他指型图。",
+      "noPianoVoicing": "没有可用的钢琴和声音型。"
+    },
+    "settingsDialog": {
+      "title": "播放设置"
+    },
+    "chordGrid": {
+      "title": "和弦游乐场",
+      "closeAriaLabel": "关闭和弦游乐场",
+      "selectPadThenChord": "先选择一个打击垫，然后选择和弦",
+      "padChordLabel": "打击垫和弦",
+      "keyboardHelp": "键盘：打击垫使用 1-0，然后使用 A-Z；空格键播放或停止音轨，Shift 切换录制。",
+      "noPianoVoicings": "没有可用的生成钢琴和声音型。",
+      "countInTooltip": "预备拍 {{current}}/{{total}}",
+      "countInAriaLabel": "预备拍，第 {{current}} / {{total}} 拍",
+      "stopRecording": "停止录制",
+      "recordArrangement": "录制编排",
+      "disableLoop": "关闭循环",
+      "enableLoop": "开启循环",
+      "disableMetronome": "关闭节拍器",
+      "enableMetronome": "开启节拍器",
+      "beatCounter": "拍 {{current}}/{{total}}",
+      "clearRecording": "清除录制",
+      "lengthLabel": "长度",
+      "oneBar": "1 小节",
+      "multipleBars": "{{count}} 小节",
+      "countInActive": "预备拍进行中",
+      "stepSummary": "步骤 {{current}}/{{total}}",
+      "eventSingular": "{{count}} 个事件",
+      "eventPlural": "{{count}} 个事件"
+    }
+  }
+}

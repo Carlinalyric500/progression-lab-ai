@@ -1,0 +1,217 @@
+{
+  "header": {
+    "description": "Syota muutama sointu, tunnelma ja asteikko. Saat ideoita progressioihin, rakennesuosituksia seka yksinkertaiset kitara- ja pianokaaviot."
+  },
+  "status": {
+    "loadingSuggestions": "Ladataan ehdotuksia...",
+    "loadingProgressionIdeas": "Ladataan progressioideoita...",
+    "loadingStructureSuggestions": "Ladataan rakennesuosituksia..."
+  },
+  "errors": {
+    "selectMode": "Valitse tai syota moodi / asteikko.",
+    "selectGenre": "Valitse tai syota genre.",
+    "requestFailed": "Ehdotusten luominen ei onnistunut."
+  },
+  "form": {
+    "seedChords": {
+      "label": "Lahtosoinnut",
+      "placeholder": "Fmaj7, F#m7",
+      "required": "Lahtosoinnut ovat pakollisia",
+      "atLeastOne": "Anna vahintaan yksi sointu"
+    },
+    "mood": {
+      "label": "Tunnelma",
+      "placeholder": "unelmallinen, tumma, toiveikas",
+      "required": "Tunnelma on pakollinen"
+    },
+    "mode": {
+      "label": "Moodi / asteikko",
+      "placeholder": "jooninen, doorinen, harmoninen molli",
+      "required": "Moodi / asteikko on pakollinen"
+    },
+    "genre": {
+      "label": "Genre",
+      "placeholder": "piano house, jazz, indie pop",
+      "required": "Genre on pakollinen"
+    },
+    "styleReference": {
+      "label": "Tyyliviite (valinnainen)",
+      "placeholder": "Barry Harris, Bill Evans, jne.",
+      "helperText": "Kayta artistia, opettajaa tai harmoniakoulukuntaa tyylillisena viitteena."
+    },
+    "adventurousness": {
+      "label": "Rohkeus",
+      "placeholder": "varma, tasapainoinen, yllattava"
+    },
+    "actions": {
+      "randomizeInputs": "Satunnaista syotteet",
+      "generateIdeas": "Luo ideoita",
+      "generating": "Luodaan..."
+    }
+  },
+  "optionGroups": {
+    "mode": {
+      "majorDiatonic": "Duuri / Diatoninen",
+      "minorModal": "Molli / Modaalinen",
+      "pentatonicBlues": "Pentatoninen / Blues",
+      "extendedColors": "Laajennetut varit",
+      "symmetricAdvanced": "Symmetrinen / Edistynyt",
+      "other": "Muu"
+    },
+    "genre": {
+      "danceClub": "Dance / Club",
+      "popSongwriter": "Pop / Songwriter",
+      "urbanGroove": "Urban / Groove",
+      "jazzHarmony": "Jazz / Harmonia",
+      "atmosphericCinematic": "Atmosfaarinen / Elokuvallinen",
+      "bandAcoustic": "Yhtye / Akustinen",
+      "other": "Muu"
+    },
+    "adventurousness": {
+      "riskProfile": "Riskiprofiili"
+    }
+  },
+  "styleReferenceGroups": {
+    "jazzPianoIcons": "Jazzpianon ikonit",
+    "modernHarmonyVoices": "Modernit harmonian aanet",
+    "educatorsAndMethods": "Opettajat ja menetelmat"
+  },
+  "options": {
+    "mode": {
+      "ionian": "Jooninen (Duuri)",
+      "dorian": "Doorinen",
+      "phrygian": "Fryyginen",
+      "lydian": "Lyydinen",
+      "mixolydian": "Miksolyydinen",
+      "aeolian": "Aeolinen (Luonnollinen molli)",
+      "locrian": "Lokrinen",
+      "majorPentatonic": "Duuripentatoninen",
+      "minorPentatonic": "Mollipentatoninen",
+      "harmonicMinor": "Harmoninen molli",
+      "melodicMinor": "Melodinen molli",
+      "blues": "Blues",
+      "wholeTone": "Kokosavelasteikko",
+      "diminished": "Vahennetty",
+      "chromatic": "Kromaattinen",
+      "custom": "Mukautettu"
+    },
+    "genre": {
+      "house": "House",
+      "pianoHouse": "Piano House",
+      "deepHouse": "Deep House",
+      "discoHouse": "Disco House",
+      "techHouse": "Tech House",
+      "funkDisco": "Funk / Disco",
+      "pop": "Pop",
+      "indiePop": "Indie Pop",
+      "rnbNeoSoul": "R&B / Neo Soul",
+      "jazz": "Jazz",
+      "loFi": "Lo-fi",
+      "ambient": "Ambient",
+      "cinematic": "Elokuvallinen",
+      "edm": "EDM",
+      "afroHouse": "Afro House",
+      "progressiveHouse": "Progressive House",
+      "hipHop": "Hip-Hop",
+      "rock": "Rock",
+      "folk": "Folk",
+      "custom": "Mukautettu"
+    },
+    "mood": {
+      "dreamy": "Unelmallinen",
+      "dark": "Tumma",
+      "hopeful": "Toiveikas",
+      "energetic": "Energinen",
+      "melancholic": "Melankolinen",
+      "happy": "Iloinen",
+      "sad": "Surullinen",
+      "angry": "Vihainen",
+      "calm": "Rauhallinen",
+      "uplifting": "Kohottava",
+      "emotional": "Tunteellinen",
+      "peaceful": "Tyyni",
+      "intense": "Intensiivinen",
+      "mellow": "Pehmea",
+      "bright": "Kirkas",
+      "moody": "Tunnelmallinen",
+      "somber": "Synkka",
+      "playful": "Leikkisa",
+      "dramatic": "Dramaattinen",
+      "romantic": "Romanttinen",
+      "mysterious": "Salaperainen",
+      "ethereal": "Eteerinen",
+      "groovy": "Groovy",
+      "chill": "Rento",
+      "epic": "Eeppinen",
+      "whimsical": "Oikukas",
+      "nostalgic": "Nostalginen",
+      "vibrant": "Elavainen",
+      "soulful": "Sielukas",
+      "ambient": "Ambient",
+      "hypnotic": "Hypnoottinen"
+    },
+    "adventurousness": {
+      "safe": "Varma",
+      "balanced": "Tasapainoinen",
+      "surprising": "Yllattava"
+    }
+  },
+  "ui": {
+    "buttons": {
+      "save": "Tallenna",
+      "settings": "Asetukset",
+      "pads": "Padit",
+      "piano": "Piano",
+      "guitar": "Kitara",
+      "playChord": "Soita sointu",
+      "stopChord": "Pysayta sointu",
+      "playSection": "Soita osio",
+      "stop": "Pysayta",
+      "playArrangement": "Soita sovitus",
+      "stopArrangement": "Pysayta sovitus",
+      "saveArrangement": "Tallenna sovitus",
+      "edit": "Muokkaa"
+    },
+    "sectionTitles": {
+      "nextChordSuggestions": "Seuraavan soinnun ehdotukset",
+      "progressionIdeas": "Progressioideat",
+      "structureSuggestions": "Rakennesuositukset"
+    },
+    "labels": {
+      "commonChordExamples": "Yleiset sointuesimerkit",
+      "harmonicSource": "Harmoninen lahde: {{label}}"
+    },
+    "messages": {
+      "noGuitarDiagram": "Kitara-kaaviota ei ole saatavilla.",
+      "noPianoVoicing": "Pianon soinnutus ei ole saatavilla."
+    },
+    "settingsDialog": {
+      "title": "Toistoasetukset"
+    },
+    "chordGrid": {
+      "title": "Sointualue",
+      "closeAriaLabel": "Sulje sointualue",
+      "selectPadThenChord": "Valitse padi ja sitten sointu",
+      "padChordLabel": "Padin sointu",
+      "countInTooltip": "Esilaskenta {{current}}/{{total}}",
+      "countInAriaLabel": "Esilaskenta {{current}} / {{total}}",
+      "stopRecording": "Lopeta nauhoitus",
+      "recordArrangement": "Nauhoita sovitus",
+      "disableLoop": "Poista looppi",
+      "enableLoop": "Ota looppi kayttoon",
+      "disableMetronome": "Poista metronomi",
+      "enableMetronome": "Ota metronomi kayttoon",
+      "beatCounter": "Isku {{current}}/{{total}}",
+      "clearRecording": "Tyhjenna nauhoitus",
+      "lengthLabel": "Pituus",
+      "oneBar": "1 tahti",
+      "multipleBars": "{{count}} tahtia",
+      "countInActive": "Esilaskenta kaynnissa",
+      "stepSummary": "Vaihe {{current}}/{{total}}",
+      "eventSingular": "{{count}} tapahtuma",
+      "eventPlural": "{{count}} tapahtumaa",
+      "keyboardHelp": "Nappaimisto: padit kayttavat 1-0 ja sitten A-Z, valilyonti soittaa/pysayttaa raidan, Shift vaihtaa nauhoituksen.",
+      "noPianoVoicings": "Generoituja pianosoinnutuksia ei ole saatavilla."
+    }
+  }
+}

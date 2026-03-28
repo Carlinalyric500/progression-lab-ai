@@ -20,6 +20,7 @@ import LoopIcon from '@mui/icons-material/Loop';
 import SaveIcon from '@mui/icons-material/Save';
 import { alpha, type Theme, useTheme } from '@mui/material/styles';
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import {
   getAudioClockSeconds,
@@ -219,6 +220,7 @@ export default function GeneratedChordGridDialog({
   pendingLoad = null,
   onSaveSuccess,
 }: GeneratedChordGridDialogProps) {
+  const { t } = useTranslation('generator');
   const theme = useTheme();
   const { appColors } = theme.palette;
 
@@ -839,6 +841,7 @@ export default function GeneratedChordGridDialog({
 
   return (
     <Dialog
+      dir="ltr"
       open={open}
       onClose={onClose}
       maxWidth={false}
@@ -851,6 +854,8 @@ export default function GeneratedChordGridDialog({
         },
       }}
       PaperProps={{
+        dir: 'ltr',
+        style: { direction: 'ltr' },
         sx: {
           width: '100%',
           maxWidth: isMobile ? '100%' : 800,
@@ -864,9 +869,9 @@ export default function GeneratedChordGridDialog({
     >
       <DialogTitle sx={{ fontWeight: 700, fontSize: '1.25rem' }}>
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <Typography variant="h5">Chord Playground</Typography>
+          <Typography variant="h5">{t('ui.chordGrid.title')}</Typography>
           <IconButton
-            aria-label="Close chord playground"
+            aria-label={t('ui.chordGrid.closeAriaLabel')}
             onClick={onClose}
             size="small"
             sx={{ color: appColors.accent.chordCloseIcon }}
@@ -892,24 +897,32 @@ export default function GeneratedChordGridDialog({
           <PlaybackToggleButton
             isPlaying={isSequencerPlaying}
             onClick={handleSequencerPlayToggle}
+            playTitle={t('ui.buttons.playArrangement')}
+            stopTitle={t('ui.buttons.stopArrangement')}
           />
           <Tooltip
             title={
               isCountInActive
-                ? `Count-in ${currentBeatInBar}/${beatsPerBar}`
+                ? t('ui.chordGrid.countInTooltip', {
+                    current: currentBeatInBar,
+                    total: beatsPerBar,
+                  })
                 : isRecording
-                  ? 'Stop recording'
-                  : 'Record arrangement'
+                  ? t('ui.chordGrid.stopRecording')
+                  : t('ui.chordGrid.recordArrangement')
             }
           >
             <IconButton
               size="small"
               aria-label={
                 isCountInActive
-                  ? `Count-in ${currentBeatInBar} of ${beatsPerBar}`
+                  ? t('ui.chordGrid.countInAriaLabel', {
+                      current: currentBeatInBar,
+                      total: beatsPerBar,
+                    })
                   : isRecording
-                    ? 'Stop recording'
-                    : 'Record arrangement'
+                    ? t('ui.chordGrid.stopRecording')
+                    : t('ui.chordGrid.recordArrangement')
               }
               onClick={handleRecordToggle}
               sx={getTransportIconButtonSx(isRecording || isCountInActive, 'error')}
@@ -917,20 +930,34 @@ export default function GeneratedChordGridDialog({
               <FiberManualRecordIcon fontSize="small" />
             </IconButton>
           </Tooltip>
-          <Tooltip title={isLoopEnabled ? 'Disable loop' : 'Enable loop'}>
+          <Tooltip
+            title={isLoopEnabled ? t('ui.chordGrid.disableLoop') : t('ui.chordGrid.enableLoop')}
+          >
             <IconButton
               size="small"
-              aria-label={isLoopEnabled ? 'Disable loop' : 'Enable loop'}
+              aria-label={
+                isLoopEnabled ? t('ui.chordGrid.disableLoop') : t('ui.chordGrid.enableLoop')
+              }
               onClick={() => setIsLoopEnabled((previous) => !previous)}
               sx={getTransportIconButtonSx(isLoopEnabled)}
             >
               <LoopIcon fontSize="small" />
             </IconButton>
           </Tooltip>
-          <Tooltip title={metronomeEnabled ? 'Disable metronome' : 'Enable metronome'}>
+          <Tooltip
+            title={
+              metronomeEnabled
+                ? t('ui.chordGrid.disableMetronome')
+                : t('ui.chordGrid.enableMetronome')
+            }
+          >
             <IconButton
               size="small"
-              aria-label={metronomeEnabled ? 'Disable metronome' : 'Enable metronome'}
+              aria-label={
+                metronomeEnabled
+                  ? t('ui.chordGrid.disableMetronome')
+                  : t('ui.chordGrid.enableMetronome')
+              }
               onClick={() => onSettingsChange.onMetronomeEnabledChange(!metronomeEnabled)}
               sx={getTransportIconButtonSx(metronomeEnabled)}
             >
@@ -958,11 +985,14 @@ export default function GeneratedChordGridDialog({
               }}
             />
             <Typography variant="caption" color="text.secondary" sx={{ minWidth: 50 }}>
-              Beat {currentBeatInBar}/{beatsPerBar}
+              {t('ui.chordGrid.beatCounter', {
+                current: currentBeatInBar,
+                total: beatsPerBar,
+              })}
             </Typography>
           </Box>
           <IconButton
-            aria-label="Clear recording"
+            aria-label={t('ui.chordGrid.clearRecording')}
             size="small"
             onClick={clearRecordedEvents}
             disabled={arrangementEvents.length === 0}
@@ -977,7 +1007,7 @@ export default function GeneratedChordGridDialog({
             }}
           >
             <SelectField
-              label="Length"
+              label={t('ui.chordGrid.lengthLabel')}
               value={String(loopLengthBars)}
               size="small"
               onChange={(event) => {
@@ -992,7 +1022,10 @@ export default function GeneratedChordGridDialog({
               }}
               options={LOOP_LENGTH_OPTIONS.map((value) => ({
                 value: String(value),
-                label: `${value} bar${value > 1 ? 's' : ''}`,
+                label:
+                  value === 1
+                    ? t('ui.chordGrid.oneBar')
+                    : t('ui.chordGrid.multipleBars', { count: value }),
               }))}
               sx={{ minWidth: { xs: '100%', sm: 144 } }}
             />
@@ -1000,11 +1033,19 @@ export default function GeneratedChordGridDialog({
           <Typography
             variant="caption"
             color="text.secondary"
-            sx={{ width: '100%', textAlign: 'right' }}
+            sx={{ width: '100%' }}
+            style={{ textAlign: 'right' }}
           >
-            {isCountInActive ? 'Count-in active' : `Step ${currentStep + 1}/${totalSteps}`} •{' '}
-            {arrangementEvents.length} event
-            {arrangementEvents.length === 1 ? '' : 's'}
+            {isCountInActive
+              ? t('ui.chordGrid.countInActive')
+              : t('ui.chordGrid.stepSummary', {
+                  current: currentStep + 1,
+                  total: totalSteps,
+                })}{' '}
+            •{' '}
+            {arrangementEvents.length === 1
+              ? t('ui.chordGrid.eventSingular', { count: arrangementEvents.length })
+              : t('ui.chordGrid.eventPlural', { count: arrangementEvents.length })}
           </Typography>
         </Box>
 
@@ -1031,12 +1072,12 @@ export default function GeneratedChordGridDialog({
             }}
           >
             <Typography variant="subtitle2" sx={{ mb: 1 }}>
-              Select a pad, then pick a chord
+              {t('ui.chordGrid.selectPadThenChord')}
             </Typography>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'nowrap' }}>
               <Box sx={{ width: { xs: '68%', sm: 'auto' }, flexGrow: { sm: 1 }, minWidth: 0 }}>
                 <SelectField
-                  label="Pad chord"
+                  label={t('ui.chordGrid.padChordLabel')}
                   value={editingEntry?.chord ?? ''}
                   onChange={(event) => {
                     if (editingPadKey) {
@@ -1056,7 +1097,7 @@ export default function GeneratedChordGridDialog({
                 disabled={!editingPadKey}
                 sx={{ textTransform: 'none', fontWeight: 600, whiteSpace: 'nowrap' }}
               >
-                Save
+                {t('ui.buttons.save')}
               </Button>
             </Box>
           </Box>
@@ -1161,7 +1202,6 @@ export default function GeneratedChordGridDialog({
                     sx={{
                       position: 'absolute',
                       top: 6,
-                      left: 6,
                       minWidth: 20,
                       height: 20,
                       px: 0.5,
@@ -1177,6 +1217,7 @@ export default function GeneratedChordGridDialog({
                       border: `1px solid ${alpha(theme.palette.common.white, 0.32)}`,
                       boxShadow: `0 1px 0 ${alpha(theme.palette.common.black, 0.3)}`,
                     }}
+                    style={{ left: 6 }}
                   >
                     {hotkeyLabel}
                   </Box>
@@ -1196,13 +1237,13 @@ export default function GeneratedChordGridDialog({
 
         {showKeyboardHints ? (
           <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
-            Keyboard: pads use 1-0 then A-Z, Space plays/stops the track, Shift toggles record.
+            {t('ui.chordGrid.keyboardHelp')}
           </Typography>
         ) : null}
 
         {editableChords.length === 0 ? (
           <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-            No generated piano voicings available.
+            {t('ui.chordGrid.noPianoVoicings')}
           </Typography>
         ) : null}
       </DialogContent>
@@ -1240,7 +1281,7 @@ export default function GeneratedChordGridDialog({
               },
             })}
           >
-            Edit
+            {t('ui.buttons.edit')}
           </Button>
         </Box>
 
@@ -1256,7 +1297,7 @@ export default function GeneratedChordGridDialog({
             disabled={arrangementEvents.length === 0}
             sx={{ textTransform: 'none', fontWeight: 600 }}
           >
-            Save arrangement
+            {t('ui.buttons.saveArrangement')}
           </Button>
         </Box>
       </DialogActions>

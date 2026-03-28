@@ -1,5 +1,6 @@
 'use client';
 
+import { useMemo } from 'react';
 import {
   Controller,
   type Control,
@@ -15,23 +16,39 @@ import {
   Stack,
   TextField as MuiTextField,
 } from '@mui/material';
+import { useTranslation } from 'react-i18next';
 
 import Card from '../../../components/ui/Card';
 import GroupedAutocompleteField from '../../../components/ui/GroupedAutocompleteField';
 import {
-  ADVENTUROUSNESS_CATEGORY_BY_NAME,
   ADVENTUROUSNESS_OPTIONS,
   CHORD_OPTIONS,
-  GENRE_CATEGORY_BY_NAME,
   GENRE_INPUT_OPTIONS,
-  MODE_CATEGORY_BY_NAME,
   MODE_INPUT_OPTIONS,
   MOOD_OPTIONS,
-  STYLE_REFERENCE_CATEGORY_BY_NAME,
   STYLE_REFERENCE_OPTIONS,
 } from '../../../lib/formOptions';
+import {
+  ADVENTUROUSNESS_CATEGORY_KEY_BY_VALUE,
+  ADVENTUROUSNESS_LABEL_KEY_BY_VALUE,
+  GENRE_CATEGORY_KEY_BY_VALUE,
+  GENRE_LABEL_KEY_BY_VALUE,
+  MOOD_LABEL_KEY_BY_VALUE,
+  MODE_CATEGORY_KEY_BY_VALUE,
+  MODE_LABEL_KEY_BY_VALUE,
+  STYLE_REFERENCE_CATEGORY_KEY_BY_VALUE,
+} from '../../../lib/i18n/generatorOptionTranslations';
 import { getChordChipSx, getMoodChipSx } from '../../../lib/tagMetadata';
 import type { GeneratorFormData } from '../types';
+
+function buildTranslatedGroupMap(
+  groupKeyByValue: Record<string, string>,
+  translate: (key: string) => string,
+) {
+  return Object.fromEntries(
+    Object.entries(groupKeyByValue).map(([value, key]) => [value, translate(key)]),
+  );
+}
 
 /**
  * Props for the main generator form card.
@@ -60,6 +77,34 @@ export default function GeneratorFormCard({
   errorMessage,
   onRandomize,
 }: GeneratorFormCardProps) {
+  const { t } = useTranslation('generator');
+  const translateMoodOption = (option: string) => t(MOOD_LABEL_KEY_BY_VALUE[option] ?? option);
+  const resolveMoodValueFromInput = (input: string) => {
+    const normalizedInput = input.trim();
+    const matchingOption = MOOD_OPTIONS.find(
+      (option) => translateMoodOption(option) === normalizedInput,
+    );
+
+    return matchingOption ?? input;
+  };
+
+  const modeGroupByName = useMemo(
+    () => buildTranslatedGroupMap(MODE_CATEGORY_KEY_BY_VALUE, (key) => t(key)),
+    [t],
+  );
+  const genreGroupByName = useMemo(
+    () => buildTranslatedGroupMap(GENRE_CATEGORY_KEY_BY_VALUE, (key) => t(key)),
+    [t],
+  );
+  const adventurousnessGroupByName = useMemo(
+    () => buildTranslatedGroupMap(ADVENTUROUSNESS_CATEGORY_KEY_BY_VALUE, (key) => t(key)),
+    [t],
+  );
+  const styleReferenceGroupByName = useMemo(
+    () => buildTranslatedGroupMap(STYLE_REFERENCE_CATEGORY_KEY_BY_VALUE, (key) => t(key)),
+    [t],
+  );
+
   return (
     <Card>
       <Box
@@ -79,9 +124,9 @@ export default function GeneratorFormCard({
           name="seedChords"
           control={control}
           rules={{
-            required: 'Seed chords are required',
+            required: t('form.seedChords.required'),
             validate: (value) => {
-              return value.trim().length > 0 || 'Please enter at least one chord';
+              return value.trim().length > 0 || t('form.seedChords.atLeastOne');
             },
           }}
           render={({ field: { value, onChange }, fieldState: { error } }) => {
@@ -116,8 +161,8 @@ export default function GeneratorFormCard({
                 renderInput={(params) => (
                   <MuiTextField
                     {...params}
-                    label="Seed chords"
-                    placeholder={chordArray.length > 0 ? '' : 'Fmaj7, F#m7'}
+                    label={t('form.seedChords.label')}
+                    placeholder={chordArray.length > 0 ? '' : t('form.seedChords.placeholder')}
                     fullWidth
                     variant="outlined"
                     InputLabelProps={{ shrink: true }}
@@ -134,7 +179,7 @@ export default function GeneratorFormCard({
           name="mood"
           control={control}
           rules={{
-            required: 'Mood is required',
+            required: t('form.mood.required'),
           }}
           render={({ field: { value, onChange }, fieldState: { error } }) => {
             const moodArray = value
@@ -146,9 +191,10 @@ export default function GeneratorFormCard({
                 multiple
                 freeSolo
                 options={MOOD_OPTIONS}
+                getOptionLabel={translateMoodOption}
                 value={moodArray}
                 onChange={(_, newValue) => {
-                  onChange(newValue.join(', '));
+                  onChange(newValue.map((option) => resolveMoodValueFromInput(option)).join(', '));
                 }}
                 disabled={isSubmitting || loading}
                 renderTags={(tagValue, getTagProps) =>
@@ -157,7 +203,7 @@ export default function GeneratorFormCard({
                     return (
                       <Chip
                         key={key}
-                        label={option}
+                        label={translateMoodOption(option)}
                         size="small"
                         sx={getMoodChipSx(option)}
                         {...tagProps}
@@ -168,8 +214,8 @@ export default function GeneratorFormCard({
                 renderInput={(params) => (
                   <MuiTextField
                     {...params}
-                    label="Mood"
-                    placeholder={moodArray.length > 0 ? '' : 'dreamy, dark, hopeful'}
+                    label={t('form.mood.label')}
+                    placeholder={moodArray.length > 0 ? '' : t('form.mood.placeholder')}
                     fullWidth
                     variant="outlined"
                     InputLabelProps={{ shrink: true }}
@@ -186,19 +232,20 @@ export default function GeneratorFormCard({
           name="mode"
           control={control}
           rules={{
-            required: 'Mode / scale is required',
-            validate: (value) => value.trim().length > 0 || 'Mode / scale is required',
+            required: t('form.mode.required'),
+            validate: (value) => value.trim().length > 0 || t('form.mode.required'),
           }}
           render={({ field: { value, onChange }, fieldState: { error } }) => (
             <GroupedAutocompleteField
-              label="Mode / scale"
+              label={t('form.mode.label')}
               value={value}
               onChange={onChange}
               options={MODE_INPUT_OPTIONS}
-              groupByName={MODE_CATEGORY_BY_NAME}
+              groupByName={modeGroupByName}
+              getOptionLabel={(option) => t(MODE_LABEL_KEY_BY_VALUE[option] ?? option)}
               freeSolo
               disabled={isSubmitting || loading}
-              placeholder="ionian, dorian, harmonic minor"
+              placeholder={t('form.mode.placeholder')}
               helperText={error?.message}
               error={!!error}
             />
@@ -209,19 +256,20 @@ export default function GeneratorFormCard({
           name="genre"
           control={control}
           rules={{
-            required: 'Genre is required',
-            validate: (value) => value.trim().length > 0 || 'Genre is required',
+            required: t('form.genre.required'),
+            validate: (value) => value.trim().length > 0 || t('form.genre.required'),
           }}
           render={({ field: { value, onChange }, fieldState: { error } }) => (
             <GroupedAutocompleteField
-              label="Genre"
+              label={t('form.genre.label')}
               value={value}
               onChange={onChange}
               options={GENRE_INPUT_OPTIONS}
-              groupByName={GENRE_CATEGORY_BY_NAME}
+              groupByName={genreGroupByName}
+              getOptionLabel={(option) => t(GENRE_LABEL_KEY_BY_VALUE[option] ?? option)}
               freeSolo
               disabled={isSubmitting || loading}
-              placeholder="piano house, jazz, indie pop"
+              placeholder={t('form.genre.placeholder')}
               helperText={error?.message}
               error={!!error}
             />
@@ -233,15 +281,15 @@ export default function GeneratorFormCard({
           control={control}
           render={({ field: { value, onChange } }) => (
             <GroupedAutocompleteField
-              label="Style reference (optional)"
+              label={t('form.styleReference.label')}
               value={value}
               onChange={onChange}
               freeSolo
               options={STYLE_REFERENCE_OPTIONS}
-              groupByName={STYLE_REFERENCE_CATEGORY_BY_NAME}
+              groupByName={styleReferenceGroupByName}
               disabled={isSubmitting || loading}
-              placeholder="Barry Harris, Bill Evans, etc."
-              helperText="Use a player, teacher, or harmony school as a stylistic guide."
+              placeholder={t('form.styleReference.placeholder')}
+              helperText={t('form.styleReference.helperText')}
             />
           )}
         />
@@ -251,13 +299,14 @@ export default function GeneratorFormCard({
           control={control}
           render={({ field: { value, onChange } }) => (
             <GroupedAutocompleteField
-              label="Adventurousness"
+              label={t('form.adventurousness.label')}
               value={value}
               onChange={onChange}
               options={ADVENTUROUSNESS_OPTIONS.map((option) => option)}
-              groupByName={ADVENTUROUSNESS_CATEGORY_BY_NAME}
+              groupByName={adventurousnessGroupByName}
+              getOptionLabel={(option) => t(ADVENTUROUSNESS_LABEL_KEY_BY_VALUE[option] ?? option)}
               disabled={isSubmitting || loading}
-              placeholder="safe, balanced, surprising"
+              placeholder={t('form.adventurousness.placeholder')}
             />
           )}
         />
@@ -272,7 +321,7 @@ export default function GeneratorFormCard({
             disabled={isSubmitting || loading}
             fullWidth
           >
-            Randomize Inputs
+            {t('form.actions.randomizeInputs')}
           </Button>
           <Button
             variant="contained"
@@ -281,7 +330,7 @@ export default function GeneratorFormCard({
             disabled={isSubmitting || loading || Object.keys(errors).length > 0}
             fullWidth
           >
-            {loading ? 'Generating...' : 'Generate Ideas'}
+            {loading ? t('form.actions.generating') : t('form.actions.generateIdeas')}
           </Button>
         </Stack>
 

@@ -1,0 +1,217 @@
+{
+  "header": {
+    "description": "Enter a few chords, a mood, and a mode. Get back progression ideas, structure suggestions, and simple guitar/piano diagrams."
+  },
+  "status": {
+    "loadingSuggestions": "Loading suggestions...",
+    "loadingProgressionIdeas": "Loading progression ideas...",
+    "loadingStructureSuggestions": "Loading structure suggestions..."
+  },
+  "errors": {
+    "selectMode": "Please select or enter a mode / scale.",
+    "selectGenre": "Please select or enter a genre.",
+    "requestFailed": "Could not generate suggestions."
+  },
+  "form": {
+    "seedChords": {
+      "label": "Seed chords",
+      "placeholder": "Fmaj7, F#m7",
+      "required": "Seed chords are required",
+      "atLeastOne": "Please enter at least one chord"
+    },
+    "mood": {
+      "label": "Mood",
+      "placeholder": "dreamy, dark, hopeful",
+      "required": "Mood is required"
+    },
+    "mode": {
+      "label": "Mode / scale",
+      "placeholder": "ionian, dorian, harmonic minor",
+      "required": "Mode / scale is required"
+    },
+    "genre": {
+      "label": "Genre",
+      "placeholder": "piano house, jazz, indie pop",
+      "required": "Genre is required"
+    },
+    "styleReference": {
+      "label": "Style reference (optional)",
+      "placeholder": "Barry Harris, Bill Evans, etc.",
+      "helperText": "Use a player, teacher, or harmony school as a stylistic guide."
+    },
+    "adventurousness": {
+      "label": "Adventurousness",
+      "placeholder": "safe, balanced, surprising"
+    },
+    "actions": {
+      "randomizeInputs": "Randomize Inputs",
+      "generateIdeas": "Generate Ideas",
+      "generating": "Generating..."
+    }
+  },
+  "optionGroups": {
+    "mode": {
+      "majorDiatonic": "Major / Diatonic",
+      "minorModal": "Minor / Modal",
+      "pentatonicBlues": "Pentatonic / Blues",
+      "extendedColors": "Extended Colors",
+      "symmetricAdvanced": "Symmetric / Advanced",
+      "other": "Other"
+    },
+    "genre": {
+      "danceClub": "Dance / Club",
+      "popSongwriter": "Pop / Songwriter",
+      "urbanGroove": "Urban / Groove",
+      "jazzHarmony": "Jazz / Harmony",
+      "atmosphericCinematic": "Atmospheric / Cinematic",
+      "bandAcoustic": "Band / Acoustic",
+      "other": "Other"
+    },
+    "adventurousness": {
+      "riskProfile": "Risk Profile"
+    }
+  },
+  "styleReferenceGroups": {
+    "jazzPianoIcons": "Jazz Piano Icons",
+    "modernHarmonyVoices": "Modern Harmony Voices",
+    "educatorsAndMethods": "Educators and Methods"
+  },
+  "options": {
+    "mode": {
+      "ionian": "Ionian (Major)",
+      "dorian": "Dorian",
+      "phrygian": "Phrygian",
+      "lydian": "Lydian",
+      "mixolydian": "Mixolydian",
+      "aeolian": "Aeolian (Natural Minor)",
+      "locrian": "Locrian",
+      "majorPentatonic": "Major Pentatonic",
+      "minorPentatonic": "Minor Pentatonic",
+      "harmonicMinor": "Harmonic Minor",
+      "melodicMinor": "Melodic Minor",
+      "blues": "Blues",
+      "wholeTone": "Whole Tone",
+      "diminished": "Diminished",
+      "chromatic": "Chromatic",
+      "custom": "Custom"
+    },
+    "genre": {
+      "house": "House",
+      "pianoHouse": "Piano House",
+      "deepHouse": "Deep House",
+      "discoHouse": "Disco House",
+      "techHouse": "Tech House",
+      "funkDisco": "Funk / Disco",
+      "pop": "Pop",
+      "indiePop": "Indie Pop",
+      "rnbNeoSoul": "R&B / Neo Soul",
+      "jazz": "Jazz",
+      "loFi": "Lo-fi",
+      "ambient": "Ambient",
+      "cinematic": "Cinematic",
+      "edm": "EDM",
+      "afroHouse": "Afro House",
+      "progressiveHouse": "Progressive House",
+      "hipHop": "Hip-Hop",
+      "rock": "Rock",
+      "folk": "Folk",
+      "custom": "Custom"
+    },
+    "mood": {
+      "dreamy": "Dreamy",
+      "dark": "Dark",
+      "hopeful": "Hopeful",
+      "energetic": "Energetic",
+      "melancholic": "Melancholic",
+      "happy": "Happy",
+      "sad": "Sad",
+      "angry": "Angry",
+      "calm": "Calm",
+      "uplifting": "Uplifting",
+      "emotional": "Emotional",
+      "peaceful": "Peaceful",
+      "intense": "Intense",
+      "mellow": "Mellow",
+      "bright": "Bright",
+      "moody": "Moody",
+      "somber": "Somber",
+      "playful": "Playful",
+      "dramatic": "Dramatic",
+      "romantic": "Romantic",
+      "mysterious": "Mysterious",
+      "ethereal": "Ethereal",
+      "groovy": "Groovy",
+      "chill": "Chill",
+      "epic": "Epic",
+      "whimsical": "Whimsical",
+      "nostalgic": "Nostalgic",
+      "vibrant": "Vibrant",
+      "soulful": "Soulful",
+      "ambient": "Ambient",
+      "hypnotic": "Hypnotic"
+    },
+    "adventurousness": {
+      "safe": "Safe",
+      "balanced": "Balanced",
+      "surprising": "Surprising"
+    }
+  },
+  "ui": {
+    "buttons": {
+      "save": "Save",
+      "settings": "Settings",
+      "pads": "Pads",
+      "piano": "Piano",
+      "guitar": "Guitar",
+      "playChord": "Play chord",
+      "stopChord": "Stop chord",
+      "playSection": "Play section",
+      "stop": "Stop",
+      "playArrangement": "Play arrangement",
+      "stopArrangement": "Stop arrangement",
+      "saveArrangement": "Save arrangement",
+      "edit": "Edit"
+    },
+    "sectionTitles": {
+      "nextChordSuggestions": "Next chord suggestions",
+      "progressionIdeas": "Progression ideas",
+      "structureSuggestions": "Structure suggestions"
+    },
+    "labels": {
+      "commonChordExamples": "Common Chord Examples",
+      "harmonicSource": "Harmonic source: {{label}}"
+    },
+    "messages": {
+      "noGuitarDiagram": "No guitar diagram available.",
+      "noPianoVoicing": "No piano voicing available."
+    },
+    "settingsDialog": {
+      "title": "Playback Settings"
+    },
+    "chordGrid": {
+      "title": "Chord Playground",
+      "closeAriaLabel": "Close chord playground",
+      "selectPadThenChord": "Select a pad, then pick a chord",
+      "padChordLabel": "Pad chord",
+      "countInTooltip": "Count-in {{current}}/{{total}}",
+      "countInAriaLabel": "Count-in {{current}} of {{total}}",
+      "stopRecording": "Stop recording",
+      "recordArrangement": "Record arrangement",
+      "disableLoop": "Disable loop",
+      "enableLoop": "Enable loop",
+      "disableMetronome": "Disable metronome",
+      "enableMetronome": "Enable metronome",
+      "beatCounter": "Beat {{current}}/{{total}}",
+      "clearRecording": "Clear recording",
+      "lengthLabel": "Length",
+      "oneBar": "1 bar",
+      "multipleBars": "{{count}} bars",
+      "countInActive": "Count-in active",
+      "stepSummary": "Step {{current}}/{{total}}",
+      "eventSingular": "{{count}} event",
+      "eventPlural": "{{count}} events",
+      "keyboardHelp": "Keyboard: pads use 1-0 then A-Z, Space plays/stops the track, Shift toggles record.",
+      "noPianoVoicings": "No generated piano voicings available."
+    }
+  }
+}
