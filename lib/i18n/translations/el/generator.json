@@ -3,7 +3,9 @@
     "description": "Εισαγάγετε μερικές συγχορδίες, μια διάθεση και έναν τρόπο. Λάβετε ιδέες για προόδους, προτάσεις δομής και απλά διαγράμματα κιθάρας/πιάνου."
   },
   "status": {
-    "loadingSuggestions": "Φόρτωση προτάσεων..."
+    "loadingSuggestions": "Φόρτωση προτάσεων...",
+    "loadingProgressionIdeas": "Φόρτωση ιδεών προόδου...",
+    "loadingStructureSuggestions": "Φόρτωση προτάσεων δομής..."
   },
   "errors": {
     "selectMode": "Παρακαλώ επιλέξτε ή εισαγάγετε έναν τρόπο / κλίμακα.",
@@ -115,10 +117,101 @@
       "folk": "Folk",
       "custom": "Προσαρμοσμένο"
     },
+    "mood": {
+      "dreamy": "Ονειρικό",
+      "dark": "Σκοτεινό",
+      "hopeful": "Ελπιδοφόρο",
+      "energetic": "Ενεργητικό",
+      "melancholic": "Μελαγχολικό",
+      "happy": "Χαρούμενο",
+      "sad": "Λυπημένο",
+      "angry": "Θυμωμένο",
+      "calm": "Ήρεμο",
+      "uplifting": "Ανεβαστικό",
+      "emotional": "Συναισθηματικό",
+      "peaceful": "Γαλήνιο",
+      "intense": "Έντονο",
+      "mellow": "Απαλό",
+      "bright": "Φωτεινό",
+      "moody": "Ατμοσφαιρικό",
+      "somber": "Ζοφερό",
+      "playful": "Παιχνιδιάρικο",
+      "dramatic": "Δραματικό",
+      "romantic": "Ρομαντικό",
+      "mysterious": "Μυστηριώδες",
+      "ethereal": "Αιθέριο",
+      "groovy": "Groovy",
+      "chill": "Χαλαρό",
+      "epic": "Επικό",
+      "whimsical": "Παραμυθένιο",
+      "nostalgic": "Νοσταλγικό",
+      "vibrant": "Ζωντανό",
+      "soulful": "Με ψυχή",
+      "ambient": "Ambient",
+      "hypnotic": "Υπνωτικό"
+    },
     "adventurousness": {
       "safe": "Ασφαλής",
       "balanced": "Ισορροπημένη",
       "surprising": "Απρόσμενη"
+    }
+  },
+  "ui": {
+    "buttons": {
+      "save": "Αποθήκευση",
+      "settings": "Ρυθμίσεις",
+      "pads": "Pads",
+      "piano": "Πιάνο",
+      "guitar": "Κιθάρα",
+      "playChord": "Αναπαραγωγή συγχορδίας",
+      "stopChord": "Διακοπή συγχορδίας",
+      "playSection": "Αναπαραγωγή ενότητας",
+      "stop": "Διακοπή",
+      "playArrangement": "Αναπαραγωγή διάταξης",
+      "stopArrangement": "Διακοπή διάταξης",
+      "saveArrangement": "Αποθήκευση διάταξης",
+      "edit": "Επεξεργασία"
+    },
+    "sectionTitles": {
+      "nextChordSuggestions": "Προτάσεις επόμενης συγχορδίας",
+      "progressionIdeas": "Ιδέες προόδου",
+      "structureSuggestions": "Προτάσεις δομής"
+    },
+    "labels": {
+      "commonChordExamples": "Συνηθισμένα παραδείγματα συγχορδιών",
+      "harmonicSource": "Αρμονική πηγή: {{label}}"
+    },
+    "messages": {
+      "noGuitarDiagram": "Δεν υπάρχει διαθέσιμο διάγραμμα κιθάρας.",
+      "noPianoVoicing": "Δεν υπάρχει διαθέσιμη φωνή πιάνου."
+    },
+    "settingsDialog": {
+      "title": "Ρυθμίσεις αναπαραγωγής"
+    },
+    "chordGrid": {
+      "title": "Παιχνιδότοπος συγχορδιών",
+      "closeAriaLabel": "Κλείσιμο παιχνιδότοπου συγχορδιών",
+      "selectPadThenChord": "Επιλέξτε pad και μετά συγχορδία",
+      "padChordLabel": "Συγχορδία pad",
+      "keyboardHelp": "Πληκτρολόγιο: τα pads χρησιμοποιούν 1-0 και μετά A-Z· το Space αναπαράγει ή σταματά το track και το Shift ενεργοποιεί ή απενεργοποιεί την εγγραφή.",
+      "noPianoVoicings": "Δεν υπάρχουν διαθέσιμες παραγόμενες φωνές πιάνου.",
+      "countInTooltip": "Μέτρημα {{current}}/{{total}}",
+      "countInAriaLabel": "Μέτρημα {{current}} από {{total}}",
+      "stopRecording": "Διακοπή εγγραφής",
+      "recordArrangement": "Εγγραφή διάταξης",
+      "disableLoop": "Απενεργοποίηση loop",
+      "enableLoop": "Ενεργοποίηση loop",
+      "disableMetronome": "Απενεργοποίηση μετρονόμου",
+      "enableMetronome": "Ενεργοποίηση μετρονόμου",
+      "beatCounter": "Χτύπος {{current}}/{{total}}",
+      "clearRecording": "Καθαρισμός εγγραφής",
+      "lengthLabel": "Διάρκεια",
+      "oneBar": "1 μέτρο",
+      "multipleBars": "{{count}} μέτρα",
+      "countInActive": "Το μέτρημα είναι ενεργό",
+      "stepSummary": "Βήμα {{current}}/{{total}}",
+      "eventSingular": "{{count}} συμβάν",
+      "eventPlural": "{{count}} συμβάντα"
     }
   }
 }

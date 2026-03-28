@@ -3,7 +3,9 @@
     "description": "Gib ein paar Akkorde, eine Stimmung und einen Modus ein. Erhalte Progressionsideen, Strukturempfehlungen sowie einfache Gitarren- und Klavierdiagramme."
   },
   "status": {
-    "loadingSuggestions": "Vorschlage werden geladen..."
+    "loadingSuggestions": "Vorschlage werden geladen...",
+    "loadingProgressionIdeas": "Progressionsideen werden geladen...",
+    "loadingStructureSuggestions": "Strukturvorschlage werden geladen..."
   },
   "errors": {
     "selectMode": "Bitte wahlen oder eingeben: Modus / Tonleiter.",
@@ -115,10 +117,101 @@
       "folk": "Folk",
       "custom": "Benutzerdefiniert"
     },
+    "mood": {
+      "dreamy": "Vertraumt",
+      "dark": "Dunkel",
+      "hopeful": "Hoffnungsvoll",
+      "energetic": "Energetisch",
+      "melancholic": "Melancholisch",
+      "happy": "Glucklich",
+      "sad": "Traurig",
+      "angry": "Wutend",
+      "calm": "Ruhig",
+      "uplifting": "Aufmunternd",
+      "emotional": "Emotional",
+      "peaceful": "Friedlich",
+      "intense": "Intensiv",
+      "mellow": "Sanft",
+      "bright": "Hell",
+      "moody": "Stimmungsvoll",
+      "somber": "Duster",
+      "playful": "Verspielt",
+      "dramatic": "Dramatisch",
+      "romantic": "Romantisch",
+      "mysterious": "Geheimnisvoll",
+      "ethereal": "Atherisch",
+      "groovy": "Groovy",
+      "chill": "Entspannt",
+      "epic": "Episch",
+      "whimsical": "Wunderlich",
+      "nostalgic": "Nostalgisch",
+      "vibrant": "Lebendig",
+      "soulful": "Gefuhlvoll",
+      "ambient": "Ambient",
+      "hypnotic": "Hypnotisch"
+    },
     "adventurousness": {
       "safe": "Sicher",
       "balanced": "Ausgewogen",
       "surprising": "Überraschend"
+    }
+  },
+  "ui": {
+    "buttons": {
+      "save": "Speichern",
+      "settings": "Einstellungen",
+      "pads": "Pads",
+      "piano": "Klavier",
+      "guitar": "Gitarre",
+      "playChord": "Akkord abspielen",
+      "stopChord": "Akkord stoppen",
+      "playSection": "Abschnitt abspielen",
+      "stop": "Stopp",
+      "playArrangement": "Arrangement abspielen",
+      "stopArrangement": "Arrangement stoppen",
+      "saveArrangement": "Arrangement speichern",
+      "edit": "Bearbeiten"
+    },
+    "sectionTitles": {
+      "nextChordSuggestions": "Vorschlage fur den nachsten Akkord",
+      "progressionIdeas": "Progressionsideen",
+      "structureSuggestions": "Strukturvorschlage"
+    },
+    "labels": {
+      "commonChordExamples": "Haufige Akkordbeispiele",
+      "harmonicSource": "Harmonische Quelle: {{label}}"
+    },
+    "messages": {
+      "noGuitarDiagram": "Kein Gitarrendiagramm verfugbar.",
+      "noPianoVoicing": "Kein Klavier-Voicing verfugbar."
+    },
+    "settingsDialog": {
+      "title": "Wiedergabeeinstellungen"
+    },
+    "chordGrid": {
+      "title": "Akkord-Spielwiese",
+      "closeAriaLabel": "Akkord-Spielwiese schliessen",
+      "selectPadThenChord": "Wahle ein Pad und dann einen Akkord",
+      "padChordLabel": "Pad-Akkord",
+      "keyboardHelp": "Tastatur: Pads verwenden 1-0 und dann A-Z; die Leertaste startet oder stoppt die Spur und Umschalt schaltet die Aufnahme um.",
+      "noPianoVoicings": "Keine generierten Klavier-Voicings verfugbar.",
+      "countInTooltip": "Einzahler {{current}}/{{total}}",
+      "countInAriaLabel": "Einzahler {{current}} von {{total}}",
+      "stopRecording": "Aufnahme stoppen",
+      "recordArrangement": "Arrangement aufnehmen",
+      "disableLoop": "Loop deaktivieren",
+      "enableLoop": "Loop aktivieren",
+      "disableMetronome": "Metronom deaktivieren",
+      "enableMetronome": "Metronom aktivieren",
+      "beatCounter": "Schlag {{current}}/{{total}}",
+      "clearRecording": "Aufnahme loschen",
+      "lengthLabel": "Lange",
+      "oneBar": "1 Takt",
+      "multipleBars": "{{count}} Takte",
+      "countInActive": "Einzahler aktiv",
+      "stepSummary": "Schritt {{current}}/{{total}}",
+      "eventSingular": "{{count}} Ereignis",
+      "eventPlural": "{{count}} Ereignisse"
     }
   }
 }

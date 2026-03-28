@@ -250,6 +250,8 @@ type RestoreGeneratorCacheParams = {
   playbackSettingsSetters: PlaybackSettingsSetters;
 };
 
+type RestoreGeneratorCacheResult = { status: 'restored' } | { status: 'locale-mismatch' };
+
 const restoreFromGeneratorCache = ({
   activeLocale,
   rawGeneratorCache,
@@ -258,11 +260,11 @@ const restoreFromGeneratorCache = ({
   setIsLoadedFromSavedProgression,
   setHasRestoredSessionData,
   playbackSettingsSetters,
-}: RestoreGeneratorCacheParams): void => {
+}: RestoreGeneratorCacheParams): RestoreGeneratorCacheResult => {
   const parsedCache = parseGeneratorCachePayload(rawGeneratorCache);
 
   if (parsedCache.locale !== activeLocale) {
-    throw new Error('Generator cache locale mismatch');
+    return { status: 'locale-mismatch' };
   }
 
   reset(parsedCache.formData);
@@ -270,6 +272,8 @@ const restoreFromGeneratorCache = ({
   setHasRestoredSessionData(true);
   setData(parsedCache.data);
   applyPlaybackSettings(playbackSettingsSetters, parsedCache.playbackSettings);
+
+  return { status: 'restored' };
 };
 
 type RestoreLoadedProgressionParams = {
@@ -348,7 +352,7 @@ export default function useGeneratorSessionCache({
       }
 
       try {
-        restoreFromGeneratorCache({
+        const restoreResult = restoreFromGeneratorCache({
           activeLocale: locale,
           rawGeneratorCache,
           reset,
@@ -357,6 +361,10 @@ export default function useGeneratorSessionCache({
           setHasRestoredSessionData,
           playbackSettingsSetters: playbackSettingsSettersRef.current,
         });
+
+        if (restoreResult.status === 'locale-mismatch') {
+          removeSessionStorage(GENERATOR_CACHE_KEY);
+        }
       } catch (err) {
         console.error('Failed to restore generator cache from session storage:', err);
         removeSessionStorage(GENERATOR_CACHE_KEY);

@@ -1,6 +1,7 @@
 'use client';
 
 import { Box, Stack, Typography } from '@mui/material';
+import { useTranslation } from 'react-i18next';
 
 import GuitarChordDiagram from './GuitarChordDiagram';
 import PianoChordDiagram from './PianoChordDiagram';
@@ -65,6 +66,7 @@ export default function NextChordSuggestionsSection({
   scale,
   genre,
 }: NextChordSuggestionsSectionProps) {
+  const { t } = useTranslation('generator');
   const { playingId, initializingId, handlePlayToggle } = usePlaybackToggle();
 
   return (
@@ -72,7 +74,7 @@ export default function NextChordSuggestionsSection({
       {showTitle ? (
         <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 2 }}>
           <Typography variant="h5" component="h2">
-            Next chord suggestions
+            {t('ui.sectionTitles.nextChordSuggestions')}
           </Typography>
           {suggestions.length > 0 ? (
             <PdfDownloadButton
@@ -148,8 +150,8 @@ export default function NextChordSuggestionsSection({
                   {pianoVoicing ? (
                     <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap" sx={{ mt: 1.5 }}>
                       <PlaybackToggleButton
-                        playTitle="Play chord"
-                        stopTitle="Stop chord"
+                        playTitle={t('ui.buttons.playChord')}
+                        stopTitle={t('ui.buttons.stopChord')}
                         isPlaying={playingId === playId}
                         isInitializing={initializingId === playId}
                         onClick={() => {
@@ -225,7 +227,7 @@ export default function NextChordSuggestionsSection({
                   {progressionDiagramInstrument === 'guitar' ? (
                     <Box sx={{ mt: 1 }}>
                       <Typography variant="body2" sx={{ fontWeight: 700 }}>
-                        Common Chord Examples
+                        {t('ui.labels.commonChordExamples')}
                       </Typography>
                       <Typography variant="body2">
                         {item.chord}: {getGuitarShapeTextFromVoicing(item.guitarVoicing)}

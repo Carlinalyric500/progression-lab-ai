@@ -1,124 +1,217 @@
 {
-	"header": {
-		"description": "Birkaç akor, bir duygu ve bir mod girin. Progresyon fikirleri, yapı önerileri ve basit gitar/piyano diyagramları alın."
-	},
-	"status": {
-		"loadingSuggestions": "Öneriler yükleniyor..."
-	},
-	"errors": {
-		"selectMode": "Lütfen bir mod / dizi seçin veya girin.",
-		"selectGenre": "Lütfen bir tür seçin veya girin.",
-		"requestFailed": "Öneriler oluşturulamadı."
-	},
-	"form": {
-		"seedChords": {
-			"label": "Başlangıç akorları",
-			"placeholder": "Fmaj7, F#m7",
-			"required": "Başlangıç akorları zorunludur",
-			"atLeastOne": "Lütfen en az bir akor girin"
-		},
-		"mood": {
-			"label": "Duygu",
-			"placeholder": "rüya gibi, karanlık, umutlu",
-			"required": "Duygu zorunludur"
-		},
-		"mode": {
-			"label": "Mod / dizi",
-			"placeholder": "iyonian, dorian, armonik minör",
-			"required": "Mod / dizi zorunludur"
-		},
-		"genre": {
-			"label": "Tür",
-			"placeholder": "piano house, jazz, indie pop",
-			"required": "Tür zorunludur"
-		},
-		"styleReference": {
-			"label": "Stil referansı (isteğe bağlı)",
-			"placeholder": "Barry Harris, Bill Evans vb.",
-			"helperText": "Stil rehberi olarak bir icracı, eğitmen veya armoni ekolü kullanın."
-		},
-		"adventurousness": {
-			"label": "Cesaret seviyesi",
-			"placeholder": "güvenli, dengeli, şaşırtıcı"
-		},
-		"actions": {
-			"randomizeInputs": "Girdileri rastgeleleştir",
-			"generateIdeas": "Fikir üret",
-			"generating": "Üretiliyor..."
-		}
-	},
-	"optionGroups": {
-		"mode": {
-			"majorDiatonic": "Majör / Diyatonik",
-			"minorModal": "Minör / Modal",
-			"pentatonicBlues": "Pentatonik / Blues",
-			"extendedColors": "Genişletilmiş renkler",
-			"symmetricAdvanced": "Simetrik / İleri",
-			"other": "Diğer"
-		},
-		"genre": {
-			"danceClub": "Dans / Kulüp",
-			"popSongwriter": "Pop / Şarkı Yazarı",
-			"urbanGroove": "Urban / Groove",
-			"jazzHarmony": "Caz / Armoni",
-			"atmosphericCinematic": "Atmosferik / Sinematik",
-			"bandAcoustic": "Grup / Akustik",
-			"other": "Diğer"
-		},
-		"adventurousness": {
-			"riskProfile": "Risk profili"
-		}
-	},
-	"styleReferenceGroups": {
-		"jazzPianoIcons": "Caz piyano ikonları",
-		"modernHarmonyVoices": "Modern armoni sesleri",
-		"educatorsAndMethods": "Eğitmenler ve yöntemler"
-	},
-	"options": {
-		"mode": {
-			"ionian": "İyonian (Majör)",
-			"dorian": "Dorian",
-			"phrygian": "Phrygian",
-			"lydian": "Lydian",
-			"mixolydian": "Mixolydian",
-			"aeolian": "Aeolian (Doğal minör)",
-			"locrian": "Locrian",
-			"majorPentatonic": "Majör pentatonik",
-			"minorPentatonic": "Minör pentatonik",
-			"harmonicMinor": "Armonik minör",
-			"melodicMinor": "Melodik minör",
-			"blues": "Blues",
-			"wholeTone": "Tam ton",
-			"diminished": "Eksilmiş",
-			"chromatic": "Kromatik",
-			"custom": "Özel"
-		},
-		"genre": {
-			"house": "House",
-			"pianoHouse": "Piano House",
-			"deepHouse": "Deep House",
-			"discoHouse": "Disco House",
-			"techHouse": "Tech House",
-			"funkDisco": "Funk / Disco",
-			"pop": "Pop",
-			"indiePop": "Indie Pop",
-			"rnbNeoSoul": "R&B / Neo Soul",
-			"jazz": "Caz",
-			"loFi": "Lo-fi",
-			"ambient": "Ambient",
-			"cinematic": "Sinematik",
-			"edm": "EDM",
-			"afroHouse": "Afro House",
-			"progressiveHouse": "Progressive House",
-			"hipHop": "Hip-Hop",
-			"rock": "Rock",
-			"folk": "Folk",
-			"custom": "Özel"
-		},
-		"adventurousness": {
-			"safe": "Güvenli",
-			"balanced": "Dengeli",
-			"surprising": "Şaşırtıcı"
-		}
-	}
+  "header": {
+    "description": "Birkaç akor, bir duygu ve bir mod girin. Progresyon fikirleri, yapı önerileri ve basit gitar/piyano diyagramları alın."
+  },
+  "status": {
+    "loadingSuggestions": "Öneriler yükleniyor...",
+    "loadingProgressionIdeas": "Progresyon fikirleri yukleniyor...",
+    "loadingStructureSuggestions": "Yapi onerileri yukleniyor..."
+  },
+  "errors": {
+    "selectMode": "Lütfen bir mod / dizi seçin veya girin.",
+    "selectGenre": "Lütfen bir tür seçin veya girin.",
+    "requestFailed": "Öneriler oluşturulamadı."
+  },
+  "form": {
+    "seedChords": {
+      "label": "Başlangıç akorları",
+      "placeholder": "Fmaj7, F#m7",
+      "required": "Başlangıç akorları zorunludur",
+      "atLeastOne": "Lütfen en az bir akor girin"
+    },
+    "mood": {
+      "label": "Duygu",
+      "placeholder": "rüya gibi, karanlık, umutlu",
+      "required": "Duygu zorunludur"
+    },
+    "mode": {
+      "label": "Mod / dizi",
+      "placeholder": "iyonian, dorian, armonik minör",
+      "required": "Mod / dizi zorunludur"
+    },
+    "genre": {
+      "label": "Tür",
+      "placeholder": "piano house, jazz, indie pop",
+      "required": "Tür zorunludur"
+    },
+    "styleReference": {
+      "label": "Stil referansı (isteğe bağlı)",
+      "placeholder": "Barry Harris, Bill Evans vb.",
+      "helperText": "Stil rehberi olarak bir icracı, eğitmen veya armoni ekolü kullanın."
+    },
+    "adventurousness": {
+      "label": "Cesaret seviyesi",
+      "placeholder": "güvenli, dengeli, şaşırtıcı"
+    },
+    "actions": {
+      "randomizeInputs": "Girdileri rastgeleleştir",
+      "generateIdeas": "Fikir üret",
+      "generating": "Üretiliyor..."
+    }
+  },
+  "optionGroups": {
+    "mode": {
+      "majorDiatonic": "Majör / Diyatonik",
+      "minorModal": "Minör / Modal",
+      "pentatonicBlues": "Pentatonik / Blues",
+      "extendedColors": "Genişletilmiş renkler",
+      "symmetricAdvanced": "Simetrik / İleri",
+      "other": "Diğer"
+    },
+    "genre": {
+      "danceClub": "Dans / Kulüp",
+      "popSongwriter": "Pop / Şarkı Yazarı",
+      "urbanGroove": "Urban / Groove",
+      "jazzHarmony": "Caz / Armoni",
+      "atmosphericCinematic": "Atmosferik / Sinematik",
+      "bandAcoustic": "Grup / Akustik",
+      "other": "Diğer"
+    },
+    "adventurousness": {
+      "riskProfile": "Risk profili"
+    }
+  },
+  "styleReferenceGroups": {
+    "jazzPianoIcons": "Caz piyano ikonları",
+    "modernHarmonyVoices": "Modern armoni sesleri",
+    "educatorsAndMethods": "Eğitmenler ve yöntemler"
+  },
+  "options": {
+    "mode": {
+      "ionian": "İyonian (Majör)",
+      "dorian": "Dorian",
+      "phrygian": "Phrygian",
+      "lydian": "Lydian",
+      "mixolydian": "Mixolydian",
+      "aeolian": "Aeolian (Doğal minör)",
+      "locrian": "Locrian",
+      "majorPentatonic": "Majör pentatonik",
+      "minorPentatonic": "Minör pentatonik",
+      "harmonicMinor": "Armonik minör",
+      "melodicMinor": "Melodik minör",
+      "blues": "Blues",
+      "wholeTone": "Tam ton",
+      "diminished": "Eksilmiş",
+      "chromatic": "Kromatik",
+      "custom": "Özel"
+    },
+    "genre": {
+      "house": "House",
+      "pianoHouse": "Piano House",
+      "deepHouse": "Deep House",
+      "discoHouse": "Disco House",
+      "techHouse": "Tech House",
+      "funkDisco": "Funk / Disco",
+      "pop": "Pop",
+      "indiePop": "Indie Pop",
+      "rnbNeoSoul": "R&B / Neo Soul",
+      "jazz": "Caz",
+      "loFi": "Lo-fi",
+      "ambient": "Ambient",
+      "cinematic": "Sinematik",
+      "edm": "EDM",
+      "afroHouse": "Afro House",
+      "progressiveHouse": "Progressive House",
+      "hipHop": "Hip-Hop",
+      "rock": "Rock",
+      "folk": "Folk",
+      "custom": "Özel"
+    },
+    "mood": {
+      "dreamy": "Hayalperest",
+      "dark": "Karanlık",
+      "hopeful": "Umutlu",
+      "energetic": "Enerjik",
+      "melancholic": "Melankolik",
+      "happy": "Mutlu",
+      "sad": "Üzgün",
+      "angry": "Öfkeli",
+      "calm": "Sakin",
+      "uplifting": "İç açıcı",
+      "emotional": "Duygusal",
+      "peaceful": "Huzurlu",
+      "intense": "Yoğun",
+      "mellow": "Yumuşak",
+      "bright": "Aydınlık",
+      "moody": "Atmosferik",
+      "somber": "Kasvetli",
+      "playful": "Eğlenceli",
+      "dramatic": "Dramatik",
+      "romantic": "Romantik",
+      "mysterious": "Gizemli",
+      "ethereal": "Eterik",
+      "groovy": "Groovy",
+      "chill": "Rahat",
+      "epic": "Epik",
+      "whimsical": "Tuhaf",
+      "nostalgic": "Nostaljik",
+      "vibrant": "Canlı",
+      "soulful": "Ruh dolu",
+      "ambient": "Ambient",
+      "hypnotic": "Hipnotik"
+    },
+    "adventurousness": {
+      "safe": "Güvenli",
+      "balanced": "Dengeli",
+      "surprising": "Şaşırtıcı"
+    }
+  },
+  "ui": {
+    "buttons": {
+      "save": "Kaydet",
+      "settings": "Ayarlar",
+      "pads": "Padler",
+      "piano": "Piyano",
+      "guitar": "Gitar",
+      "playChord": "Akoru cal",
+      "stopChord": "Akoru durdur",
+      "playSection": "Bolumu cal",
+      "stop": "Durdur",
+      "playArrangement": "Duzenlemeyi cal",
+      "stopArrangement": "Duzenlemeyi durdur",
+      "saveArrangement": "Duzenlemeyi kaydet",
+      "edit": "Duzenle"
+    },
+    "sectionTitles": {
+      "nextChordSuggestions": "Sonraki akor onerileri",
+      "progressionIdeas": "Progresyon fikirleri",
+      "structureSuggestions": "Yapi onerileri"
+    },
+    "labels": {
+      "commonChordExamples": "Yaygin akor ornekleri",
+      "harmonicSource": "Harmonik kaynak: {{label}}"
+    },
+    "messages": {
+      "noGuitarDiagram": "Kullanilabilir gitar diyagrami yok.",
+      "noPianoVoicing": "Kullanilabilir piyano voicingi yok."
+    },
+    "settingsDialog": {
+      "title": "Calma ayarlari"
+    },
+    "chordGrid": {
+      "title": "Akor oyun alani",
+      "closeAriaLabel": "Akor oyun alanini kapat",
+      "selectPadThenChord": "Bir pad secin, sonra bir akor secin",
+      "padChordLabel": "Pad akoru",
+      "keyboardHelp": "Klavye: padler 1-0 ve sonra A-Z tuslarini kullanir; Bosluk parcayi calar veya durdurur, Shift ise kaydi acar ya da kapatir.",
+      "noPianoVoicings": "Olusturulmus piyano voicingleri mevcut degil.",
+      "countInTooltip": "Sayim {{current}}/{{total}}",
+      "countInAriaLabel": "Sayim {{current}} / {{total}}",
+      "stopRecording": "Kaydi durdur",
+      "recordArrangement": "Duzenlemeyi kaydet",
+      "disableLoop": "Donguyu kapat",
+      "enableLoop": "Donguyu ac",
+      "disableMetronome": "Metronomu kapat",
+      "enableMetronome": "Metronomu ac",
+      "beatCounter": "Vurus {{current}}/{{total}}",
+      "clearRecording": "Kaydi temizle",
+      "lengthLabel": "Uzunluk",
+      "oneBar": "1 olcu",
+      "multipleBars": "{{count}} olcu",
+      "countInActive": "Sayim aktif",
+      "stepSummary": "Adim {{current}}/{{total}}",
+      "eventSingular": "{{count}} olay",
+      "eventPlural": "{{count}} olay"
+    }
+  }
 }

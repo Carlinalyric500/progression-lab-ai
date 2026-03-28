@@ -33,6 +33,7 @@ import {
   ADVENTUROUSNESS_LABEL_KEY_BY_VALUE,
   GENRE_CATEGORY_KEY_BY_VALUE,
   GENRE_LABEL_KEY_BY_VALUE,
+  MOOD_LABEL_KEY_BY_VALUE,
   MODE_CATEGORY_KEY_BY_VALUE,
   MODE_LABEL_KEY_BY_VALUE,
   STYLE_REFERENCE_CATEGORY_KEY_BY_VALUE,
@@ -77,6 +78,15 @@ export default function GeneratorFormCard({
   onRandomize,
 }: GeneratorFormCardProps) {
   const { t } = useTranslation('generator');
+  const translateMoodOption = (option: string) => t(MOOD_LABEL_KEY_BY_VALUE[option] ?? option);
+  const resolveMoodValueFromInput = (input: string) => {
+    const normalizedInput = input.trim();
+    const matchingOption = MOOD_OPTIONS.find(
+      (option) => translateMoodOption(option) === normalizedInput,
+    );
+
+    return matchingOption ?? input;
+  };
 
   const modeGroupByName = useMemo(
     () => buildTranslatedGroupMap(MODE_CATEGORY_KEY_BY_VALUE, (key) => t(key)),
@@ -181,9 +191,10 @@ export default function GeneratorFormCard({
                 multiple
                 freeSolo
                 options={MOOD_OPTIONS}
+                getOptionLabel={translateMoodOption}
                 value={moodArray}
                 onChange={(_, newValue) => {
-                  onChange(newValue.join(', '));
+                  onChange(newValue.map((option) => resolveMoodValueFromInput(option)).join(', '));
                 }}
                 disabled={isSubmitting || loading}
                 renderTags={(tagValue, getTagProps) =>
@@ -192,7 +203,7 @@ export default function GeneratorFormCard({
                     return (
                       <Chip
                         key={key}
-                        label={option}
+                        label={translateMoodOption(option)}
                         size="small"
                         sx={getMoodChipSx(option)}
                         {...tagProps}

@@ -1,6 +1,7 @@
 'use client';
 
 import { Box, Stack, Typography } from '@mui/material';
+import { useTranslation } from 'react-i18next';
 
 import { playProgression } from '../../../domain/audio/audio';
 import type {
@@ -99,12 +100,14 @@ const buildArrangementChartOptions = ({
   scale,
   genre,
   tempoBpm,
+  arrangementTitle,
 }: {
   structureSuggestions: ChordSuggestionResponse['structureSuggestions'];
   progressionIdeas: ChordSuggestionResponse['progressionIdeas'];
   scale?: string;
   genre?: string;
   tempoBpm: number;
+  arrangementTitle: string;
 }): PdfChartOptions => {
   const chords = structureSuggestions.flatMap((section, index) => {
     const idea =
@@ -118,7 +121,7 @@ const buildArrangementChartOptions = ({
   });
 
   return {
-    title: 'Structure Suggestions',
+    title: arrangementTitle,
     scale,
     genre,
     tempoBpm,
@@ -155,6 +158,7 @@ export default function StructureSuggestionsSection({
   genre,
   showTitle = true,
 }: StructureSuggestionsSectionProps) {
+  const { t } = useTranslation('generator');
   const { playingId, initializingId, handlePlayToggle } = usePlaybackToggle();
 
   const arrangementVoicings = structureSuggestions.flatMap((section, index) => {
@@ -169,6 +173,7 @@ export default function StructureSuggestionsSection({
     scale,
     genre,
     tempoBpm,
+    arrangementTitle: t('ui.sectionTitles.structureSuggestions'),
   });
 
   return (
@@ -182,12 +187,12 @@ export default function StructureSuggestionsSection({
           sx={{ mb: 2 }}
         >
           <Typography variant="h5" component="h2">
-            Structure suggestions
+            {t('ui.sectionTitles.structureSuggestions')}
           </Typography>
           <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap">
             <PlaybackToggleButton
-              playTitle="Play arrangement"
-              stopTitle="Stop arrangement"
+              playTitle={t('ui.buttons.playArrangement')}
+              stopTitle={t('ui.buttons.stopArrangement')}
               isPlaying={playingId === 'arrangement'}
               isInitializing={initializingId === 'arrangement'}
               disabled={arrangementVoicings.length === 0}
@@ -259,14 +264,14 @@ export default function StructureSuggestionsSection({
 
                 {idea ? (
                   <Typography variant="body2" color="text.secondary">
-                    Harmonic source: {idea.label}
+                    {t('ui.labels.harmonicSource', { label: idea.label })}
                   </Typography>
                 ) : null}
 
                 <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap">
                   <PlaybackToggleButton
-                    playTitle="Play section"
-                    stopTitle="Stop"
+                    playTitle={t('ui.buttons.playSection')}
+                    stopTitle={t('ui.buttons.stop')}
                     isPlaying={playingId === `section-${index}`}
                     isInitializing={initializingId === `section-${index}`}
                     disabled={sectionVoicings.length === 0}

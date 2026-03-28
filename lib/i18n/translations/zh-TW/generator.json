@@ -1,124 +1,217 @@
 {
-	"header": {
-		"description": "輸入幾個和弦、一種情緒與一個調式。即可獲得和弦進行靈感、結構建議，以及簡單的吉他與鋼琴圖示。"
-	},
-	"status": {
-		"loadingSuggestions": "正在載入建議..."
-	},
-	"errors": {
-		"selectMode": "請選擇或輸入調式 / 音階。",
-		"selectGenre": "請選擇或輸入風格。",
-		"requestFailed": "無法產生建議。"
-	},
-	"form": {
-		"seedChords": {
-			"label": "起始和弦",
-			"placeholder": "Fmaj7, F#m7",
-			"required": "起始和弦為必填",
-			"atLeastOne": "請至少輸入一個和弦"
-		},
-		"mood": {
-			"label": "情緒",
-			"placeholder": "夢幻、陰暗、充滿希望",
-			"required": "情緒為必填"
-		},
-		"mode": {
-			"label": "調式 / 音階",
-			"placeholder": "ionian、dorian、和聲小調",
-			"required": "調式 / 音階為必填"
-		},
-		"genre": {
-			"label": "風格",
-			"placeholder": "piano house、jazz、indie pop",
-			"required": "風格為必填"
-		},
-		"styleReference": {
-			"label": "風格參考（選填）",
-			"placeholder": "Barry Harris、Bill Evans 等",
-			"helperText": "可使用演奏者、教師或和聲學派作為風格參考。"
-		},
-		"adventurousness": {
-			"label": "冒險程度",
-			"placeholder": "保守、平衡、驚喜"
-		},
-		"actions": {
-			"randomizeInputs": "隨機輸入",
-			"generateIdeas": "產生靈感",
-			"generating": "產生中..."
-		}
-	},
-	"optionGroups": {
-		"mode": {
-			"majorDiatonic": "大調 / 自然音階",
-			"minorModal": "小調 / 調式",
-			"pentatonicBlues": "五聲音階 / 藍調",
-			"extendedColors": "延伸色彩",
-			"symmetricAdvanced": "對稱 / 進階",
-			"other": "其他"
-		},
-		"genre": {
-			"danceClub": "舞曲 / 夜店",
-			"popSongwriter": "流行 / 創作歌手",
-			"urbanGroove": "都會 / Groove",
-			"jazzHarmony": "爵士 / 和聲",
-			"atmosphericCinematic": "氛圍 / 電影感",
-			"bandAcoustic": "樂團 / 原聲",
-			"other": "其他"
-		},
-		"adventurousness": {
-			"riskProfile": "風險輪廓"
-		}
-	},
-	"styleReferenceGroups": {
-		"jazzPianoIcons": "爵士鋼琴經典",
-		"modernHarmonyVoices": "現代和聲語彙",
-		"educatorsAndMethods": "教育者與方法"
-	},
-	"options": {
-		"mode": {
-			"ionian": "Ionian（大調）",
-			"dorian": "Dorian",
-			"phrygian": "Phrygian",
-			"lydian": "Lydian",
-			"mixolydian": "Mixolydian",
-			"aeolian": "Aeolian（自然小調）",
-			"locrian": "Locrian",
-			"majorPentatonic": "大調五聲音階",
-			"minorPentatonic": "小調五聲音階",
-			"harmonicMinor": "和聲小調",
-			"melodicMinor": "旋律小調",
-			"blues": "藍調",
-			"wholeTone": "全音音階",
-			"diminished": "減音音階",
-			"chromatic": "半音音階",
-			"custom": "自訂"
-		},
-		"genre": {
-			"house": "House",
-			"pianoHouse": "Piano House",
-			"deepHouse": "Deep House",
-			"discoHouse": "Disco House",
-			"techHouse": "Tech House",
-			"funkDisco": "Funk / Disco",
-			"pop": "Pop",
-			"indiePop": "Indie Pop",
-			"rnbNeoSoul": "R&B / Neo Soul",
-			"jazz": "Jazz",
-			"loFi": "Lo-fi",
-			"ambient": "Ambient",
-			"cinematic": "電影感",
-			"edm": "EDM",
-			"afroHouse": "Afro House",
-			"progressiveHouse": "Progressive House",
-			"hipHop": "Hip-Hop",
-			"rock": "Rock",
-			"folk": "Folk",
-			"custom": "自訂"
-		},
-		"adventurousness": {
-			"safe": "保守",
-			"balanced": "平衡",
-			"surprising": "驚喜"
-		}
-	}
+  "header": {
+    "description": "輸入幾個和弦、一種情緒與一個調式。即可獲得和弦進行靈感、結構建議，以及簡單的吉他與鋼琴圖示。"
+  },
+  "status": {
+    "loadingSuggestions": "正在載入建議...",
+    "loadingProgressionIdeas": "正在載入進行想法...",
+    "loadingStructureSuggestions": "正在載入結構建議..."
+  },
+  "errors": {
+    "selectMode": "請選擇或輸入調式 / 音階。",
+    "selectGenre": "請選擇或輸入風格。",
+    "requestFailed": "無法產生建議。"
+  },
+  "form": {
+    "seedChords": {
+      "label": "起始和弦",
+      "placeholder": "Fmaj7, F#m7",
+      "required": "起始和弦為必填",
+      "atLeastOne": "請至少輸入一個和弦"
+    },
+    "mood": {
+      "label": "情緒",
+      "placeholder": "夢幻、陰暗、充滿希望",
+      "required": "情緒為必填"
+    },
+    "mode": {
+      "label": "調式 / 音階",
+      "placeholder": "ionian、dorian、和聲小調",
+      "required": "調式 / 音階為必填"
+    },
+    "genre": {
+      "label": "風格",
+      "placeholder": "piano house、jazz、indie pop",
+      "required": "風格為必填"
+    },
+    "styleReference": {
+      "label": "風格參考（選填）",
+      "placeholder": "Barry Harris、Bill Evans 等",
+      "helperText": "可使用演奏者、教師或和聲學派作為風格參考。"
+    },
+    "adventurousness": {
+      "label": "冒險程度",
+      "placeholder": "保守、平衡、驚喜"
+    },
+    "actions": {
+      "randomizeInputs": "隨機輸入",
+      "generateIdeas": "產生靈感",
+      "generating": "產生中..."
+    }
+  },
+  "optionGroups": {
+    "mode": {
+      "majorDiatonic": "大調 / 自然音階",
+      "minorModal": "小調 / 調式",
+      "pentatonicBlues": "五聲音階 / 藍調",
+      "extendedColors": "延伸色彩",
+      "symmetricAdvanced": "對稱 / 進階",
+      "other": "其他"
+    },
+    "genre": {
+      "danceClub": "舞曲 / 夜店",
+      "popSongwriter": "流行 / 創作歌手",
+      "urbanGroove": "都會 / Groove",
+      "jazzHarmony": "爵士 / 和聲",
+      "atmosphericCinematic": "氛圍 / 電影感",
+      "bandAcoustic": "樂團 / 原聲",
+      "other": "其他"
+    },
+    "adventurousness": {
+      "riskProfile": "風險輪廓"
+    }
+  },
+  "styleReferenceGroups": {
+    "jazzPianoIcons": "爵士鋼琴經典",
+    "modernHarmonyVoices": "現代和聲語彙",
+    "educatorsAndMethods": "教育者與方法"
+  },
+  "options": {
+    "mode": {
+      "ionian": "Ionian（大調）",
+      "dorian": "Dorian",
+      "phrygian": "Phrygian",
+      "lydian": "Lydian",
+      "mixolydian": "Mixolydian",
+      "aeolian": "Aeolian（自然小調）",
+      "locrian": "Locrian",
+      "majorPentatonic": "大調五聲音階",
+      "minorPentatonic": "小調五聲音階",
+      "harmonicMinor": "和聲小調",
+      "melodicMinor": "旋律小調",
+      "blues": "藍調",
+      "wholeTone": "全音音階",
+      "diminished": "減音音階",
+      "chromatic": "半音音階",
+      "custom": "自訂"
+    },
+    "genre": {
+      "house": "House",
+      "pianoHouse": "Piano House",
+      "deepHouse": "Deep House",
+      "discoHouse": "Disco House",
+      "techHouse": "Tech House",
+      "funkDisco": "Funk / Disco",
+      "pop": "Pop",
+      "indiePop": "Indie Pop",
+      "rnbNeoSoul": "R&B / Neo Soul",
+      "jazz": "Jazz",
+      "loFi": "Lo-fi",
+      "ambient": "Ambient",
+      "cinematic": "電影感",
+      "edm": "EDM",
+      "afroHouse": "Afro House",
+      "progressiveHouse": "Progressive House",
+      "hipHop": "Hip-Hop",
+      "rock": "Rock",
+      "folk": "Folk",
+      "custom": "自訂"
+    },
+    "mood": {
+      "dreamy": "夢幻",
+      "dark": "黑暗",
+      "hopeful": "充滿希望",
+      "energetic": "充滿活力",
+      "melancholic": "憂鬱",
+      "happy": "快樂",
+      "sad": "悲傷",
+      "angry": "憤怒",
+      "calm": "平靜",
+      "uplifting": "振奮",
+      "emotional": "感性",
+      "peaceful": "寧靜",
+      "intense": "強烈",
+      "mellow": "柔和",
+      "bright": "明亮",
+      "moody": "氛圍感",
+      "somber": "陰鬱",
+      "playful": "俏皮",
+      "dramatic": "戲劇化",
+      "romantic": "浪漫",
+      "mysterious": "神秘",
+      "ethereal": "空靈",
+      "groovy": "律動感強",
+      "chill": "放鬆",
+      "epic": "史詩感",
+      "whimsical": "奇想",
+      "nostalgic": "懷舊",
+      "vibrant": "鮮活",
+      "soulful": "富有靈魂感",
+      "ambient": "氛圍",
+      "hypnotic": "催眠感"
+    },
+    "adventurousness": {
+      "safe": "保守",
+      "balanced": "平衡",
+      "surprising": "驚喜"
+    }
+  },
+  "ui": {
+    "buttons": {
+      "save": "儲存",
+      "settings": "設定",
+      "pads": "打擊墊",
+      "piano": "鋼琴",
+      "guitar": "吉他",
+      "playChord": "播放和弦",
+      "stopChord": "停止和弦",
+      "playSection": "播放段落",
+      "stop": "停止",
+      "playArrangement": "播放編曲",
+      "stopArrangement": "停止編曲",
+      "saveArrangement": "儲存編曲",
+      "edit": "編輯"
+    },
+    "sectionTitles": {
+      "nextChordSuggestions": "下一個和弦建議",
+      "progressionIdeas": "進行想法",
+      "structureSuggestions": "結構建議"
+    },
+    "labels": {
+      "commonChordExamples": "常見和弦範例",
+      "harmonicSource": "和聲來源：{{label}}"
+    },
+    "messages": {
+      "noGuitarDiagram": "沒有可用的吉他和弦圖。",
+      "noPianoVoicing": "沒有可用的鋼琴和聲配置。"
+    },
+    "settingsDialog": {
+      "title": "播放設定"
+    },
+    "chordGrid": {
+      "title": "和弦遊樂場",
+      "closeAriaLabel": "關閉和弦遊樂場",
+      "selectPadThenChord": "先選擇打擊墊，再挑選和弦",
+      "padChordLabel": "打擊墊和弦",
+      "keyboardHelp": "鍵盤：打擊墊使用 1-0，接著使用 A-Z；空白鍵可播放或停止音軌，Shift 可切換錄音。",
+      "noPianoVoicings": "沒有可用的產生鋼琴和聲配置。",
+      "countInTooltip": "預備拍 {{current}}/{{total}}",
+      "countInAriaLabel": "預備拍，第 {{current}} / {{total}} 拍",
+      "stopRecording": "停止錄音",
+      "recordArrangement": "錄製編曲",
+      "disableLoop": "停用循環",
+      "enableLoop": "啟用循環",
+      "disableMetronome": "停用節拍器",
+      "enableMetronome": "啟用節拍器",
+      "beatCounter": "拍 {{current}}/{{total}}",
+      "clearRecording": "清除錄音",
+      "lengthLabel": "長度",
+      "oneBar": "1 小節",
+      "multipleBars": "{{count}} 小節",
+      "countInActive": "預備拍進行中",
+      "stepSummary": "步驟 {{current}}/{{total}}",
+      "eventSingular": "{{count}} 個事件",
+      "eventPlural": "{{count}} 個事件"
+    }
+  }
 }

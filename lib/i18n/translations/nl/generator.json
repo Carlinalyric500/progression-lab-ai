@@ -1,124 +1,217 @@
 {
-	"header": {
-		"description": "Voer een paar akkoorden, een sfeer en een modus in. Krijg ideeën voor progressies, structuursuggesties en eenvoudige gitaar-/pianodiagrammen terug."
-	},
-	"status": {
-		"loadingSuggestions": "Suggesties laden..."
-	},
-	"errors": {
-		"selectMode": "Selecteer of voer een modus / toonladder in.",
-		"selectGenre": "Selecteer of voer een genre in.",
-		"requestFailed": "Kon geen suggesties genereren."
-	},
-	"form": {
-		"seedChords": {
-			"label": "Startakkoorden",
-			"placeholder": "Fmaj7, F#m7",
-			"required": "Startakkoorden zijn verplicht",
-			"atLeastOne": "Voer minimaal één akkoord in"
-		},
-		"mood": {
-			"label": "Sfeer",
-			"placeholder": "dromerig, donker, hoopvol",
-			"required": "Sfeer is verplicht"
-		},
-		"mode": {
-			"label": "Modus / toonladder",
-			"placeholder": "ionisch, dorisch, harmonisch mineur",
-			"required": "Modus / toonladder is verplicht"
-		},
-		"genre": {
-			"label": "Genre",
-			"placeholder": "piano house, jazz, indie pop",
-			"required": "Genre is verplicht"
-		},
-		"styleReference": {
-			"label": "Stijlreferentie (optioneel)",
-			"placeholder": "Barry Harris, Bill Evans, enz.",
-			"helperText": "Gebruik een speler, docent of harmonieleer als stilistische leidraad."
-		},
-		"adventurousness": {
-			"label": "Avontuurlijkheid",
-			"placeholder": "veilig, gebalanceerd, verrassend"
-		},
-		"actions": {
-			"randomizeInputs": "Invoer willekeurig maken",
-			"generateIdeas": "Ideeën genereren",
-			"generating": "Bezig met genereren..."
-		}
-	},
-	"optionGroups": {
-		"mode": {
-			"majorDiatonic": "Majeur / Diatonisch",
-			"minorModal": "Mineur / Modaal",
-			"pentatonicBlues": "Pentatonisch / Blues",
-			"extendedColors": "Uitgebreide kleuren",
-			"symmetricAdvanced": "Symmetrisch / Geavanceerd",
-			"other": "Overig"
-		},
-		"genre": {
-			"danceClub": "Dance / Club",
-			"popSongwriter": "Pop / Singer-songwriter",
-			"urbanGroove": "Urban / Groove",
-			"jazzHarmony": "Jazz / Harmonie",
-			"atmosphericCinematic": "Sfeervol / Filmisch",
-			"bandAcoustic": "Band / Akoestisch",
-			"other": "Overig"
-		},
-		"adventurousness": {
-			"riskProfile": "Risicoprofiel"
-		}
-	},
-	"styleReferenceGroups": {
-		"jazzPianoIcons": "Jazzpiano-iconen",
-		"modernHarmonyVoices": "Moderne harmonische stemmen",
-		"educatorsAndMethods": "Docenten en methoden"
-	},
-	"options": {
-		"mode": {
-			"ionian": "Ionisch (Majeur)",
-			"dorian": "Dorisch",
-			"phrygian": "Frygisch",
-			"lydian": "Lydisch",
-			"mixolydian": "Mixolydisch",
-			"aeolian": "Aeolisch (Natuurlijk mineur)",
-			"locrian": "Locrisch",
-			"majorPentatonic": "Majeur pentatonisch",
-			"minorPentatonic": "Mineur pentatonisch",
-			"harmonicMinor": "Harmonisch mineur",
-			"melodicMinor": "Melodisch mineur",
-			"blues": "Blues",
-			"wholeTone": "Heletoons",
-			"diminished": "Verminderd",
-			"chromatic": "Chromatisch",
-			"custom": "Aangepast"
-		},
-		"genre": {
-			"house": "House",
-			"pianoHouse": "Piano House",
-			"deepHouse": "Deep House",
-			"discoHouse": "Disco House",
-			"techHouse": "Tech House",
-			"funkDisco": "Funk / Disco",
-			"pop": "Pop",
-			"indiePop": "Indie Pop",
-			"rnbNeoSoul": "R&B / Neo Soul",
-			"jazz": "Jazz",
-			"loFi": "Lo-fi",
-			"ambient": "Ambient",
-			"cinematic": "Filmisch",
-			"edm": "EDM",
-			"afroHouse": "Afro House",
-			"progressiveHouse": "Progressive House",
-			"hipHop": "Hip-Hop",
-			"rock": "Rock",
-			"folk": "Folk",
-			"custom": "Aangepast"
-		},
-		"adventurousness": {
-			"safe": "Veilig",
-			"balanced": "Gebalanceerd",
-			"surprising": "Verrassend"
-		}
-	}
+  "header": {
+    "description": "Voer een paar akkoorden, een sfeer en een modus in. Krijg ideeën voor progressies, structuursuggesties en eenvoudige gitaar-/pianodiagrammen terug."
+  },
+  "status": {
+    "loadingSuggestions": "Suggesties laden...",
+    "loadingProgressionIdeas": "Progressie-ideeen laden...",
+    "loadingStructureSuggestions": "Structuursuggesties laden..."
+  },
+  "errors": {
+    "selectMode": "Selecteer of voer een modus / toonladder in.",
+    "selectGenre": "Selecteer of voer een genre in.",
+    "requestFailed": "Kon geen suggesties genereren."
+  },
+  "form": {
+    "seedChords": {
+      "label": "Startakkoorden",
+      "placeholder": "Fmaj7, F#m7",
+      "required": "Startakkoorden zijn verplicht",
+      "atLeastOne": "Voer minimaal één akkoord in"
+    },
+    "mood": {
+      "label": "Sfeer",
+      "placeholder": "dromerig, donker, hoopvol",
+      "required": "Sfeer is verplicht"
+    },
+    "mode": {
+      "label": "Modus / toonladder",
+      "placeholder": "ionisch, dorisch, harmonisch mineur",
+      "required": "Modus / toonladder is verplicht"
+    },
+    "genre": {
+      "label": "Genre",
+      "placeholder": "piano house, jazz, indie pop",
+      "required": "Genre is verplicht"
+    },
+    "styleReference": {
+      "label": "Stijlreferentie (optioneel)",
+      "placeholder": "Barry Harris, Bill Evans, enz.",
+      "helperText": "Gebruik een speler, docent of harmonieleer als stilistische leidraad."
+    },
+    "adventurousness": {
+      "label": "Avontuurlijkheid",
+      "placeholder": "veilig, gebalanceerd, verrassend"
+    },
+    "actions": {
+      "randomizeInputs": "Invoer willekeurig maken",
+      "generateIdeas": "Ideeën genereren",
+      "generating": "Bezig met genereren..."
+    }
+  },
+  "optionGroups": {
+    "mode": {
+      "majorDiatonic": "Majeur / Diatonisch",
+      "minorModal": "Mineur / Modaal",
+      "pentatonicBlues": "Pentatonisch / Blues",
+      "extendedColors": "Uitgebreide kleuren",
+      "symmetricAdvanced": "Symmetrisch / Geavanceerd",
+      "other": "Overig"
+    },
+    "genre": {
+      "danceClub": "Dance / Club",
+      "popSongwriter": "Pop / Singer-songwriter",
+      "urbanGroove": "Urban / Groove",
+      "jazzHarmony": "Jazz / Harmonie",
+      "atmosphericCinematic": "Sfeervol / Filmisch",
+      "bandAcoustic": "Band / Akoestisch",
+      "other": "Overig"
+    },
+    "adventurousness": {
+      "riskProfile": "Risicoprofiel"
+    }
+  },
+  "styleReferenceGroups": {
+    "jazzPianoIcons": "Jazzpiano-iconen",
+    "modernHarmonyVoices": "Moderne harmonische stemmen",
+    "educatorsAndMethods": "Docenten en methoden"
+  },
+  "options": {
+    "mode": {
+      "ionian": "Ionisch (Majeur)",
+      "dorian": "Dorisch",
+      "phrygian": "Frygisch",
+      "lydian": "Lydisch",
+      "mixolydian": "Mixolydisch",
+      "aeolian": "Aeolisch (Natuurlijk mineur)",
+      "locrian": "Locrisch",
+      "majorPentatonic": "Majeur pentatonisch",
+      "minorPentatonic": "Mineur pentatonisch",
+      "harmonicMinor": "Harmonisch mineur",
+      "melodicMinor": "Melodisch mineur",
+      "blues": "Blues",
+      "wholeTone": "Heletoons",
+      "diminished": "Verminderd",
+      "chromatic": "Chromatisch",
+      "custom": "Aangepast"
+    },
+    "genre": {
+      "house": "House",
+      "pianoHouse": "Piano House",
+      "deepHouse": "Deep House",
+      "discoHouse": "Disco House",
+      "techHouse": "Tech House",
+      "funkDisco": "Funk / Disco",
+      "pop": "Pop",
+      "indiePop": "Indie Pop",
+      "rnbNeoSoul": "R&B / Neo Soul",
+      "jazz": "Jazz",
+      "loFi": "Lo-fi",
+      "ambient": "Ambient",
+      "cinematic": "Filmisch",
+      "edm": "EDM",
+      "afroHouse": "Afro House",
+      "progressiveHouse": "Progressive House",
+      "hipHop": "Hip-Hop",
+      "rock": "Rock",
+      "folk": "Folk",
+      "custom": "Aangepast"
+    },
+    "mood": {
+      "dreamy": "Dromerig",
+      "dark": "Donker",
+      "hopeful": "Hoopvol",
+      "energetic": "Energiek",
+      "melancholic": "Melancholisch",
+      "happy": "Blij",
+      "sad": "Verdrietig",
+      "angry": "Boos",
+      "calm": "Rustig",
+      "uplifting": "Opbeurend",
+      "emotional": "Emotioneel",
+      "peaceful": "Vredig",
+      "intense": "Intens",
+      "mellow": "Zacht",
+      "bright": "Helder",
+      "moody": "Sfeervol",
+      "somber": "Somber",
+      "playful": "Speels",
+      "dramatic": "Dramatisch",
+      "romantic": "Romantisch",
+      "mysterious": "Mysterieus",
+      "ethereal": "Etherisch",
+      "groovy": "Groovy",
+      "chill": "Relaxed",
+      "epic": "Episch",
+      "whimsical": "Grillig",
+      "nostalgic": "Nostalgisch",
+      "vibrant": "Levendig",
+      "soulful": "Soulvol",
+      "ambient": "Ambient",
+      "hypnotic": "Hypnotisch"
+    },
+    "adventurousness": {
+      "safe": "Veilig",
+      "balanced": "Gebalanceerd",
+      "surprising": "Verrassend"
+    }
+  },
+  "ui": {
+    "buttons": {
+      "save": "Opslaan",
+      "settings": "Instellingen",
+      "pads": "Pads",
+      "piano": "Piano",
+      "guitar": "Gitaar",
+      "playChord": "Akkoord afspelen",
+      "stopChord": "Akkoord stoppen",
+      "playSection": "Sectie afspelen",
+      "stop": "Stoppen",
+      "playArrangement": "Arrangement afspelen",
+      "stopArrangement": "Arrangement stoppen",
+      "saveArrangement": "Arrangement opslaan",
+      "edit": "Bewerken"
+    },
+    "sectionTitles": {
+      "nextChordSuggestions": "Suggesties voor volgend akkoord",
+      "progressionIdeas": "Progressie-ideeen",
+      "structureSuggestions": "Structuursuggesties"
+    },
+    "labels": {
+      "commonChordExamples": "Veelvoorkomende akkoordvoorbeelden",
+      "harmonicSource": "Harmonische bron: {{label}}"
+    },
+    "messages": {
+      "noGuitarDiagram": "Geen gitaardiagram beschikbaar.",
+      "noPianoVoicing": "Geen pianovoicing beschikbaar."
+    },
+    "settingsDialog": {
+      "title": "Afspeelinstellingen"
+    },
+    "chordGrid": {
+      "title": "Akkoord-speeltuin",
+      "closeAriaLabel": "Akkoord-speeltuin sluiten",
+      "selectPadThenChord": "Selecteer een pad en kies daarna een akkoord",
+      "padChordLabel": "Pad-akkoord",
+      "keyboardHelp": "Toetsenbord: pads gebruiken 1-0 en daarna A-Z; de spatiebalk speelt of stopt de track en Shift schakelt opname in of uit.",
+      "noPianoVoicings": "Geen gegenereerde pianovoicings beschikbaar.",
+      "countInTooltip": "Incount {{current}}/{{total}}",
+      "countInAriaLabel": "Incount {{current}} van {{total}}",
+      "stopRecording": "Opname stoppen",
+      "recordArrangement": "Arrangement opnemen",
+      "disableLoop": "Loop uitschakelen",
+      "enableLoop": "Loop inschakelen",
+      "disableMetronome": "Metronoom uitschakelen",
+      "enableMetronome": "Metronoom inschakelen",
+      "beatCounter": "Tel {{current}}/{{total}}",
+      "clearRecording": "Opname wissen",
+      "lengthLabel": "Lengte",
+      "oneBar": "1 maat",
+      "multipleBars": "{{count}} maten",
+      "countInActive": "Incount actief",
+      "stepSummary": "Stap {{current}}/{{total}}",
+      "eventSingular": "{{count}} gebeurtenis",
+      "eventPlural": "{{count}} gebeurtenissen"
+    }
+  }
 }

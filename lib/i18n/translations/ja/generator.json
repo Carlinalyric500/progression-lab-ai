@@ -3,7 +3,9 @@
     "description": "いくつかのコード、ムード、モードを入力してください。進行アイデア、構成の提案、シンプルなギター/ピアノ図を受け取れます。"
   },
   "status": {
-    "loadingSuggestions": "提案を読み込み中..."
+    "loadingSuggestions": "提案を読み込み中...",
+    "loadingProgressionIdeas": "進行アイデアを読み込み中...",
+    "loadingStructureSuggestions": "構成の提案を読み込み中..."
   },
   "errors": {
     "selectMode": "モード / スケールを選択または入力してください。",
@@ -115,10 +117,101 @@
       "folk": "フォーク",
       "custom": "カスタム"
     },
+    "mood": {
+      "dreamy": "夢見心地",
+      "dark": "ダーク",
+      "hopeful": "希望に満ちた",
+      "energetic": "エネルギッシュ",
+      "melancholic": "メランコリック",
+      "happy": "幸せな",
+      "sad": "悲しい",
+      "angry": "怒りに満ちた",
+      "calm": "穏やか",
+      "uplifting": "高揚感のある",
+      "emotional": "感情的",
+      "peaceful": "平穏",
+      "intense": "強烈",
+      "mellow": "まろやか",
+      "bright": "明るい",
+      "moody": "ムーディー",
+      "somber": "陰鬱",
+      "playful": "遊び心のある",
+      "dramatic": "劇的",
+      "romantic": "ロマンチック",
+      "mysterious": "神秘的",
+      "ethereal": "幻想的",
+      "groovy": "グルーヴィー",
+      "chill": "チル",
+      "epic": "壮大",
+      "whimsical": "気まぐれ",
+      "nostalgic": "ノスタルジック",
+      "vibrant": "鮮やか",
+      "soulful": "ソウルフル",
+      "ambient": "アンビエント",
+      "hypnotic": "催眠的"
+    },
     "adventurousness": {
       "safe": "安全",
       "balanced": "バランス",
       "surprising": "意外性"
+    }
+  },
+  "ui": {
+    "buttons": {
+      "save": "保存",
+      "settings": "設定",
+      "pads": "パッド",
+      "piano": "ピアノ",
+      "guitar": "ギター",
+      "playChord": "コードを再生",
+      "stopChord": "コードを停止",
+      "playSection": "セクションを再生",
+      "stop": "停止",
+      "playArrangement": "アレンジを再生",
+      "stopArrangement": "アレンジを停止",
+      "saveArrangement": "アレンジを保存",
+      "edit": "編集"
+    },
+    "sectionTitles": {
+      "nextChordSuggestions": "次のコード候補",
+      "progressionIdeas": "進行アイデア",
+      "structureSuggestions": "構成の提案"
+    },
+    "labels": {
+      "commonChordExamples": "一般的なコード例",
+      "harmonicSource": "ハーモニーの元: {{label}}"
+    },
+    "messages": {
+      "noGuitarDiagram": "利用できるギター図はありません。",
+      "noPianoVoicing": "利用できるピアノボイシングはありません。"
+    },
+    "settingsDialog": {
+      "title": "再生設定"
+    },
+    "chordGrid": {
+      "title": "コードプレイグラウンド",
+      "closeAriaLabel": "コードプレイグラウンドを閉じる",
+      "selectPadThenChord": "パッドを選んでからコードを選択してください",
+      "padChordLabel": "パッドのコード",
+      "keyboardHelp": "キーボード: パッドは 1-0、その後 A-Z を使用します。Space でトラックを再生または停止し、Shift で録音を切り替えます。",
+      "noPianoVoicings": "生成されたピアノボイシングはありません。",
+      "countInTooltip": "カウントイン {{current}}/{{total}}",
+      "countInAriaLabel": "{{total}} 中 {{current}} のカウントイン",
+      "stopRecording": "録音を停止",
+      "recordArrangement": "アレンジを録音",
+      "disableLoop": "ループを無効化",
+      "enableLoop": "ループを有効化",
+      "disableMetronome": "メトロノームを無効化",
+      "enableMetronome": "メトロノームを有効化",
+      "beatCounter": "拍 {{current}}/{{total}}",
+      "clearRecording": "録音をクリア",
+      "lengthLabel": "長さ",
+      "oneBar": "1 小節",
+      "multipleBars": "{{count}} 小節",
+      "countInActive": "カウントイン中",
+      "stepSummary": "ステップ {{current}}/{{total}}",
+      "eventSingular": "{{count}} イベント",
+      "eventPlural": "{{count}} イベント"
     }
   }
 }

@@ -1,6 +1,7 @@
 'use client';
 
 import { alpha, ToggleButton, ToggleButtonGroup } from '@mui/material';
+import { useTranslation } from 'react-i18next';
 
 import type { ProgressionDiagramInstrument } from '../types';
 
@@ -16,6 +17,8 @@ type InstrumentToggleProps = {
  * Compact piano/guitar toggle used above result sections.
  */
 export default function InstrumentToggle({ value, onChange }: InstrumentToggleProps) {
+  const { t } = useTranslation('generator');
+
   return (
     <ToggleButtonGroup
       size="small"
@@ -57,8 +60,8 @@ export default function InstrumentToggle({ value, onChange }: InstrumentTogglePr
         };
       }}
     >
-      <ToggleButton value="piano">Piano</ToggleButton>
-      <ToggleButton value="guitar">Guitar</ToggleButton>
+      <ToggleButton value="piano">{t('ui.buttons.piano')}</ToggleButton>
+      <ToggleButton value="guitar">{t('ui.buttons.guitar')}</ToggleButton>
     </ToggleButtonGroup>
   );
 }

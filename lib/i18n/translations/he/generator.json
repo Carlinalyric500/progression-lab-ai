@@ -3,7 +3,9 @@
     "description": "הזן כמה אקורדים, אווירה ומודוס. קבל רעיונות למהלכים, הצעות למבנה ותרשימים פשוטים לגיטרה ולפסנתר."
   },
   "status": {
-    "loadingSuggestions": "טוען הצעות..."
+    "loadingSuggestions": "טוען הצעות...",
+    "loadingProgressionIdeas": "טוען רעיונות למהלך...",
+    "loadingStructureSuggestions": "טוען הצעות למבנה..."
   },
   "errors": {
     "selectMode": "בחר או הזן מודוס / סולם.",
@@ -115,10 +117,101 @@
       "folk": "פולק",
       "custom": "מותאם אישית"
     },
+    "mood": {
+      "dreamy": "חלומי",
+      "dark": "אפל",
+      "hopeful": "מלא תקווה",
+      "energetic": "אנרגטי",
+      "melancholic": "מלנכולי",
+      "happy": "שמח",
+      "sad": "עצוב",
+      "angry": "כועס",
+      "calm": "רגוע",
+      "uplifting": "מרומם",
+      "emotional": "רגשי",
+      "peaceful": "שליו",
+      "intense": "אינטנסיבי",
+      "mellow": "רך",
+      "bright": "בהיר",
+      "moody": "אווירתי",
+      "somber": "קודר",
+      "playful": "שובב",
+      "dramatic": "דרמטי",
+      "romantic": "רומנטי",
+      "mysterious": "מסתורי",
+      "ethereal": "אֶתֵרִי",
+      "groovy": "גרובי",
+      "chill": "נינוח",
+      "epic": "אפי",
+      "whimsical": "גחמני",
+      "nostalgic": "נוסטלגי",
+      "vibrant": "תוסס",
+      "soulful": "מלא נשמה",
+      "ambient": "אמביינט",
+      "hypnotic": "מהפנט"
+    },
     "adventurousness": {
       "safe": "בטוח",
       "balanced": "מאוזן",
       "surprising": "מפתיע"
+    }
+  },
+  "ui": {
+    "buttons": {
+      "save": "שמור",
+      "settings": "הגדרות",
+      "pads": "Pads",
+      "piano": "פסנתר",
+      "guitar": "גיטרה",
+      "playChord": "נגן אקורד",
+      "stopChord": "עצור אקורד",
+      "playSection": "נגן קטע",
+      "stop": "עצור",
+      "playArrangement": "נגן עיבוד",
+      "stopArrangement": "עצור עיבוד",
+      "saveArrangement": "שמור עיבוד",
+      "edit": "ערוך"
+    },
+    "sectionTitles": {
+      "nextChordSuggestions": "הצעות לאקורד הבא",
+      "progressionIdeas": "רעיונות למהלך",
+      "structureSuggestions": "הצעות למבנה"
+    },
+    "labels": {
+      "commonChordExamples": "דוגמאות נפוצות לאקורדים",
+      "harmonicSource": "מקור הרמוני: {{label}}"
+    },
+    "messages": {
+      "noGuitarDiagram": "אין תרשים גיטרה זמין.",
+      "noPianoVoicing": "אין וייסינג פסנתר זמין."
+    },
+    "settingsDialog": {
+      "title": "הגדרות ניגון"
+    },
+    "chordGrid": {
+      "title": "מגרש המשחקים של האקורדים",
+      "closeAriaLabel": "סגור את מגרש המשחקים של האקורדים",
+      "selectPadThenChord": "בחר pad ואז בחר אקורד",
+      "padChordLabel": "אקורד של pad",
+      "keyboardHelp": "מקלדת: ה-pads משתמשים ב-1-0 ואז ב-A-Z; מקש הרווח מנגן או עוצר את הערוץ, ו-Shift מחליף מצב הקלטה.",
+      "noPianoVoicings": "אין וייסינגים פסנתריים שנוצרו זמינים.",
+      "countInTooltip": "קאונט-אין {{current}}/{{total}}",
+      "countInAriaLabel": "קאונט-אין {{current}} מתוך {{total}}",
+      "stopRecording": "עצור הקלטה",
+      "recordArrangement": "הקלט עיבוד",
+      "disableLoop": "כבה לופ",
+      "enableLoop": "הפעל לופ",
+      "disableMetronome": "כבה מטרונום",
+      "enableMetronome": "הפעל מטרונום",
+      "beatCounter": "פעמה {{current}}/{{total}}",
+      "clearRecording": "נקה הקלטה",
+      "lengthLabel": "אורך",
+      "oneBar": "תיבה אחת",
+      "multipleBars": "{{count}} תיבות",
+      "countInActive": "הקאונט-אין פעיל",
+      "stepSummary": "צעד {{current}}/{{total}}",
+      "eventSingular": "{{count}} אירוע",
+      "eventPlural": "{{count}} אירועים"
     }
   }
 }

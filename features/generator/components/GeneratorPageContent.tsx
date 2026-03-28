@@ -574,7 +574,7 @@ export default function GeneratorPageContent() {
     {
       key: 'progressions',
       shouldRender: true,
-      fallbackLabel: 'Loading progression ideas...',
+      fallbackLabel: t('status.loadingProgressionIdeas'),
       render: () => (
         <ProgressionIdeasSection
           progressionIdeas={visibleProgressionIdeas}
@@ -603,7 +603,7 @@ export default function GeneratorPageContent() {
     {
       key: 'structure',
       shouldRender: !isLoadedFromSavedProgression,
-      fallbackLabel: 'Loading structure suggestions...',
+      fallbackLabel: t('status.loadingStructureSuggestions'),
       render: () => (
         <StructureSuggestionsSection
           structureSuggestions={visibleStructureSuggestions}
@@ -758,7 +758,7 @@ export default function GeneratorPageContent() {
                           },
                         }}
                       >
-                        Save
+                        {t('ui.buttons.save')}
                       </Button>
                       <PlaybackSettingsButton
                         settings={playbackSettings}
@@ -789,7 +789,7 @@ export default function GeneratorPageContent() {
                             },
                           }}
                         >
-                          Pads
+                          {t('ui.buttons.pads')}
                         </Button>
                       ) : null}
                       <InstrumentToggle

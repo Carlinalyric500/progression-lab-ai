@@ -3,7 +3,9 @@
     "description": "कुछ कॉर्ड, एक मूड और एक मोड दर्ज करें। प्रोग्रेशन आइडिया, संरचना सुझाव और सरल गिटार/पियानो डायग्राम प्राप्त करें।"
   },
   "status": {
-    "loadingSuggestions": "सुझाव लोड हो रहे हैं..."
+    "loadingSuggestions": "सुझाव लोड हो रहे हैं...",
+    "loadingProgressionIdeas": "प्रोग्रेशन विचार लोड हो रहे हैं...",
+    "loadingStructureSuggestions": "संरचना सुझाव लोड हो रहे हैं..."
   },
   "errors": {
     "selectMode": "कृपया कोई मोड / स्केल चुनें या दर्ज करें।",
@@ -115,10 +117,101 @@
       "folk": "फोक",
       "custom": "कस्टम"
     },
+    "mood": {
+      "dreamy": "स्वप्निल",
+      "dark": "गहरा",
+      "hopeful": "आशावान",
+      "energetic": "ऊर्जावान",
+      "melancholic": "विषादपूर्ण",
+      "happy": "खुश",
+      "sad": "दुखी",
+      "angry": "क्रोधित",
+      "calm": "शांत",
+      "uplifting": "उत्साहवर्धक",
+      "emotional": "भावनात्मक",
+      "peaceful": "सुकूनभरा",
+      "intense": "तीव्र",
+      "mellow": "मधुर",
+      "bright": "उज्ज्वल",
+      "moody": "मूडी",
+      "somber": "गंभीर",
+      "playful": "चंचल",
+      "dramatic": "नाटकीय",
+      "romantic": "रोमांटिक",
+      "mysterious": "रहस्यमय",
+      "ethereal": "अलौकिक",
+      "groovy": "ग्रूवी",
+      "chill": "रिलैक्स्ड",
+      "epic": "महाकाव्यात्मक",
+      "whimsical": "सनकी",
+      "nostalgic": "नॉस्टैल्जिक",
+      "vibrant": "जीवंत",
+      "soulful": "रूहानी",
+      "ambient": "एम्बिएंट",
+      "hypnotic": "सम्मोहक"
+    },
     "adventurousness": {
       "safe": "सुरक्षित",
       "balanced": "संतुलित",
       "surprising": "आश्चर्यजनक"
+    }
+  },
+  "ui": {
+    "buttons": {
+      "save": "सेव करें",
+      "settings": "सेटिंग्स",
+      "pads": "पैड्स",
+      "piano": "पियानो",
+      "guitar": "गिटार",
+      "playChord": "कॉर्ड चलाएं",
+      "stopChord": "कॉर्ड रोकें",
+      "playSection": "सेक्शन चलाएं",
+      "stop": "रोकें",
+      "playArrangement": "अरेंजमेंट चलाएं",
+      "stopArrangement": "अरेंजमेंट रोकें",
+      "saveArrangement": "अरेंजमेंट सेव करें",
+      "edit": "संपादित करें"
+    },
+    "sectionTitles": {
+      "nextChordSuggestions": "अगले कॉर्ड के सुझाव",
+      "progressionIdeas": "प्रोग्रेशन विचार",
+      "structureSuggestions": "संरचना सुझाव"
+    },
+    "labels": {
+      "commonChordExamples": "सामान्य कॉर्ड उदाहरण",
+      "harmonicSource": "हार्मोनिक स्रोत: {{label}}"
+    },
+    "messages": {
+      "noGuitarDiagram": "कोई गिटार डायग्राम उपलब्ध नहीं है।",
+      "noPianoVoicing": "कोई पियानो वॉइसिंग उपलब्ध नहीं है।"
+    },
+    "settingsDialog": {
+      "title": "प्लेबैक सेटिंग्स"
+    },
+    "chordGrid": {
+      "title": "कॉर्ड प्लेग्राउंड",
+      "closeAriaLabel": "कॉर्ड प्लेग्राउंड बंद करें",
+      "selectPadThenChord": "पहले पैड चुनें, फिर कॉर्ड चुनें",
+      "padChordLabel": "पैड कॉर्ड",
+      "keyboardHelp": "कीबोर्ड: पैड्स 1-0 और फिर A-Z का उपयोग करते हैं; Space ट्रैक को चलाता या रोकता है, और Shift रिकॉर्डिंग को टॉगल करता है।",
+      "noPianoVoicings": "कोई जनरेटेड पियानो वॉइसिंग उपलब्ध नहीं है।",
+      "countInTooltip": "काउंट-इन {{current}}/{{total}}",
+      "countInAriaLabel": "काउंट-इन {{current}} में से {{total}}",
+      "stopRecording": "रिकॉर्डिंग रोकें",
+      "recordArrangement": "अरेंजमेंट रिकॉर्ड करें",
+      "disableLoop": "लूप बंद करें",
+      "enableLoop": "लूप चालू करें",
+      "disableMetronome": "मेट्रोनोम बंद करें",
+      "enableMetronome": "मेट्रोनोम चालू करें",
+      "beatCounter": "बीट {{current}}/{{total}}",
+      "clearRecording": "रिकॉर्डिंग साफ करें",
+      "lengthLabel": "लंबाई",
+      "oneBar": "1 बार",
+      "multipleBars": "{{count}} बार",
+      "countInActive": "काउंट-इन सक्रिय है",
+      "stepSummary": "स्टेप {{current}}/{{total}}",
+      "eventSingular": "{{count}} इवेंट",
+      "eventPlural": "{{count}} इवेंट"
     }
   }
 }

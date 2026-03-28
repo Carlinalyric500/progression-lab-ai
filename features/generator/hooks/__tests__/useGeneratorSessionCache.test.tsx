@@ -72,6 +72,7 @@ describe('useGeneratorSessionCache', () => {
         reset,
         setData,
         setIsLoadedFromSavedProgression,
+        locale: 'en',
         playbackSettings: {} as never,
         playbackSettingsSetters: {} as never,
       }),
@@ -129,6 +130,7 @@ describe('useGeneratorSessionCache', () => {
         reset,
         setData,
         setIsLoadedFromSavedProgression,
+        locale: 'en',
         playbackSettings: {} as never,
         playbackSettingsSetters: {} as never,
       }),
@@ -155,5 +157,50 @@ describe('useGeneratorSessionCache', () => {
     expect(sessionStorage.getItem('generatorCache')).toBeNull();
     expect(applyPlaybackSettings).not.toHaveBeenCalled();
     expect(result.current.hasRestoredSessionData).toBe(true);
+  });
+
+  it('clears stale generator cache when the active locale changes', async () => {
+    const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+
+    sessionStorage.setItem(
+      'generatorCache',
+      JSON.stringify({
+        locale: 'en',
+        seedChords: 'Cmaj7, Am7',
+        mood: 'warm',
+        mode: 'ionian',
+        customMode: '',
+        genre: 'jazz',
+        customGenre: '',
+        styleReference: 'Barry Harris',
+        adventurousness: 'balanced',
+        data: mockSuggestionData,
+        playbackSettings: { reverb: 0.45 },
+      }),
+    );
+
+    const { result } = renderHook(() =>
+      useGeneratorSessionCache({
+        reset,
+        setData,
+        setIsLoadedFromSavedProgression,
+        locale: 'es',
+        playbackSettings: {} as never,
+        playbackSettingsSetters: {} as never,
+      }),
+    );
+
+    await waitFor(() => {
+      expect(result.current.isRestoringState).toBe(false);
+    });
+
+    expect(sessionStorage.getItem('generatorCache')).toBeNull();
+    expect(reset).not.toHaveBeenCalled();
+    expect(setData).not.toHaveBeenCalled();
+    expect(applyPlaybackSettings).not.toHaveBeenCalled();
+    expect(consoleErrorSpy).not.toHaveBeenCalled();
+    expect(result.current.hasRestoredSessionData).toBe(false);
+
+    consoleErrorSpy.mockRestore();
   });
 });

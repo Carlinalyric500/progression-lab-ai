@@ -3,7 +3,9 @@
     "description": "Informe alguns acordes, um clima e um modo. Receba ideias de progressao, sugestoes de estrutura e diagramas simples de guitarra e piano."
   },
   "status": {
-    "loadingSuggestions": "Carregando sugestoes..."
+    "loadingSuggestions": "Carregando sugestoes...",
+    "loadingProgressionIdeas": "Carregando ideias de progressao...",
+    "loadingStructureSuggestions": "Carregando sugestoes de estrutura..."
   },
   "errors": {
     "selectMode": "Selecione ou digite um modo / escala.",
@@ -115,10 +117,101 @@
       "folk": "Folk",
       "custom": "Personalizado"
     },
+    "mood": {
+      "dreamy": "Onírico",
+      "dark": "Sombrio",
+      "hopeful": "Esperançoso",
+      "energetic": "Energético",
+      "melancholic": "Melancólico",
+      "happy": "Feliz",
+      "sad": "Triste",
+      "angry": "Bravo",
+      "calm": "Calmo",
+      "uplifting": "Inspirador",
+      "emotional": "Emocional",
+      "peaceful": "Pacífico",
+      "intense": "Intenso",
+      "mellow": "Suave",
+      "bright": "Brilhante",
+      "moody": "Atmosférico",
+      "somber": "Soturno",
+      "playful": "Lúdico",
+      "dramatic": "Dramático",
+      "romantic": "Romântico",
+      "mysterious": "Misterioso",
+      "ethereal": "Etéreo",
+      "groovy": "Groovy",
+      "chill": "Relaxado",
+      "epic": "Épico",
+      "whimsical": "Caprichoso",
+      "nostalgic": "Nostálgico",
+      "vibrant": "Vibrante",
+      "soulful": "Cheio de alma",
+      "ambient": "Ambient",
+      "hypnotic": "Hipnótico"
+    },
     "adventurousness": {
       "safe": "Seguro",
       "balanced": "Equilibrado",
       "surprising": "Surpreendente"
+    }
+  },
+  "ui": {
+    "buttons": {
+      "save": "Salvar",
+      "settings": "Configuracoes",
+      "pads": "Pads",
+      "piano": "Piano",
+      "guitar": "Violao",
+      "playChord": "Tocar acorde",
+      "stopChord": "Parar acorde",
+      "playSection": "Tocar secao",
+      "stop": "Parar",
+      "playArrangement": "Tocar arranjo",
+      "stopArrangement": "Parar arranjo",
+      "saveArrangement": "Salvar arranjo",
+      "edit": "Editar"
+    },
+    "sectionTitles": {
+      "nextChordSuggestions": "Sugestoes para o proximo acorde",
+      "progressionIdeas": "Ideias de progressao",
+      "structureSuggestions": "Sugestoes de estrutura"
+    },
+    "labels": {
+      "commonChordExamples": "Exemplos comuns de acordes",
+      "harmonicSource": "Fonte harmonica: {{label}}"
+    },
+    "messages": {
+      "noGuitarDiagram": "Nenhum diagrama de violao disponivel.",
+      "noPianoVoicing": "Nenhum voicing de piano disponivel."
+    },
+    "settingsDialog": {
+      "title": "Configuracoes de reproducao"
+    },
+    "chordGrid": {
+      "title": "Playground de acordes",
+      "closeAriaLabel": "Fechar playground de acordes",
+      "selectPadThenChord": "Selecione um pad e depois um acorde",
+      "padChordLabel": "Acorde do pad",
+      "keyboardHelp": "Teclado: os pads usam 1-0 e depois A-Z; Espaco toca ou para a faixa, e Shift alterna a gravacao.",
+      "noPianoVoicings": "Nenhum voicing de piano gerado disponivel.",
+      "countInTooltip": "Contagem {{current}}/{{total}}",
+      "countInAriaLabel": "Contagem {{current}} de {{total}}",
+      "stopRecording": "Parar gravacao",
+      "recordArrangement": "Gravar arranjo",
+      "disableLoop": "Desativar loop",
+      "enableLoop": "Ativar loop",
+      "disableMetronome": "Desativar metronomo",
+      "enableMetronome": "Ativar metronomo",
+      "beatCounter": "Batida {{current}}/{{total}}",
+      "clearRecording": "Limpar gravacao",
+      "lengthLabel": "Duracao",
+      "oneBar": "1 compasso",
+      "multipleBars": "{{count}} compassos",
+      "countInActive": "Contagem ativa",
+      "stepSummary": "Passo {{current}}/{{total}}",
+      "eventSingular": "{{count}} evento",
+      "eventPlural": "{{count}} eventos"
     }
   }
 }
