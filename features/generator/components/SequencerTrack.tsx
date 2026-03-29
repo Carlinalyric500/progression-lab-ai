@@ -1,5 +1,7 @@
 'use client';
 
+import type { PointerEvent as ReactPointerEvent } from 'react';
+
 import { Box, Typography } from '@mui/material';
 import { alpha, useTheme } from '@mui/material/styles';
 import { useEffect, useMemo, useRef, useState } from 'react';
@@ -507,29 +509,31 @@ export default function SequencerTrack({
     }
   }, [clips, extendedTrackWidth, isDarkMode, laneTop, theme.palette.common.white, totalWidth]);
 
-  const handleClipMouseDown = (
-    clip: RenderedClip,
-    e: { preventDefault: () => void; stopPropagation: () => void; clientX: number },
-  ) => {
+  const handleClipPointerDown = (clip: RenderedClip, event: ReactPointerEvent<HTMLElement>) => {
     if (isPlaying) return;
-    e.preventDefault();
-    e.stopPropagation();
+
+    if (event.pointerType === 'touch') {
+      event.preventDefault();
+    }
+
+    event.stopPropagation();
     const sourceStep = clip.sourceStepIndex;
-    const startX = e.clientX;
+    const startX = event.clientX;
     onClipClick?.(sourceStep);
     dragSourceStepRef.current = sourceStep;
 
-    const handleMove = (me: MouseEvent) => {
-      const delta = Math.round((me.clientX - startX) / PIXELS_PER_STEP);
+    const handleMove = (moveEvent: PointerEvent) => {
+      const delta = Math.round((moveEvent.clientX - startX) / PIXELS_PER_STEP);
       const next = Math.max(0, Math.min(totalSteps - 1, sourceStep + delta));
       setDragGhostStep(next);
     };
 
-    const handleUp = (ue: MouseEvent) => {
-      window.removeEventListener('mousemove', handleMove);
-      window.removeEventListener('mouseup', handleUp);
+    const handleUp = (endEvent: PointerEvent) => {
+      window.removeEventListener('pointermove', handleMove);
+      window.removeEventListener('pointerup', handleUp);
+      window.removeEventListener('pointercancel', handleUp);
       dragSourceStepRef.current = null;
-      const delta = Math.round((ue.clientX - startX) / PIXELS_PER_STEP);
+      const delta = Math.round((endEvent.clientX - startX) / PIXELS_PER_STEP);
       const next = Math.max(0, Math.min(totalSteps - 1, sourceStep + delta));
       setDragGhostStep(null);
       if (next !== sourceStep) {
@@ -537,8 +541,9 @@ export default function SequencerTrack({
       }
     };
 
-    window.addEventListener('mousemove', handleMove);
-    window.addEventListener('mouseup', handleUp);
+    window.addEventListener('pointermove', handleMove, { passive: false });
+    window.addEventListener('pointerup', handleUp, { passive: false });
+    window.addEventListener('pointercancel', handleUp, { passive: false });
   };
 
   return (
@@ -750,7 +755,7 @@ export default function SequencerTrack({
                       key={`${clip.padKey}-${clip.sourceStepIndex}-${index}`}
                       title={`${clip.label} at step ${clip.sourceStepIndex + 1}`}
                       aria-label={`${clip.label} at step ${clip.sourceStepIndex + 1}`}
-                      onMouseDown={(e) => handleClipMouseDown(clip, e)}
+                      onPointerDown={(event) => handleClipPointerDown(clip, event)}
                       sx={{
                         position: 'absolute',
                         left: clip.stepIndex * PIXELS_PER_STEP + 1,
@@ -769,6 +774,8 @@ export default function SequencerTrack({
                         zIndex: 3,
                         opacity: isDraggingThis ? 0.35 : 1,
                         userSelect: 'none',
+                        WebkitUserSelect: 'none',
+                        touchAction: 'none',
                       }}
                     />
                   );

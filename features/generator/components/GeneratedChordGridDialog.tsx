@@ -16,6 +16,8 @@ import CloseIcon from '@mui/icons-material/Close';
 import AvTimerIcon from '@mui/icons-material/AvTimer';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
+import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
+import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import LoopIcon from '@mui/icons-material/Loop';
 import SaveIcon from '@mui/icons-material/Save';
 import { alpha, type Theme, useTheme } from '@mui/material/styles';
@@ -723,6 +725,15 @@ export default function GeneratedChordGridDialog({
     setSelectedStepIndex(null);
   };
 
+  const deleteSelectedClip = () => {
+    if (selectedStepIndex === null) {
+      return;
+    }
+
+    setArrangementEvents((prev) => prev.filter((event) => event.stepIndex !== selectedStepIndex));
+    setSelectedStepIndex(null);
+  };
+
   const moveClipStep = (sourceStepIndex: number, newStepIndex: number) => {
     setArrangementEvents((prev) =>
       prev
@@ -732,6 +743,19 @@ export default function GeneratedChordGridDialog({
         .sort((a, b) => a.stepIndex - b.stepIndex),
     );
     setSelectedStepIndex(newStepIndex);
+  };
+
+  const nudgeSelectedClip = (delta: number) => {
+    if (selectedStepIndex === null) {
+      return;
+    }
+
+    const next = Math.max(0, Math.min(totalSteps - 1, selectedStepIndex + delta));
+    if (next === selectedStepIndex) {
+      return;
+    }
+
+    moveClipStep(selectedStepIndex, next);
   };
 
   const triggerPad = (entry: ChordGridEntry) => {
@@ -819,8 +843,7 @@ export default function GeneratedChordGridDialog({
 
       if ((key === 'delete' || key === 'backspace') && selectedStepIndex !== null) {
         event.preventDefault();
-        setArrangementEvents((prev) => prev.filter((e) => e.stepIndex !== selectedStepIndex));
-        setSelectedStepIndex(null);
+        deleteSelectedClip();
         return;
       }
 
@@ -831,16 +854,7 @@ export default function GeneratedChordGridDialog({
 
       if ((key === 'arrowleft' || key === 'arrowright') && selectedStepIndex !== null) {
         event.preventDefault();
-        const delta = key === 'arrowleft' ? -1 : 1;
-        const next = Math.max(0, Math.min(totalSteps - 1, selectedStepIndex + delta));
-        if (next !== selectedStepIndex) {
-          setArrangementEvents((prev) =>
-            prev
-              .map((e) => (e.stepIndex === selectedStepIndex ? { ...e, stepIndex: next } : e))
-              .sort((a, b) => a.stepIndex - b.stepIndex),
-          );
-          setSelectedStepIndex(next);
-        }
+        nudgeSelectedClip(key === 'arrowleft' ? -1 : 1);
         return;
       }
 
@@ -932,6 +946,8 @@ export default function GeneratedChordGridDialog({
   const editingEntry = editingPadKey
     ? editableChords.find((entry) => entry.key === editingPadKey)
     : undefined;
+  const selectedStepEventCount =
+    selectedStepIndex === null ? 0 : (eventsByStep.get(selectedStepIndex)?.length ?? 0);
 
   const handleStartEditing = () => {
     setIsEditMode(true);
@@ -1180,6 +1196,99 @@ export default function GeneratedChordGridDialog({
           }}
           onClipMove={moveClipStep}
         />
+
+        {selectedStepIndex !== null ? (
+          <Box
+            sx={{
+              mb: 1.5,
+              p: 1.25,
+              borderRadius: 1.5,
+              bgcolor: appColors.surface.translucentPanel,
+              border: `1px solid ${appColors.surface.translucentPanelBorder}`,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 1,
+              flexWrap: 'wrap',
+            }}
+          >
+            <Box sx={{ flex: 1, minWidth: 160 }}>
+              <Typography variant="subtitle2" sx={{ lineHeight: 1.2 }}>
+                {t('ui.chordGrid.selectedClipTitle', {
+                  defaultValue: 'Selected clip',
+                })}
+              </Typography>
+              <Typography variant="caption" color="text.secondary">
+                {t('ui.chordGrid.selectedClipMeta', {
+                  defaultValue:
+                    '{{count}} event at step {{step}}. Drag the clip or use the controls to move it.',
+                  count: selectedStepEventCount,
+                  step: selectedStepIndex + 1,
+                })}
+              </Typography>
+            </Box>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, ml: 'auto' }}>
+              <Tooltip
+                title={t('ui.chordGrid.moveClipLeft', {
+                  defaultValue: 'Move clip left',
+                })}
+              >
+                <span>
+                  <IconButton
+                    size="small"
+                    onClick={() => nudgeSelectedClip(-1)}
+                    disabled={selectedStepIndex === 0}
+                    aria-label={t('ui.chordGrid.moveClipLeft', {
+                      defaultValue: 'Move clip left',
+                    })}
+                  >
+                    <KeyboardArrowLeftIcon fontSize="small" />
+                  </IconButton>
+                </span>
+              </Tooltip>
+              <Tooltip
+                title={t('ui.chordGrid.moveClipRight', {
+                  defaultValue: 'Move clip right',
+                })}
+              >
+                <span>
+                  <IconButton
+                    size="small"
+                    onClick={() => nudgeSelectedClip(1)}
+                    disabled={selectedStepIndex >= totalSteps - 1}
+                    aria-label={t('ui.chordGrid.moveClipRight', {
+                      defaultValue: 'Move clip right',
+                    })}
+                  >
+                    <KeyboardArrowRightIcon fontSize="small" />
+                  </IconButton>
+                </span>
+              </Tooltip>
+              <Tooltip
+                title={t('ui.chordGrid.deleteSelectedClip', { defaultValue: 'Delete clip' })}
+              >
+                <span>
+                  <IconButton
+                    size="small"
+                    onClick={deleteSelectedClip}
+                    aria-label={t('ui.chordGrid.deleteSelectedClip', {
+                      defaultValue: 'Delete clip',
+                    })}
+                    sx={{ color: theme.palette.error.main }}
+                  >
+                    <DeleteOutlineIcon fontSize="small" />
+                  </IconButton>
+                </span>
+              </Tooltip>
+            </Box>
+            {isMobile ? (
+              <Typography variant="caption" color="text.secondary" sx={{ width: '100%' }}>
+                {t('ui.chordGrid.touchEditHint', {
+                  defaultValue: 'Tap a clip to select it. Drag it horizontally to move it.',
+                })}
+              </Typography>
+            ) : null}
+          </Box>
+        ) : null}
 
         {isEditMode ? (
           <Box
