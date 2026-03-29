@@ -46,7 +46,6 @@ import type { TimeSignature } from '../../../domain/audio/audio';
 import SelectField from '../../../components/ui/SelectField';
 import EffectParamSlider from './EffectParamSlider';
 import EffectSettingsCard from './EffectSettingsCard';
-import EnvelopeControls from './EnvelopeControls';
 import { stopGlobalPlayback } from '../hooks/usePlaybackToggle';
 import type {
   PlaybackSettings,
@@ -133,6 +132,41 @@ export default function PlaybackSettingsButton({
   }, []);
 
   const effectConfigs: EffectConfig[] = createEffectConfigs(settings, onChange);
+  const envelopeSliderConfigs: SliderRowConfig[] = [
+    {
+      key: 'attack',
+      label: 'Attack',
+      valueText: `${attack.toFixed(2)}s`,
+      value: attack,
+      onChange: onAttackChange,
+      min: 0,
+      max: 0.5,
+      step: 0.01,
+      ariaLabel: 'Attack time',
+    },
+    {
+      key: 'decay',
+      label: 'Decay',
+      valueText: `${decay.toFixed(2)}s`,
+      value: decay,
+      onChange: onDecayChange,
+      min: 0.1,
+      max: 3,
+      step: 0.1,
+      ariaLabel: 'Decay time',
+    },
+    {
+      key: 'gate',
+      label: PLAYBACK_SETTINGS_COPY.gateLabel,
+      valueText: formatGateLabel(gate),
+      value: gate,
+      onChange: onGateChange,
+      min: GATE_RANGE.min,
+      max: GATE_RANGE.max,
+      step: GATE_RANGE.step,
+      ariaLabel: PLAYBACK_SETTINGS_COPY.gateAriaLabel,
+    },
+  ];
   const padSliderConfigs: SliderRowConfig[] = createPadSliderConfigs(settings, onChange);
 
   /**
@@ -382,34 +416,30 @@ export default function PlaybackSettingsButton({
               }}
             >
               <Card variant="outlined">
-                <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
-                  <Typography variant="subtitle2" sx={{ mb: 1 }}>
-                    {PLAYBACK_SETTINGS_COPY.envelopeLabel}
-                  </Typography>
-                  <EnvelopeControls
-                    attack={attack}
-                    onAttackChange={onAttackChange}
-                    decay={decay}
-                    onDecayChange={onDecayChange}
-                    direction="column"
-                  />
-                  <Box sx={{ mt: 2 }}>
-                    <EffectParamSlider
-                      label={PLAYBACK_SETTINGS_COPY.gateLabel}
-                      valueText={formatGateLabel(gate)}
-                      value={gate}
-                      onChange={onGateChange}
-                      min={GATE_RANGE.min}
-                      max={GATE_RANGE.max}
-                      step={GATE_RANGE.step}
-                      ariaLabel={PLAYBACK_SETTINGS_COPY.gateAriaLabel}
-                    />
-                  </Box>
+                <CardContent>
+                  <Stack spacing={2}>
+                    <Typography variant="subtitle2">
+                      {PLAYBACK_SETTINGS_COPY.envelopeLabel}
+                    </Typography>
+                    {envelopeSliderConfigs.map((slider) => (
+                      <EffectParamSlider
+                        key={slider.key}
+                        label={slider.label}
+                        valueText={slider.valueText}
+                        value={slider.value}
+                        onChange={slider.onChange}
+                        min={slider.min}
+                        max={slider.max}
+                        step={slider.step}
+                        ariaLabel={slider.ariaLabel}
+                      />
+                    ))}
+                  </Stack>
                 </CardContent>
               </Card>
 
               <Card variant="outlined">
-                <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
+                <CardContent>
                   <Stack spacing={2}>
                     <Typography variant="subtitle2">{PLAYBACK_SETTINGS_COPY.padsLabel}</Typography>
 
