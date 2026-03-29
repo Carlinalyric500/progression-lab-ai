@@ -260,4 +260,44 @@ describe('GeneratedChordGridDialog', () => {
 
     expect(screen.getByRole('button', { name: 'Record arrangement' })).toBeDisabled();
   });
+
+  it('renders suggestion mode buttons and allows switching modes', async () => {
+    const user = userEvent.setup();
+
+    renderWithProviders(
+      <GeneratedChordGridDialog
+        open={true}
+        onClose={jest.fn()}
+        tempoBpm={120}
+        settings={PLAYBACK_SETTINGS_DEFAULTS}
+        onSettingsChange={mockHandlers}
+        onTempoBpmChange={jest.fn()}
+        chords={[mockChord]}
+      />,
+    );
+
+    await user.click(screen.getByRole('button', { name: 'Suggestion modes' }));
+
+    const offButton = screen.getByRole('button', { name: 'Off' });
+    const currentButton = screen.getByRole('button', { name: 'Both directions' });
+    const dominantFlowButton = screen.getByRole('button', { name: 'Dominant flow' });
+    const subdominantFlowButton = screen.getByRole('button', { name: 'Subdominant flow' });
+
+    expect(currentButton).toHaveAttribute('aria-pressed', 'true');
+    expect(offButton).toHaveAttribute('aria-pressed', 'false');
+    expect(dominantFlowButton).toHaveAttribute('aria-pressed', 'false');
+    expect(subdominantFlowButton).toHaveAttribute('aria-pressed', 'false');
+
+    await user.click(dominantFlowButton);
+    expect(dominantFlowButton).toHaveAttribute('aria-pressed', 'true');
+    expect(currentButton).toHaveAttribute('aria-pressed', 'false');
+
+    await user.click(subdominantFlowButton);
+    expect(subdominantFlowButton).toHaveAttribute('aria-pressed', 'true');
+    expect(dominantFlowButton).toHaveAttribute('aria-pressed', 'false');
+
+    await user.click(offButton);
+    expect(offButton).toHaveAttribute('aria-pressed', 'true');
+    expect(subdominantFlowButton).toHaveAttribute('aria-pressed', 'false');
+  });
 });

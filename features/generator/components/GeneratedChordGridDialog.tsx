@@ -1,6 +1,9 @@
 'use client';
 
 import {
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
   Box,
   Button,
   Dialog,
@@ -8,11 +11,14 @@ import {
   DialogContent,
   DialogTitle,
   IconButton,
+  ToggleButton,
+  ToggleButtonGroup,
   Tooltip,
   Typography,
   useMediaQuery,
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import AvTimerIcon from '@mui/icons-material/AvTimer';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
@@ -35,7 +41,7 @@ import {
 import { createPianoVoicingFromChordSymbol } from '../../../domain/music/chordVoicing';
 import {
   getChordRootSemitone,
-  getCircleOfFifthsNeighborSemitones,
+  getCircleOfFifthsSuggestedSemitones,
 } from '../../../domain/music/circleOfFifths';
 import { CHORD_OPTIONS } from '../../../lib/formOptions';
 import PlaybackSettingsButton from './PlaybackSettingsButton';
@@ -54,6 +60,7 @@ import type {
   ArrangementPlaybackSnapshot,
   ArrangementTimeline,
 } from '../../../lib/types';
+import type { CircleOfFifthsSuggestionMode } from '../../../domain/music/circleOfFifths';
 
 /**
  * Render-ready chord data for each playable grid pad.
@@ -262,6 +269,9 @@ export default function GeneratedChordGridDialog({
 
   const [activePadKey, setActivePadKey] = useState<string | null>(null);
   const [cofFocusPadKey, setCofFocusPadKey] = useState<string | null>(null);
+  const [cofSuggestionMode, setCofSuggestionMode] =
+    useState<CircleOfFifthsSuggestionMode>('neighbors');
+  const [isSuggestionAccordionExpanded, setIsSuggestionAccordionExpanded] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
   const [editableChords, setEditableChords] = useState<ChordGridEntry[]>(chords);
   const [editingPadKey, setEditingPadKey] = useState<string | null>(null);
@@ -920,7 +930,7 @@ export default function GeneratedChordGridDialog({
   };
 
   const cofHighlightedKeys = useMemo<Set<string>>(() => {
-    if (!cofFocusPadKey) {
+    if (!cofFocusPadKey || cofSuggestionMode === 'none') {
       return new Set();
     }
 
@@ -934,7 +944,7 @@ export default function GeneratedChordGridDialog({
       return new Set();
     }
 
-    const neighborSemitones = getCircleOfFifthsNeighborSemitones(rootSemitone);
+    const suggestedSemitones = getCircleOfFifthsSuggestedSemitones(rootSemitone, cofSuggestionMode);
     const highlighted = new Set<string>();
     for (const entry of editableChords) {
       if (entry.key === cofFocusPadKey) {
@@ -942,13 +952,13 @@ export default function GeneratedChordGridDialog({
       }
 
       const entrySemitone = getChordRootSemitone(entry.chord);
-      if (entrySemitone !== null && neighborSemitones.has(entrySemitone)) {
+      if (entrySemitone !== null && suggestedSemitones.has(entrySemitone)) {
         highlighted.add(entry.key);
       }
     }
 
     return highlighted;
-  }, [cofFocusPadKey, editableChords]);
+  }, [cofFocusPadKey, cofSuggestionMode, editableChords]);
 
   const editableChordOptions = useMemo(() => {
     const values = Array.from(
@@ -1583,6 +1593,104 @@ export default function GeneratedChordGridDialog({
             );
           })}
         </Box>
+
+        <Accordion
+          disableGutters
+          expanded={isSuggestionAccordionExpanded}
+          onChange={(_event, expanded) => setIsSuggestionAccordionExpanded(expanded)}
+          sx={{
+            mt: 1.5,
+            borderRadius: 1.5,
+            bgcolor: appColors.surface.translucentPanel,
+            border: `1px solid ${appColors.surface.translucentPanelBorder}`,
+            '&:before': { display: 'none' },
+            overflow: 'hidden',
+          }}
+        >
+          <AccordionSummary
+            expandIcon={<ExpandMoreIcon />}
+            aria-label={t('ui.chordGrid.suggestionModeAccordionLabel', {
+              defaultValue: 'Suggestion modes',
+            })}
+            sx={{
+              px: 1.25,
+              minHeight: 0,
+              '& .MuiAccordionSummary-content': {
+                my: 1,
+              },
+            }}
+          >
+            <Typography variant="subtitle2">
+              {t('ui.chordGrid.suggestionModeAccordionLabel', {
+                defaultValue: 'Suggestion modes',
+              })}
+            </Typography>
+          </AccordionSummary>
+          <AccordionDetails sx={{ px: 1.25, pb: 1.25, pt: 0.25 }}>
+            <ToggleButtonGroup
+              exclusive
+              size="small"
+              color="primary"
+              fullWidth
+              value={cofSuggestionMode}
+              onChange={(_event, mode: CircleOfFifthsSuggestionMode | null) => {
+                if (mode) {
+                  setCofSuggestionMode(mode);
+                }
+              }}
+              aria-label={t('ui.chordGrid.suggestionModeLabel', {
+                defaultValue: 'Circle of 5ths suggestions',
+              })}
+              sx={{
+                '& .MuiToggleButton-root': {
+                  textTransform: 'none',
+                  fontWeight: 600,
+                  fontSize: { xs: '0.72rem', sm: '0.8rem' },
+                  px: { xs: 0.75, sm: 1.25 },
+                  py: 0.7,
+                  whiteSpace: 'nowrap',
+                },
+              }}
+            >
+              <ToggleButton
+                value="none"
+                aria-label={t('ui.chordGrid.suggestionModeOff', { defaultValue: 'Off' })}
+              >
+                {t('ui.chordGrid.suggestionModeOff', { defaultValue: 'Off' })}
+              </ToggleButton>
+              <ToggleButton
+                value="neighbors"
+                aria-label={t('ui.chordGrid.suggestionModeCurrent', {
+                  defaultValue: 'Both directions',
+                })}
+              >
+                {t('ui.chordGrid.suggestionModeCurrent', {
+                  defaultValue: 'Both directions',
+                })}
+              </ToggleButton>
+              <ToggleButton
+                value="clockwise"
+                aria-label={t('ui.chordGrid.suggestionModeClockwise', {
+                  defaultValue: 'Dominant flow',
+                })}
+              >
+                {t('ui.chordGrid.suggestionModeClockwise', {
+                  defaultValue: 'Dominant flow',
+                })}
+              </ToggleButton>
+              <ToggleButton
+                value="counterclockwise"
+                aria-label={t('ui.chordGrid.suggestionModeCounterclockwise', {
+                  defaultValue: 'Subdominant flow',
+                })}
+              >
+                {t('ui.chordGrid.suggestionModeCounterclockwise', {
+                  defaultValue: 'Subdominant flow',
+                })}
+              </ToggleButton>
+            </ToggleButtonGroup>
+          </AccordionDetails>
+        </Accordion>
 
         {editableChords.length === 0 ? (
           <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
