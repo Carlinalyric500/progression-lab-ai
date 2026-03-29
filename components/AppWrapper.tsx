@@ -40,6 +40,7 @@ type NavItem = {
 
 const RESULT_SECTION_IDS = ['suggestions', 'progressions', 'structure'] as const;
 type ResultSectionId = (typeof RESULT_SECTION_IDS)[number];
+const SHOW_THEME_SWITCHER = false;
 
 const getAvailableSections = (): ResultSectionId[] => {
   return RESULT_SECTION_IDS.filter((sectionId) => Boolean(document.getElementById(sectionId)));
@@ -212,11 +213,11 @@ export default function AppWrapper({ children }: Props) {
                 </Button>
               )}
               <LanguageSwitcher />
-              <ThemeModeToggle />
+              {SHOW_THEME_SWITCHER ? <ThemeModeToggle /> : null}
             </Box>
 
             <Box sx={{ display: { xs: 'flex', md: 'none' }, alignItems: 'center' }}>
-              <ThemeModeToggle />
+              {SHOW_THEME_SWITCHER ? <ThemeModeToggle /> : null}
               <IconButton
                 color="inherit"
                 aria-label={t('openNavigationMenu', { ns: 'common' })}
