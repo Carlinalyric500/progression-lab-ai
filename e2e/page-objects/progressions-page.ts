@@ -5,9 +5,7 @@ export default class ProgressionsPage {
 
   async gotoPublic() {
     await this.page.goto('/progressions?view=public');
-    await expect(
-      this.page.getByRole('heading', { level: 1, name: 'Public Progressions' }),
-    ).toBeVisible();
+    await expect(this.page.getByRole('heading', { level: 1, name: 'Examples' })).toBeVisible();
   }
 
   async expectCardVisible(title: string) {

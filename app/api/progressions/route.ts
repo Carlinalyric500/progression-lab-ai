@@ -115,16 +115,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (process.env.NODE_ENV !== 'production' && error instanceof Error) {
-      return NextResponse.json(
-        {
-          message: 'Failed to save progression',
-          detail: error.message,
-        },
-        { status: 500 },
-      );
-    }
-
     return NextResponse.json({ message: 'Failed to save progression' }, { status: 500 });
   }
 }

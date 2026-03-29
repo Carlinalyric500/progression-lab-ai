@@ -212,6 +212,7 @@
       "eventPlural": "{{count}} events",
       "keyboardHelp": "Keyboard: pads use 1-0 then A-Z, Space plays/stops the track, Shift toggles record.",
       "keyboardShortcutsLabel": "Keyboard shortcuts",
+      "keyboardShortcutsButtonLabel": "Tips",
       "keyboardShortcutPads": "Pads: 1-0, then A-Z.",
       "keyboardShortcutTransport": "Space: play or stop the track.",
       "keyboardShortcutRecord": "Shift: toggle recording.",

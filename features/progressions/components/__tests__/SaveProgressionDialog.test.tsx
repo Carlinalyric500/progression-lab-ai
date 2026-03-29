@@ -8,6 +8,11 @@ import * as progressionsApi from '../../api/progressionsApi';
 import type { GeneratorSnapshot } from '../../../../lib/types';
 
 jest.mock('../../api/progressionsApi');
+jest.mock('../../../../components/providers/AuthProvider', () => ({
+  useAuth: () => ({
+    user: { id: 'test-user', role: 'ADMIN' },
+  }),
+}));
 
 const renderWithProviders = (ui: ReactElement) =>
   render(<AppSnackbarProvider>{ui}</AppSnackbarProvider>);
@@ -123,6 +128,7 @@ describe('SaveProgressionDialog', () => {
     await waitFor(() => {
       expect(progressionsApi.createProgression).toHaveBeenCalledWith({
         title: undefined,
+        isPublic: false,
         generatorSnapshot: mockGeneratorSnapshot,
       });
     });
@@ -165,6 +171,7 @@ describe('SaveProgressionDialog', () => {
     await waitFor(() => {
       expect(progressionsApi.createProgression).toHaveBeenCalledWith({
         title: 'My Progress',
+        isPublic: false,
         generatorSnapshot: mockGeneratorSnapshot,
       });
     });

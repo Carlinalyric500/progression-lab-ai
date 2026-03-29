@@ -105,21 +105,22 @@ const renderWithProviders = (ui: ReactElement) =>
 const setMatchMedia = ({ desktop }: { desktop: boolean }) => {
   Object.defineProperty(window, 'matchMedia', {
     writable: true,
-    value: jest.fn().mockImplementation((query: string) => ({
-      matches:
-        query === '(hover: hover) and (pointer: fine)'
-          ? desktop
-          : query.includes('max-width')
-            ? false
-            : false,
-      media: query,
-      onchange: null,
-      addListener: jest.fn(),
-      removeListener: jest.fn(),
-      addEventListener: jest.fn(),
-      removeEventListener: jest.fn(),
-      dispatchEvent: jest.fn(),
-    })),
+    value: jest.fn().mockImplementation((query: string) => {
+      const normalizedQuery = query.replace(/\s+/g, '').toLowerCase();
+      const isDesktopPointerQuery =
+        normalizedQuery.includes('hover:hover') && normalizedQuery.includes('pointer:fine');
+
+      return {
+        matches: isDesktopPointerQuery ? desktop : false,
+        media: query,
+        onchange: null,
+        addListener: jest.fn(),
+        removeListener: jest.fn(),
+        addEventListener: jest.fn(),
+        removeEventListener: jest.fn(),
+        dispatchEvent: jest.fn(),
+      };
+    }),
   });
 };
 
@@ -144,7 +145,7 @@ describe('GeneratedChordGridDialog', () => {
       />,
     );
 
-    const trigger = screen.getByRole('button', { name: 'Keyboard shortcuts' });
+    const trigger = screen.getByRole('button', { name: 'Tips' });
     await user.hover(trigger);
 
     expect(await screen.findByText('Pads: 1-0, then A-Z.')).toBeInTheDocument();
@@ -176,11 +177,11 @@ describe('GeneratedChordGridDialog', () => {
       />,
     );
 
-    expect(screen.queryByRole('button', { name: 'Keyboard shortcuts' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Tips' })).not.toBeInTheDocument();
 
     fireEvent.keyDown(window, { key: 'Alt', altKey: true });
 
-    const trigger = await waitFor(() => screen.getByRole('button', { name: 'Keyboard shortcuts' }));
+    const trigger = await waitFor(() => screen.getByRole('button', { name: 'Tips' }));
     await user.hover(trigger);
 
     expect(await screen.findByText('Pads: 1-0, then A-Z.')).toBeInTheDocument();
