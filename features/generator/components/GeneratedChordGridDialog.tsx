@@ -1027,71 +1027,71 @@ export default function GeneratedChordGridDialog({
             >
               <AvTimerIcon fontSize="small" />
             </IconButton>
-            {showKeyboardHints ? (
-              <Box sx={{ ml: 'auto' }}>
-                <Tooltip
-                  arrow
-                  enterTouchDelay={0}
-                  leaveTouchDelay={3000}
-                  placement="bottom-end"
-                  title={
-                    <Box sx={{ maxWidth: 340, py: 0.25 }}>
-                      <Typography variant="subtitle2" sx={{ mb: 0.5 }}>
-                        {t('ui.chordGrid.keyboardShortcutsLabel', {
-                          defaultValue: 'Keyboard shortcuts',
-                        })}
-                      </Typography>
-                      <Box component="ul" sx={{ m: 0, pl: 2.25 }}>
-                        {keyboardShortcutItems.map((item) => (
-                          <Box component="li" key={item} sx={{ mt: 0.25 }}>
-                            <Typography variant="body2">{item}</Typography>
-                          </Box>
-                        ))}
-                      </Box>
-                      {isDesktopKeyboardUi ? (
-                        <>
-                          <Typography variant="subtitle2" sx={{ mt: 1.25, mb: 0.5 }}>
-                            {t('ui.chordGrid.keyboardShortcutDesktopTitle', {
-                              defaultValue: 'Desktop clip editing',
-                            })}
-                          </Typography>
-                          <Box component="ul" sx={{ m: 0, pl: 2.25 }}>
-                            {desktopKeyboardShortcutItems.map((item) => (
-                              <Box component="li" key={item} sx={{ mt: 0.25 }}>
-                                <Typography variant="body2">{item}</Typography>
-                              </Box>
-                            ))}
-                          </Box>
-                        </>
-                      ) : null}
-                    </Box>
-                  }
-                >
-                  <Button
-                    size="small"
-                    variant="text"
-                    startIcon={<KeyboardIcon fontSize="small" />}
-                    aria-label={t('ui.chordGrid.keyboardShortcutsLabel', {
-                      defaultValue: 'Keyboard shortcuts',
-                    })}
-                    sx={{
-                      px: 0.75,
-                      minWidth: 0,
-                      color: 'text.secondary',
-                      textTransform: 'none',
-                      fontWeight: 600,
-                    }}
-                  >
-                    <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}>
+          </Tooltip>
+          {showKeyboardHints ? (
+            <Box sx={{ ml: 'auto' }}>
+              <Tooltip
+                arrow
+                enterTouchDelay={0}
+                leaveTouchDelay={3000}
+                placement="bottom-end"
+                title={
+                  <Box sx={{ maxWidth: 340, py: 0.25 }}>
+                    <Typography variant="subtitle2" sx={{ mb: 0.5 }}>
                       {t('ui.chordGrid.keyboardShortcutsLabel', {
                         defaultValue: 'Keyboard shortcuts',
                       })}
+                    </Typography>
+                    <Box component="ul" sx={{ m: 0, pl: 2.25 }}>
+                      {keyboardShortcutItems.map((item) => (
+                        <Box component="li" key={item} sx={{ mt: 0.25 }}>
+                          <Typography variant="body2">{item}</Typography>
+                        </Box>
+                      ))}
                     </Box>
-                  </Button>
-                </Tooltip>
-              </Box>
-            ) : null}
-          </Tooltip>
+                    {isDesktopKeyboardUi ? (
+                      <>
+                        <Typography variant="subtitle2" sx={{ mt: 1.25, mb: 0.5 }}>
+                          {t('ui.chordGrid.keyboardShortcutDesktopTitle', {
+                            defaultValue: 'Desktop clip editing',
+                          })}
+                        </Typography>
+                        <Box component="ul" sx={{ m: 0, pl: 2.25 }}>
+                          {desktopKeyboardShortcutItems.map((item) => (
+                            <Box component="li" key={item} sx={{ mt: 0.25 }}>
+                              <Typography variant="body2">{item}</Typography>
+                            </Box>
+                          ))}
+                        </Box>
+                      </>
+                    ) : null}
+                  </Box>
+                }
+              >
+                <Button
+                  size="small"
+                  variant="text"
+                  startIcon={<KeyboardIcon fontSize="small" />}
+                  aria-label={t('ui.chordGrid.keyboardShortcutsLabel', {
+                    defaultValue: 'Keyboard shortcuts',
+                  })}
+                  sx={{
+                    px: 0.75,
+                    minWidth: 0,
+                    color: 'text.secondary',
+                    textTransform: 'none',
+                    fontWeight: 600,
+                  }}
+                >
+                  <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}>
+                    {t('ui.chordGrid.keyboardShortcutsLabel', {
+                      defaultValue: 'Keyboard shortcuts',
+                    })}
+                  </Box>
+                </Button>
+              </Tooltip>
+            </Box>
+          ) : null}
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
             <Box
               sx={{
