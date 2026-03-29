@@ -4,7 +4,7 @@ import {
   Button,
   Card,
   CardContent,
-  CircularProgress,
+  LinearProgress,
   Stack,
   Table,
   TableBody,
@@ -63,9 +63,9 @@ export default function ProgressionsTable({
               {isLoading ? (
                 <TableRow>
                   <TableCell colSpan={6}>
-                    <Stack direction="row" spacing={1} alignItems="center">
-                      <CircularProgress size={16} />
+                    <Stack spacing={1.25}>
                       <Typography color="text.secondary">Loading data...</Typography>
+                      <LinearProgress />
                     </Stack>
                   </TableCell>
                 </TableRow>

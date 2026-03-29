@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Box, Button, Chip, Stack, Typography, CircularProgress } from '@mui/material';
+import { Box, Button, Chip, Stack, Typography } from '@mui/material';
 import FileCopyIcon from '@mui/icons-material/FileCopy';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
@@ -181,27 +181,23 @@ export default function ProgressionCard({
       <Button
         size="small"
         variant="outlined"
-        startIcon={
-          isDownloadingPdf ? <CircularProgress size={16} color="inherit" /> : <FileDownloadIcon />
-        }
+        startIcon={<FileDownloadIcon />}
         onClick={handleDownloadPdf}
         disabled={isDownloadingPdf}
         title="Download as PDF chart"
       >
-        {isDownloadingPdf ? 'PDF...' : 'PDF'}
+        {isDownloadingPdf ? 'Downloading PDF...' : 'Download PDF'}
       </Button>
 
       <Button
         size="small"
         variant="outlined"
-        startIcon={
-          isDownloadingMidi ? <CircularProgress size={16} color="inherit" /> : <AudioFileIcon />
-        }
+        startIcon={<AudioFileIcon />}
         onClick={handleDownloadMidi}
         disabled={isDownloadingMidi || !canPlay}
         title="Download as MIDI file"
       >
-        {isDownloadingMidi ? 'MIDI...' : 'MIDI'}
+        {isDownloadingMidi ? 'Downloading MIDI...' : 'Download MIDI'}
       </Button>
 
       {onOpen && (
@@ -242,7 +238,7 @@ export default function ProgressionCard({
           size="small"
           color="error"
           variant="outlined"
-          startIcon={isDeleting ? <CircularProgress size={16} color="inherit" /> : <DeleteIcon />}
+          startIcon={<DeleteIcon />}
           onClick={() => onDelete(progression.id)}
           disabled={isDeleting}
         >

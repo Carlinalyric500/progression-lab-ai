@@ -1,6 +1,6 @@
 'use client';
 
-import { Box, CircularProgress, Stack, Typography } from '@mui/material';
+import { Box, LinearProgress, Stack, Typography } from '@mui/material';
 
 import GeneratorHeader from './GeneratorHeader';
 
@@ -13,18 +13,17 @@ export default function RestoringState() {
       <GeneratorHeader />
       <Box
         sx={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
+          width: '100%',
+          maxWidth: 760,
+          mx: 'auto',
           py: 10,
-          gap: 2,
+          px: { xs: 1, sm: 2 },
         }}
       >
-        <CircularProgress />
-        <Typography variant="body1" color="text.secondary">
+        <Typography variant="body1" color="text.secondary" sx={{ mb: 2 }}>
           Restoring your last generator session...
         </Typography>
+        <LinearProgress />
       </Box>
     </Stack>
   );

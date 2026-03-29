@@ -9,8 +9,8 @@ import {
   Box,
   Button,
   Chip,
-  CircularProgress,
   Container,
+  Skeleton,
   Stack,
   Typography,
 } from '@mui/material';
@@ -120,7 +120,7 @@ export default function ProgressionsPageContent() {
     };
 
     loadMyProgressions();
-  }, [isAuthenticated]);
+  }, [isAuthenticated, showError]);
 
   useEffect(() => {
     if (viewMode !== 'public') {
@@ -143,7 +143,7 @@ export default function ProgressionsPageContent() {
     };
 
     loadPublicProgressions();
-  }, [viewMode, tagQuery, keyQuery]);
+  }, [viewMode, tagQuery, keyQuery, showError]);
 
   const filteredMyProgressions = useMemo(() => {
     const normalizedTagQueries = sanitizeTags(tagQuery)
@@ -362,9 +362,11 @@ export default function ProgressionsPageContent() {
         )}
 
         {loading && (
-          <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
-            <CircularProgress />
-          </Box>
+          <Stack spacing={1.25} sx={{ py: 2 }}>
+            <Skeleton variant="rounded" height={64} />
+            <Skeleton variant="rounded" height={64} />
+            <Skeleton variant="rounded" height={64} />
+          </Stack>
         )}
 
         {!loading && displayedProgressions.length === 0 && (

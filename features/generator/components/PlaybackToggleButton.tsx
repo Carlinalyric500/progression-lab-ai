@@ -2,7 +2,7 @@
 
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import StopIcon from '@mui/icons-material/Stop';
-import { Button, CircularProgress, IconButton } from '@mui/material';
+import { Box, Button, IconButton } from '@mui/material';
 import { alpha, type Theme } from '@mui/material/styles';
 
 type PlaybackToggleButtonProps = {
@@ -41,7 +41,16 @@ export default function PlaybackToggleButton({
   stopTitle,
 }: PlaybackToggleButtonProps) {
   const icon = isInitializing ? (
-    <CircularProgress size={16} color="inherit" />
+    <Box
+      component="span"
+      sx={{
+        width: 10,
+        height: 10,
+        borderRadius: '50%',
+        bgcolor: 'currentColor',
+        opacity: 0.55,
+      }}
+    />
   ) : isPlaying ? (
     <StopIcon />
   ) : (
@@ -49,7 +58,7 @@ export default function PlaybackToggleButton({
   );
   const stateTitle = isInitializing ? 'Initializing audio' : isPlaying ? stopTitle : playTitle;
   const shouldRenderTextButton = Boolean(label || stateTitle);
-  const resolvedLabel = isInitializing ? 'Initializing...' : (stateTitle ?? label);
+  const resolvedLabel = isInitializing ? 'Initializing audio...' : (stateTitle ?? label);
 
   if (shouldRenderTextButton) {
     return (

@@ -7,15 +7,7 @@ import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import AudioFileIcon from '@mui/icons-material/AudioFile';
-import {
-  Box,
-  CircularProgress,
-  IconButton,
-  Skeleton,
-  Stack,
-  Tooltip,
-  Typography,
-} from '@mui/material';
+import { Box, IconButton, Skeleton, Stack, Tooltip, Typography } from '@mui/material';
 import { alpha, useTheme } from '@mui/material/styles';
 
 import { useAppSnackbar } from '../../../components/providers/AppSnackbarProvider';
@@ -230,7 +222,17 @@ export default function ArrangementsList({ onLoad, refreshSignal, onAvailability
                   }}
                 >
                   {downloadingPdfId === arr.id ? (
-                    <CircularProgress size={14} color="inherit" />
+                    <Box
+                      component="span"
+                      sx={{
+                        display: 'block',
+                        width: 10,
+                        height: 10,
+                        borderRadius: '50%',
+                        bgcolor: 'currentColor',
+                        opacity: 0.55,
+                      }}
+                    />
                   ) : (
                     <FileDownloadIcon fontSize="small" />
                   )}
@@ -250,7 +252,17 @@ export default function ArrangementsList({ onLoad, refreshSignal, onAvailability
                   }}
                 >
                   {downloadingMidiId === arr.id ? (
-                    <CircularProgress size={14} color="inherit" />
+                    <Box
+                      component="span"
+                      sx={{
+                        display: 'block',
+                        width: 10,
+                        height: 10,
+                        borderRadius: '50%',
+                        bgcolor: 'currentColor',
+                        opacity: 0.55,
+                      }}
+                    />
                   ) : (
                     <AudioFileIcon fontSize="small" />
                   )}
@@ -286,7 +298,17 @@ export default function ArrangementsList({ onLoad, refreshSignal, onAvailability
                   }}
                 >
                   {isDeleting ? (
-                    <CircularProgress size={14} color="inherit" />
+                    <Box
+                      component="span"
+                      sx={{
+                        display: 'block',
+                        width: 10,
+                        height: 10,
+                        borderRadius: '50%',
+                        bgcolor: 'currentColor',
+                        opacity: 0.55,
+                      }}
+                    />
                   ) : (
                     <DeleteOutlineIcon fontSize="small" />
                   )}

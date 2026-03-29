@@ -9,7 +9,6 @@ import {
   Button,
   Card,
   CardContent,
-  CircularProgress,
   Stack,
   ToggleButton,
   ToggleButtonGroup,
@@ -191,9 +190,14 @@ export default function AuthPageContent() {
             variant="contained"
             type="submit"
             disabled={isSubmitting || Object.keys(errors).length > 0}
-            startIcon={isSubmitting ? <CircularProgress size={16} color="inherit" /> : undefined}
           >
-            {isSubmitting ? 'Please wait...' : mode === 'login' ? 'Sign in' : 'Create account'}
+            {isSubmitting
+              ? mode === 'login'
+                ? 'Signing in...'
+                : 'Creating account...'
+              : mode === 'login'
+                ? 'Sign in'
+                : 'Create account'}
           </Button>
         </Stack>
       </CardContent>
