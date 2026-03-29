@@ -3,11 +3,11 @@
 import {
   Box,
   Button,
-  CircularProgress,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
+  LinearProgress,
   Stack,
   Typography,
 } from '@mui/material';
@@ -31,9 +31,9 @@ export default function ProgressionDetailsDialog({
       <DialogTitle>Progression Details</DialogTitle>
       <DialogContent dividers>
         {detailsLoading ? (
-          <Stack direction="row" spacing={1} alignItems="center">
-            <CircularProgress size={16} />
+          <Stack spacing={1.25}>
             <Typography color="text.secondary">Loading details...</Typography>
+            <LinearProgress />
           </Stack>
         ) : details ? (
           <Stack spacing={2}>

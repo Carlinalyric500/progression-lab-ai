@@ -4,7 +4,6 @@ import { useEffect } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import {
   Button,
-  CircularProgress,
   Dialog,
   DialogActions,
   DialogContent,
@@ -159,7 +158,6 @@ export default function SaveArrangementDialog({
           onClick={handleSubmit(onSubmit)}
           variant="contained"
           disabled={isSubmitting || Object.keys(errors).length > 0}
-          startIcon={isSubmitting ? <CircularProgress size={16} color="inherit" /> : undefined}
         >
           {isSubmitting ? 'Saving...' : 'Save arrangement'}
         </Button>

@@ -13,8 +13,9 @@ import {
   AccordionSummary,
   Box,
   Button,
-  CircularProgress,
   Container,
+  LinearProgress,
+  Skeleton,
   Stack,
   Typography,
 } from '@mui/material';
@@ -695,18 +696,19 @@ export default function GeneratorPageContent() {
         {loading && (
           <Box
             sx={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'center',
               py: 8,
-              gap: 2,
+              px: { xs: 1, sm: 2 },
             }}
           >
-            <CircularProgress />
-            <Typography variant="body1" color="text.secondary">
+            <Typography variant="body1" color="text.secondary" sx={{ mb: 2 }}>
               Generating suggestions...
             </Typography>
+            <LinearProgress sx={{ mb: 2 }} />
+            <Stack spacing={1.25}>
+              <Skeleton variant="rounded" height={52} />
+              <Skeleton variant="rounded" height={52} />
+              <Skeleton variant="rounded" height={52} />
+            </Stack>
           </Box>
         )}
 
