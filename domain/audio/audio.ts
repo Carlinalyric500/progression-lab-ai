@@ -1154,7 +1154,6 @@ export const createToneAudioEngine = (): AudioEngine => {
   const getMetronomeHatSynth = (): Tone.MetalSynth => {
     if (!metronomeHatSynth) {
       metronomeHatSynth = new Tone.MetalSynth({
-        frequency: 220,
         envelope: { attack: 0.001, decay: 0.05, release: 0.02 },
         harmonicity: 5.1,
         modulationIndex: 18,
@@ -1169,7 +1168,6 @@ export const createToneAudioEngine = (): AudioEngine => {
   const getMetronomeCrashSynth = (): Tone.MetalSynth => {
     if (!metronomeCrashSynth) {
       metronomeCrashSynth = new Tone.MetalSynth({
-        frequency: 320,
         envelope: { attack: 0.001, decay: 0.3, release: 0.18 },
         harmonicity: 4.3,
         modulationIndex: 20,
