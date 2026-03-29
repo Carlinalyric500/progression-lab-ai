@@ -2,6 +2,8 @@ import { NOTE_NAME_TO_SEMITONE } from './musicNoteConstants';
 
 const CHORD_ROOT_PATTERN = /^([A-G](?:#|b)?)/;
 
+export type CircleOfFifthsSuggestionMode = 'none' | 'neighbors' | 'clockwise' | 'counterclockwise';
+
 /**
  * Returns the pitch-class semitone (0–11) for the root of a chord symbol,
  * or null if the symbol cannot be parsed.
@@ -24,4 +26,26 @@ export function getChordRootSemitone(chordSymbol: string): number | null {
  */
 export function getCircleOfFifthsNeighborSemitones(rootSemitone: number): Set<number> {
   return new Set([(rootSemitone + 5) % 12, (rootSemitone + 7) % 12]);
+}
+
+/**
+ * Returns suggested semitones based on the selected Circle of Fifths strategy.
+ */
+export function getCircleOfFifthsSuggestedSemitones(
+  rootSemitone: number,
+  mode: CircleOfFifthsSuggestionMode,
+): Set<number> {
+  if (mode === 'none') {
+    return new Set();
+  }
+
+  if (mode === 'clockwise') {
+    return new Set([(rootSemitone + 7) % 12]);
+  }
+
+  if (mode === 'counterclockwise') {
+    return new Set([(rootSemitone + 5) % 12]);
+  }
+
+  return getCircleOfFifthsNeighborSemitones(rootSemitone);
 }
