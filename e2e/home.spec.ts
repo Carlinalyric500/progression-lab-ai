@@ -30,34 +30,23 @@ test.describe('generator flow', () => {
     const chordSuggestionsResponse = page.waitForResponse('**/api/chord-suggestions');
     await homePage.generateIdeas();
     await chordSuggestionsResponse;
+    await homePage.expectResultsRendered();
 
-    // Wait for a result chord (should render as a clickable suggestion)
-    const chordButton = page.getByRole('button', { name: /Am7|Cmaj7|Dm7|G7/ }).first();
-    await expect(chordButton).toBeVisible();
+    // Open the generated pad/grid dialog from the top action bar.
+    const openPadsButton = page.getByRole('button', { name: /pads/i });
+    await expect(openPadsButton).toBeVisible();
+    await openPadsButton.click();
 
-    // Open the generator dialog (usually via a button on a result or through suggestions)
-    const generatorDialogTitle = page.getByRole('heading', { name: /chord grid|arrange/i });
-    if (!(await generatorDialogTitle.isVisible())) {
-      // If no explicit button, generate a new arrangement or open from existing result
-      const arrangeButton = page.getByRole('button', { name: /arrange|open|generate/i }).first();
-      if (await arrangeButton.isVisible()) {
-        await arrangeButton.click();
-      }
-    }
-
-    await expect(generatorDialogTitle).toBeVisible({ timeout: 5000 });
+    const composerDialog = page.getByRole('dialog');
+    await expect(composerDialog).toBeVisible({ timeout: 5000 });
 
     // Switch to single-shot recording mode
-    const singleShotButton = page.getByRole('button', { name: /single-shot/i });
+    const singleShotButton = composerDialog.getByRole('button', { name: /single-shot/i });
     await expect(singleShotButton).toBeVisible();
     await singleShotButton.click();
 
-    // Verify cursor placement hint is shown
-    const cursorHint = page.getByText(/click timeline to place cursor/i);
-    await expect(cursorHint).toBeVisible();
-
     // Click on the timeline to place cursor at step ~3
-    const timelineLane = page.getByLabel(/Chord timeline lane/i);
+    const timelineLane = composerDialog.getByLabel(/Chord timeline lane/i);
     await expect(timelineLane).toBeVisible();
     const laneRect = await timelineLane.boundingBox();
     if (laneRect) {
@@ -67,25 +56,23 @@ test.describe('generator flow', () => {
     }
 
     // Verify cursor is placed (check for cursor indicator text in status)
-    const cursorStatus = page.getByText(/Single-shot cursor: step/i);
+    const cursorStatus = composerDialog.getByText(/single-shot cursor: step/i);
     await expect(cursorStatus).toBeVisible({ timeout: 2000 });
 
     // Tap a chord pad (first visible chord button in the grid)
-    const chordPadButton = page
-      .locator('button')
-      .filter({ hasText: /Am7|Cmaj7|Dm7|G7|Fmaj|^[A-G]/ })
+    const chordPadButton = composerDialog
+      .getByRole('button', { name: /^\d+\s+[A-G][^\s]*$/i })
       .first();
     await expect(chordPadButton).toBeVisible();
     await chordPadButton.click();
 
-    // Verify event was inserted (check event count increased)
-    const eventCount = page.getByText(/event|1 event/i);
+    // Verify event was inserted (event summary should report a singular event).
+    const eventCount = page.getByText(/\b1\s+event\b/i);
     await expect(eventCount).toBeVisible({ timeout: 2000 });
 
     // Tap a different chord pad to test replacement at same step
-    const secondChordPad = page
-      .locator('button')
-      .filter({ hasText: /Am7|Cmaj7|Dm7|G7|Fmaj|^[A-G]/ })
+    const secondChordPad = composerDialog
+      .getByRole('button', { name: /^\d+\s+[A-G][^\s]*$/i })
       .nth(1);
     if (await secondChordPad.isVisible()) {
       await secondChordPad.click();
