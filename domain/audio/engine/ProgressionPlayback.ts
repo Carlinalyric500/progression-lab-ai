@@ -7,11 +7,8 @@ import type {
   PlaybackStyle,
   ProgressionVoicing,
 } from '../audioEngine';
-import {
-  TIME_SIGNATURE_NUMERATOR,
-} from '../../music/padPattern';
 import type { TimeSignature } from '../../music/padPattern';
-import { applyGate, getChordDurationSeconds, normalizeTempoBpm } from './AudioMath';
+import { applyGate, getChordDurationSeconds } from './AudioMath';
 import { createProgressionPlaybackPolicies } from './ProgressionPlaybackPolicies';
 import {
   buildChordPatternScheduledEvents,
@@ -20,6 +17,7 @@ import {
 } from './ProgressionSchedulingPolicy';
 import { applyChordPatternLifecyclePolicy } from './ChordPatternLifecyclePolicy';
 import { startPartPlayback } from './PartTransportPolicy';
+import { buildTransportTiming } from './TransportTimingPolicy';
 import { triggerChordByStyle } from './ChordTrigger';
 
 interface ProgressionPlaybackDeps {
@@ -151,11 +149,12 @@ export const createProgressionPlayback = (deps: ProgressionPlaybackDeps): Progre
 
     const audioInstrument = await resolveInstrument(instrument);
 
-    const normalizedTempo = normalizeTempoBpm(tempoBpm);
+    const { normalizedTempo, transportTimeSignature, singleBeatSeconds } = buildTransportTiming({
+      tempoBpm,
+      timeSignature,
+    });
     Tone.Transport.bpm.value = normalizedTempo;
-    Tone.Transport.timeSignature = TIME_SIGNATURE_NUMERATOR[timeSignature];
-
-    const singleBeatSeconds = 60 / normalizedTempo;
+    Tone.Transport.timeSignature = transportTimeSignature;
     const chordDurationSeconds = getChordDurationSeconds(normalizedTempo);
     const noteDuration = applyGate(chordDurationSeconds, gate);
     const totalDurationSeconds = voicings.length * chordDurationSeconds;
@@ -260,11 +259,12 @@ export const createProgressionPlayback = (deps: ProgressionPlaybackDeps): Progre
 
     const audioInstrument = await resolveInstrument(instrument);
 
-    const normalizedTempo = normalizeTempoBpm(tempoBpm);
+    const { normalizedTempo, transportTimeSignature, singleBeatSeconds } = buildTransportTiming({
+      tempoBpm,
+      timeSignature,
+    });
     Tone.Transport.bpm.value = normalizedTempo;
-    Tone.Transport.timeSignature = TIME_SIGNATURE_NUMERATOR[timeSignature];
-
-    const singleBeatSeconds = 60 / normalizedTempo;
+    Tone.Transport.timeSignature = transportTimeSignature;
     const chordDurSeconds = getChordDurationSeconds(normalizedTempo);
     const noteDuration = gate !== 1 ? applyGate(chordDurSeconds, gate) : chordDurSeconds;
     const barDurationSeconds = getBarDurationSeconds(timeSignature, singleBeatSeconds);
