@@ -4,6 +4,7 @@ import userEvent from '@testing-library/user-event';
 import AdminDashboardClient from '../AdminDashboardClient';
 import useAdminDashboard from '../../components/admin/useAdminDashboard';
 import type {
+  AdminProgressionFilters,
   AdminUserFilters,
   ProgressionDetail,
   ProgressionRow,
@@ -58,12 +59,18 @@ const defaultUserFilters: AdminUserFilters = {
   overrideState: 'ALL',
 };
 
+const defaultProgressionFilters: AdminProgressionFilters = {
+  query: '',
+  visibility: 'ALL',
+};
+
 const createHookState = (overrides: Partial<ReturnType<typeof useAdminDashboard>> = {}) => ({
   user: null,
   isSessionLoading: false,
   authError: null,
   rows: [],
   total: 0,
+  progressionFilters: defaultProgressionFilters,
   page: 0,
   pageSize: 25,
   isTableLoading: false,
@@ -91,6 +98,7 @@ const createHookState = (overrides: Partial<ReturnType<typeof useAdminDashboard>
   canDelete: false,
   tableLabel: 'No records',
   usersTableLabel: 'No users',
+  hasActiveProgressionFilters: false,
   hasActiveUserFilters: false,
   setEmail: jest.fn(),
   setPassword: jest.fn(),
@@ -102,6 +110,8 @@ const createHookState = (overrides: Partial<ReturnType<typeof useAdminDashboard>
   handleOpenDetails: jest.fn(),
   handleDelete: jest.fn(),
   handlePageSizeChange: jest.fn(),
+  handleProgressionFiltersChange: jest.fn(),
+  handleResetProgressionFilters: jest.fn(),
   handleUsersPageSizeChange: jest.fn(),
   handleUserFiltersChange: jest.fn(),
   handleResetUserFilters: jest.fn(),

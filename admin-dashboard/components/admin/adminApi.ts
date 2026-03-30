@@ -1,5 +1,6 @@
 import type {
   AdminUser,
+  AdminProgressionFilters,
   AdminUserFilters,
   AdminUserRow,
   AdminUserSummary,
@@ -54,11 +55,17 @@ export async function logout(): Promise<void> {
 export async function fetchProgressions(params: {
   page: number;
   pageSize: number;
+  filters: AdminProgressionFilters;
 }): Promise<{ items: ProgressionRow[]; total: number }> {
   const searchParams = new URLSearchParams({
     page: String(params.page + 1),
     pageSize: String(params.pageSize),
+    visibility: params.filters.visibility,
   });
+
+  if (params.filters.query.trim()) {
+    searchParams.set('query', params.filters.query.trim());
+  }
 
   const response = await fetch(`/api/progressions?${searchParams.toString()}`, {
     credentials: 'include',

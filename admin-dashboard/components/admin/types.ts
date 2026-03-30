@@ -41,6 +41,13 @@ export type ProgressionDetail = {
   owner: ProgressionOwner;
 };
 
+export type ProgressionVisibilityFilter = 'ALL' | 'PUBLIC' | 'PRIVATE';
+
+export type AdminProgressionFilters = {
+  query: string;
+  visibility: ProgressionVisibilityFilter;
+};
+
 export type AdminUserRow = {
   id: string;
   email: string;

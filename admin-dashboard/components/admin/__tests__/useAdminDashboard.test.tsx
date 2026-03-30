@@ -118,7 +118,14 @@ describe('useAdminDashboard', () => {
     });
 
     expect(result.current.user).toEqual(adminUser);
-    expect(mockedFetchProgressions).toHaveBeenCalledWith({ page: 0, pageSize: 25 });
+    expect(mockedFetchProgressions).toHaveBeenCalledWith({
+      page: 0,
+      pageSize: 25,
+      filters: {
+        query: '',
+        visibility: 'ALL',
+      },
+    });
     expect(mockedFetchUsers).toHaveBeenCalledWith({
       page: 0,
       pageSize: 25,
@@ -186,7 +193,14 @@ describe('useAdminDashboard', () => {
     });
 
     expect(mockedDeleteProgression).toHaveBeenCalledWith('progression-1');
-    expect(mockedFetchProgressions).toHaveBeenLastCalledWith({ page: 0, pageSize: 25 });
+    expect(mockedFetchProgressions).toHaveBeenLastCalledWith({
+      page: 0,
+      pageSize: 25,
+      filters: {
+        query: '',
+        visibility: 'ALL',
+      },
+    });
     expect(result.current.details).toBeNull();
     expect(result.current.detailsOpen).toBe(false);
   });

@@ -3,6 +3,7 @@
 import { FormEvent, useCallback, useDeferredValue, useEffect, useMemo, useState } from 'react';
 import type {
   AdminUser,
+  AdminProgressionFilters,
   AdminUserFilters,
   AdminUserRow,
   AdminUserSummary,
@@ -29,6 +30,11 @@ const DEFAULT_USER_FILTERS: AdminUserFilters = {
   overrideState: 'ALL',
 };
 
+const DEFAULT_PROGRESSION_FILTERS: AdminProgressionFilters = {
+  query: '',
+  visibility: 'ALL',
+};
+
 export default function useAdminDashboard() {
   const [user, setUser] = useState<AdminUser | null>(null);
   const [isSessionLoading, setIsSessionLoading] = useState(true);
@@ -36,6 +42,9 @@ export default function useAdminDashboard() {
 
   const [rows, setRows] = useState<ProgressionRow[]>([]);
   const [total, setTotal] = useState(0);
+  const [progressionFilters, setProgressionFilters] = useState<AdminProgressionFilters>(
+    DEFAULT_PROGRESSION_FILTERS,
+  );
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState(25);
   const [isTableLoading, setIsTableLoading] = useState(false);
@@ -65,7 +74,16 @@ export default function useAdminDashboard() {
   const [isSubmittingLogin, setIsSubmittingLogin] = useState(false);
 
   const canDelete = user?.role === 'ADMIN';
+  const deferredProgressionQuery = useDeferredValue(progressionFilters.query);
   const deferredUserQuery = useDeferredValue(userFilters.query);
+
+  const effectiveProgressionFilters = useMemo(
+    () => ({
+      ...progressionFilters,
+      query: deferredProgressionQuery.trim(),
+    }),
+    [deferredProgressionQuery, progressionFilters],
+  );
 
   const effectiveUserFilters = useMemo(
     () => ({
@@ -73,6 +91,11 @@ export default function useAdminDashboard() {
       query: deferredUserQuery.trim(),
     }),
     [deferredUserQuery, userFilters],
+  );
+
+  const hasActiveProgressionFilters = useMemo(
+    () => progressionFilters.query.trim().length > 0 || progressionFilters.visibility !== 'ALL',
+    [progressionFilters],
   );
 
   const hasActiveUserFilters = useMemo(
@@ -135,7 +158,11 @@ export default function useAdminDashboard() {
       setTableError(null);
 
       try {
-        const data = await fetchProgressions({ page: nextPage, pageSize: nextPageSize });
+        const data = await fetchProgressions({
+          page: nextPage,
+          pageSize: nextPageSize,
+          filters: effectiveProgressionFilters,
+        });
 
         setRows(data.items);
         setTotal(data.total);
@@ -145,7 +172,7 @@ export default function useAdminDashboard() {
         setIsTableLoading(false);
       }
     },
-    [page, pageSize, user],
+    [effectiveProgressionFilters, page, pageSize, user],
   );
 
   const loadUsers = useCallback(
@@ -216,6 +243,7 @@ export default function useAdminDashboard() {
     setUser(null);
     setRows([]);
     setTotal(0);
+    setProgressionFilters({ ...DEFAULT_PROGRESSION_FILTERS });
     setUserRows([]);
     setUserTotal(0);
     setUserFilters({ ...DEFAULT_USER_FILTERS });
@@ -271,6 +299,19 @@ export default function useAdminDashboard() {
     setPage(0);
   };
 
+  const handleProgressionFiltersChange = (nextFilters: Partial<AdminProgressionFilters>) => {
+    setProgressionFilters((currentFilters) => ({
+      ...currentFilters,
+      ...nextFilters,
+    }));
+    setPage(0);
+  };
+
+  const handleResetProgressionFilters = () => {
+    setProgressionFilters({ ...DEFAULT_PROGRESSION_FILTERS });
+    setPage(0);
+  };
+
   const handleUsersPageSizeChange = (nextPageSize: number) => {
     setUserPageSize(nextPageSize);
     setUserPage(0);
@@ -315,6 +356,7 @@ export default function useAdminDashboard() {
     authError,
     rows,
     total,
+    progressionFilters,
     page,
     pageSize,
     isTableLoading,
@@ -337,6 +379,7 @@ export default function useAdminDashboard() {
     canDelete,
     tableLabel,
     usersTableLabel,
+    hasActiveProgressionFilters,
     hasActiveUserFilters,
     setEmail,
     setPassword,
@@ -348,6 +391,8 @@ export default function useAdminDashboard() {
     handleOpenDetails,
     handleDelete,
     handlePageSizeChange,
+    handleProgressionFiltersChange,
+    handleResetProgressionFilters,
     handleUsersPageSizeChange,
     handleUserFiltersChange,
     handleResetUserFilters,

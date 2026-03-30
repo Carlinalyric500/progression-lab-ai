@@ -17,6 +17,7 @@ export default function AdminDashboardClient() {
     authError,
     rows,
     total,
+    progressionFilters,
     page,
     pageSize,
     isTableLoading,
@@ -39,6 +40,7 @@ export default function AdminDashboardClient() {
     canDelete,
     tableLabel,
     usersTableLabel,
+    hasActiveProgressionFilters,
     hasActiveUserFilters,
     setEmail,
     setPassword,
@@ -50,6 +52,8 @@ export default function AdminDashboardClient() {
     handleOpenDetails,
     handleDelete,
     handlePageSizeChange,
+    handleProgressionFiltersChange,
+    handleResetProgressionFilters,
     handleUsersPageSizeChange,
     handleUserFiltersChange,
     handleResetUserFilters,
@@ -111,11 +115,15 @@ export default function AdminDashboardClient() {
           pageSize={pageSize}
           isLoading={isTableLoading}
           canDelete={canDelete}
+          filters={progressionFilters}
+          hasActiveFilters={hasActiveProgressionFilters}
           tableLabel={tableLabel}
           onView={(id) => void handleOpenDetails(id)}
           onDelete={(id) => void handleDelete(id)}
           onPageChange={setPage}
           onPageSizeChange={handlePageSizeChange}
+          onFiltersChange={handleProgressionFiltersChange}
+          onResetFilters={handleResetProgressionFilters}
         />
 
         <ProgressionDetailsDialog
