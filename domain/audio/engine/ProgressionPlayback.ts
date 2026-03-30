@@ -21,7 +21,7 @@ import { applyTransportTiming, buildTransportTiming } from './TransportTimingPol
 import { beginPlaybackSession } from './PlaybackSessionPolicy';
 import { schedulePlaybackCleanupTimeout } from './PlaybackCleanupTimeoutPolicy';
 import { triggerScheduledChordEvent } from './ScheduledChordEventPolicy';
-import { triggerChordByStyle } from './ChordTrigger';
+import { triggerOneShotChordEvent } from './OneShotChordEventPolicy';
 
 interface ProgressionPlaybackDeps {
   startAudio: () => Promise<void>;
@@ -103,24 +103,19 @@ export const createProgressionPlayback = (deps: ProgressionPlaybackDeps): Progre
 
     const lockedNotes = getLockedNotes({ leftHand, rightHand, octaveShift, inversionRegister });
 
-    if (lockedNotes.length > 0) {
-      const timingDelay = getTimingOffset({ humanize, symmetric: false });
-      const effectiveVelocity = toEffectiveVelocity({
-        velocity,
-        velocityJitter: getVelocityJitter(humanize),
-      });
-
-      triggerChordByStyle({
-        style: playbackStyle,
-        instrument: audioInstrument,
-        notes: lockedNotes,
-        duration: noteDuration,
-        startTime: timingDelay > 0 ? `+${timingDelay}` : undefined,
-        attack,
-        decay,
-        velocity: effectiveVelocity,
-      });
-    }
+    triggerOneShotChordEvent({
+      style: playbackStyle,
+      instrument: audioInstrument,
+      notes: lockedNotes,
+      duration: noteDuration,
+      attack,
+      decay,
+      velocity,
+      humanize,
+      getTimingOffset,
+      getVelocityJitter,
+      toEffectiveVelocity,
+    });
   };
 
   const playProgression = async (
