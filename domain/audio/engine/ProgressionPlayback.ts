@@ -19,6 +19,7 @@ import { applyChordPatternLifecyclePolicy } from './ChordPatternLifecyclePolicy'
 import { startPartPlayback } from './PartTransportPolicy';
 import { buildTransportTiming } from './TransportTimingPolicy';
 import { beginPlaybackSession } from './PlaybackSessionPolicy';
+import { schedulePlaybackCleanupTimeout } from './PlaybackCleanupTimeoutPolicy';
 import { triggerChordByStyle } from './ChordTrigger';
 
 interface ProgressionPlaybackDeps {
@@ -304,12 +305,12 @@ export const createProgressionPlayback = (deps: ProgressionPlaybackDeps): Progre
       part,
       barDurationSeconds,
       scheduleCleanup: (cleanupDelayMs) => {
-        const cleanupTimeout = setTimeout(() => {
-          stopAllAudio();
-        }, cleanupDelayMs);
-
-        const currentTimeouts = timeoutState.getScheduledPlaybackTimeouts();
-        timeoutState.setScheduledPlaybackTimeouts([...currentTimeouts, cleanupTimeout]);
+        schedulePlaybackCleanupTimeout({
+          cleanupDelayMs,
+          stopAllAudio,
+          getScheduledPlaybackTimeouts: timeoutState.getScheduledPlaybackTimeouts,
+          setScheduledPlaybackTimeouts: timeoutState.setScheduledPlaybackTimeouts,
+        });
       },
     });
 
