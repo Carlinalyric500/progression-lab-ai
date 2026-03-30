@@ -4,7 +4,7 @@ import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import BoltIcon from '@mui/icons-material/Bolt';
 import WorkspacePremiumIcon from '@mui/icons-material/WorkspacePremium';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import {
   Alert,
   Box,
@@ -25,8 +25,22 @@ import { createCsrfHeaders, ensureCsrfCookie } from '../../../lib/csrfClient';
 
 type CheckoutPlan = 'COMPOSER' | 'STUDIO';
 type BillingInterval = 'monthly' | 'yearly';
+type PublicPlan = 'SESSION' | 'COMPOSER' | 'STUDIO';
+
+type PricingTierConfig = {
+  plan: PublicPlan;
+  gptModel: string;
+  aiGenerationsPerMonth: number | null;
+  maxSavedProgressions: number | null;
+  maxSavedArrangements: number | null;
+  maxPublicShares: number | null;
+  canExportMidi: boolean;
+  canExportPdf: boolean;
+  canSharePublicly: boolean;
+};
 
 type PricingTier = {
+  plan: PublicPlan;
   name: string;
   priceMonthly: string;
   priceYearly: string;
@@ -41,6 +55,7 @@ type PricingTier = {
 
 const TIERS: PricingTier[] = [
   {
+    plan: 'SESSION',
     name: 'Session',
     priceMonthly: '$0',
     priceYearly: '$0',
@@ -56,6 +71,7 @@ const TIERS: PricingTier[] = [
     cta: 'Start free',
   },
   {
+    plan: 'COMPOSER',
     name: 'Composer',
     priceMonthly: '$9',
     priceYearly: '$90',
@@ -74,6 +90,7 @@ const TIERS: PricingTier[] = [
     checkoutPlan: 'COMPOSER',
   },
   {
+    plan: 'STUDIO',
     name: 'Studio',
     priceMonthly: '$19',
     priceYearly: '$190',
@@ -91,12 +108,96 @@ const TIERS: PricingTier[] = [
   },
 ];
 
+function formatLimit(limit: number | null, label: string) {
+  return limit === null ? `Unlimited ${label}` : `${limit} ${label}`;
+}
+
+function getExportFeature(config: PricingTierConfig): string {
+  if (config.canExportMidi && config.canExportPdf) {
+    return 'MIDI and PDF export';
+  }
+
+  if (config.canExportMidi) {
+    return 'MIDI export';
+  }
+
+  if (config.canExportPdf) {
+    return 'PDF export';
+  }
+
+  return 'No export tools';
+}
+
+function buildFeatures(baseFeatures: string[], config?: PricingTierConfig): string[] {
+  if (!config) {
+    return baseFeatures;
+  }
+
+  const features = [
+    formatLimit(config.aiGenerationsPerMonth, 'AI generations per month'),
+    formatLimit(config.maxSavedProgressions, 'saved progressions'),
+    formatLimit(config.maxSavedArrangements, 'saved arrangements'),
+    config.canSharePublicly
+      ? formatLimit(config.maxPublicShares, 'public shares')
+      : 'Public sharing disabled',
+    getExportFeature(config),
+  ];
+
+  if (config.plan === 'STUDIO') {
+    features.push(`AI model: ${config.gptModel}`);
+  }
+
+  return features;
+}
+
 export default function PricingPageContent() {
   const { isAuthenticated, isLoading } = useAuth();
   const { openAuthModal } = useAuthModal();
   const { showError } = useAppSnackbar();
   const [selectedInterval, setSelectedInterval] = useState<BillingInterval>('monthly');
   const [pendingPlan, setPendingPlan] = useState<CheckoutPlan | null>(null);
+  const [tierConfigs, setTierConfigs] = useState<Record<PublicPlan, PricingTierConfig> | null>(
+    null,
+  );
+
+  useEffect(() => {
+    const loadTierConfigs = async () => {
+      try {
+        const response = await fetch('/api/pricing-tier-configs', {
+          credentials: 'include',
+          cache: 'no-store',
+        });
+
+        if (!response.ok) {
+          return;
+        }
+
+        const body = (await response.json()) as { items: PricingTierConfig[] };
+        const byPlan = body.items.reduce(
+          (acc, item) => {
+            acc[item.plan] = item;
+            return acc;
+          },
+          {} as Record<PublicPlan, PricingTierConfig>,
+        );
+
+        setTierConfigs(byPlan);
+      } catch {
+        // Keep static fallback tiers if pricing config fetch fails.
+      }
+    };
+
+    void loadTierConfigs();
+  }, []);
+
+  const displayedTiers = useMemo(
+    () =>
+      TIERS.map((tier) => ({
+        ...tier,
+        features: buildFeatures(tier.features, tierConfigs?.[tier.plan]),
+      })),
+    [tierConfigs],
+  );
 
   const handleCheckout = async (plan: CheckoutPlan) => {
     if (!isAuthenticated) {
@@ -202,7 +303,7 @@ export default function PricingPageContent() {
             alignItems: 'stretch',
           }}
         >
-          {TIERS.map((tier) => {
+          {displayedTiers.map((tier) => {
             const price = selectedInterval === 'monthly' ? tier.priceMonthly : tier.priceYearly;
             return (
               <Card
