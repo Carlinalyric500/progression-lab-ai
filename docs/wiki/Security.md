@@ -18,6 +18,32 @@ Primary in-repo references:
 3. Apply migration and billing changes with explicit rollback plans.
 4. Track high-severity findings with owner and remediation status.
 
+## MFA and WebAuthn Policy
+
+- Admin dashboard enforces hardware MFA using WebAuthn.
+- `ADMIN` users must register a security key if one is not present, then use key auth at login.
+- `AUDITOR` users are required to complete key auth on admin login when they have enrolled credentials.
+- Main app users can optionally enroll WebAuthn credentials in Security settings.
+- Main app users with active credentials must complete key verification at login.
+
+## WebAuthn Configuration
+
+Main app required environment variables:
+
+- `WEBAUTHN_RP_ID`
+- `WEBAUTHN_RP_NAME`
+- `WEBAUTHN_ORIGIN`
+
+Admin dashboard also requires:
+
+- `ADMIN_WEBAUTHN_ORIGIN`
+
+Operational notes:
+
+- Origins must exactly match the deployed app origins.
+- Production WebAuthn origins must use HTTPS.
+- RP ID must be valid for the target origin domain.
+
 ## Deployment Security
 
 For release-time controls, use:

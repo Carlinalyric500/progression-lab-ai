@@ -28,6 +28,25 @@ ProgressionLab turns harmonic intent into playable music. Describe a mood, style
 - Sharing: public progression links via `shareId` pages.
 - Auth: session-based auth for protected actions while preserving a public browse flow.
 
+## MFA and Security Keys
+
+- Admin dashboard uses WebAuthn hardware MFA.
+- `ADMIN` users are required to enroll and use a security key for login.
+- `AUDITOR` users are prompted for key auth when they have enrolled credentials.
+- Main app users can enroll and manage WebAuthn credentials from Settings > Security.
+- Main app login requires key verification when an account has active WebAuthn credentials.
+- Sensitive settings routes (`/settings/security`, `/settings/billing`) require an active session and redirect to `/auth` when logged out.
+
+Required WebAuthn environment variables:
+
+- `WEBAUTHN_RP_ID`
+- `WEBAUTHN_RP_NAME`
+- `WEBAUTHN_ORIGIN`
+
+Admin dashboard additionally requires:
+
+- `ADMIN_WEBAUTHN_ORIGIN`
+
 ## Separate Admin Deployment
 
 This repository includes a standalone admin app in [admin-dashboard](admin-dashboard) that is deployed independently from the main app.
