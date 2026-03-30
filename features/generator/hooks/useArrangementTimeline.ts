@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 
 import type { ArrangementEvent, ArrangementTimeline } from '../../../lib/types';
-import { generateId } from '../components/chordGridUtils';
-import type { ChordGridEntry } from '../components/chordGridTypes';
+import { generateId } from '../components/chord-grid/chordGridUtils';
+import type { ChordGridEntry } from '../components/chord-grid/chordGridTypes';
 
 type UseArrangementTimelineProps = {
   totalSteps: number;

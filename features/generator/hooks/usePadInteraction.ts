@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 
-import { TOUCH_LONG_PRESS_MS, TOUCH_MOVE_CANCEL_THRESHOLD_PX } from '../components/chordGridTypes';
-import type { ChordGridEntry } from '../components/chordGridTypes';
+import { TOUCH_LONG_PRESS_MS, TOUCH_MOVE_CANCEL_THRESHOLD_PX } from '../components/chord-grid/chordGridTypes';
+import type { ChordGridEntry } from '../components/chord-grid/chordGridTypes';
 import type { PlayEntryArg, PlayEntryOptions } from './useSequencerEngine';
 
 type UsePadInteractionProps = {

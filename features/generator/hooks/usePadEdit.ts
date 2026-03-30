@@ -7,8 +7,8 @@ import {
 } from '../../../domain/music/circleOfFifths';
 import type { CircleOfFifthsSuggestionMode } from '../../../domain/music/circleOfFifths';
 import { CHORD_OPTIONS } from '../../../lib/formOptions';
-import { PAD_TRIGGER_KEYS } from '../components/chordGridTypes';
-import type { ChordGridEntry } from '../components/chordGridTypes';
+import { PAD_TRIGGER_KEYS } from '../components/chord-grid/chordGridTypes';
+import type { ChordGridEntry } from '../components/chord-grid/chordGridTypes';
 
 type UsePadEditProps = {
   chords: ChordGridEntry[];

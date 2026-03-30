@@ -17,7 +17,7 @@ import {
   getProgressionAutoResetMs,
   usePlaybackToggle,
 } from '../../generator/hooks/usePlaybackToggle';
-import PlaybackToggleButton from '../../generator/components/PlaybackToggleButton';
+import PlaybackToggleButton from '../../generator/components/playback/PlaybackToggleButton';
 import { downloadSessionPdf } from '../../../lib/pdf';
 import { downloadProgressionMidi } from '../../../lib/midi';
 import { progressionToPdfOptions, getProgressionFileName } from '../utils/progressionDownloadUtils';

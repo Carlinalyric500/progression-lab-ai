@@ -1,5 +1,5 @@
 import { Suspense } from 'react';
-import GeneratorPageContent from '../features/generator/components/GeneratorPageContent';
+import GeneratorPageContent from '../features/generator/components/layout/GeneratorPageContent';
 import PageSuspenseFallback from '../components/ui/PageSuspenseFallback';
 
 export default function HomePage() {

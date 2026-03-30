@@ -6,13 +6,13 @@ import { LocaleProvider } from '../../components/providers/LocaleProvider';
 import AppThemeProvider from '../../components/providers/AppThemeProvider';
 import HomePage from '../page';
 
-jest.mock('../../features/generator/components/GuitarChordDiagram', () => {
+jest.mock('../../features/generator/components/diagrams/GuitarChordDiagram', () => {
   return function MockGuitarChordDiagram() {
     return <div data-testid="guitar-diagram" />;
   };
 });
 
-jest.mock('../../features/generator/components/PianoChordDiagram', () => {
+jest.mock('../../features/generator/components/diagrams/PianoChordDiagram', () => {
   return function MockPianoChordDiagram() {
     return <div data-testid="piano-diagram" />;
   };

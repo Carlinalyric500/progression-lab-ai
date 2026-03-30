@@ -4,9 +4,9 @@ import { playMetronomePulse, startAudio, stopAllAudio } from '../../../domain/au
 import type { TimeSignature } from '../../../domain/audio/audio';
 import type { ArrangementEvent } from '../../../lib/types';
 import { stopGlobalPlayback } from './usePlaybackToggle';
-import { STEPS_PER_BEAT, RECORDING_LEAD_IN_BARS } from '../components/chordGridTypes';
-import { getSchedulerNowMs } from '../components/chordGridUtils';
-import type { RecordingMode } from '../components/chordGridTypes';
+import { STEPS_PER_BEAT, RECORDING_LEAD_IN_BARS } from '../components/chord-grid/chordGridTypes';
+import { getSchedulerNowMs } from '../components/chord-grid/chordGridUtils';
+import type { RecordingMode } from '../components/chord-grid/chordGridTypes';
 
 export type PlayEntryOptions = {
   stopBefore?: boolean;

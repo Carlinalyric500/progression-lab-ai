@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 
-import { isTypingTarget } from '../components/chordGridUtils';
-import type { ChordGridEntry } from '../components/chordGridTypes';
+import { isTypingTarget } from '../components/chord-grid/chordGridUtils';
+import type { ChordGridEntry } from '../components/chord-grid/chordGridTypes';
 
 type UseChordGridKeyboardProps = {
   open: boolean;
