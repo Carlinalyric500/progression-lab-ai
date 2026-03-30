@@ -25,6 +25,7 @@ import {
   inferFallbackDrumDurationBeats,
   normalizeTempoBpm,
 } from './engine/AudioMath';
+import { createAudioEngineRegistry, type AudioEngineScope } from './engine/AudioEngineRegistry';
 import { triggerChordByStyle } from './engine/ChordTrigger';
 import { loadDrumPattern, normalizeDrumPatternPath } from './engine/DrumPatternRepository';
 import { createMetronomeSynthBank } from './engine/MetronomeSynthBank';
@@ -1174,86 +1175,22 @@ export const createToneAudioEngine = (): AudioEngine => {
   };
 };
 
-let activeAudioEngine: AudioEngine | null = null;
+export type { AudioEngineScope };
 
-export type AudioEngineScope = {
-  engine: AudioEngine;
-  attach: () => void;
-  detach: () => void;
-  run: <T>(work: () => T) => T;
-  runAsync: <T>(work: () => Promise<T>) => Promise<T>;
-};
+const audioEngineRegistry = createAudioEngineRegistry(createToneAudioEngine);
 
-export const getAudioEngine = (): AudioEngine => {
-  if (!activeAudioEngine) {
-    activeAudioEngine = createToneAudioEngine();
-  }
-
-  return activeAudioEngine;
-};
+export const getAudioEngine = (): AudioEngine => audioEngineRegistry.getAudioEngine();
 
 export const setAudioEngine = (engine: AudioEngine): void => {
-  activeAudioEngine = engine;
+  audioEngineRegistry.setAudioEngine(engine);
 };
 
 export const resetAudioEngine = (): void => {
-  activeAudioEngine = null;
+  audioEngineRegistry.resetAudioEngine();
 };
 
-export const createAudioEngineScope = (
-  engine: AudioEngine = createToneAudioEngine(),
-): AudioEngineScope => {
-  let previousAttachedEngine: AudioEngine | null = null;
-  let isAttached = false;
-
-  const attach = (): void => {
-    previousAttachedEngine = activeAudioEngine;
-    isAttached = true;
-    setAudioEngine(engine);
-  };
-
-  const detach = (): void => {
-    if (!isAttached) {
-      return;
-    }
-
-    if (activeAudioEngine === engine) {
-      activeAudioEngine = previousAttachedEngine;
-    }
-
-    previousAttachedEngine = null;
-    isAttached = false;
-  };
-
-  const run = <T>(work: () => T): T => {
-    const previousEngine = activeAudioEngine;
-    activeAudioEngine = engine;
-
-    try {
-      return work();
-    } finally {
-      activeAudioEngine = previousEngine;
-    }
-  };
-
-  const runAsync = async <T>(work: () => Promise<T>): Promise<T> => {
-    const previousEngine = activeAudioEngine;
-    activeAudioEngine = engine;
-
-    try {
-      return await work();
-    } finally {
-      activeAudioEngine = previousEngine;
-    }
-  };
-
-  return {
-    engine,
-    attach,
-    detach,
-    run,
-    runAsync,
-  };
+export const createAudioEngineScope = (engine?: AudioEngine): AudioEngineScope => {
+  return audioEngineRegistry.createAudioEngineScope(engine);
 };
 
 export const setReverbWet = (wet: number): void => {
