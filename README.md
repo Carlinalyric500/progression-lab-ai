@@ -285,7 +285,14 @@ OPENAI_API_KEY=your_openai_api_key_here
 OPENAI_MODEL=gpt-4o
 DATABASE_URL=postgresql://postgres:postgres@localhost:5432/progression_lab
 AUTH_SECRET=      # generate with: openssl rand -base64 32
+WEBAUTHN_RP_ID=localhost
+WEBAUTHN_RP_NAME=ProgressionLab
+WEBAUTHN_ORIGIN=http://localhost:3000
+ADMIN_WEBAUTHN_ORIGIN=http://localhost:3010
 ```
+
+`WEBAUTHN_ORIGIN` should match the main app origin exactly, and `ADMIN_WEBAUTHN_ORIGIN`
+should match the admin dashboard origin exactly. In production both should be HTTPS origins.
 
 **3. Start the database**
 ```bash

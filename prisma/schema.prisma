@@ -41,6 +41,24 @@ enum UsageEventType {
   PDF_EXPORT
 }
 
+enum MfaPolicy {
+  NONE
+  OPTIONAL
+  REQUIRED_ADMIN
+}
+
+enum MfaEnrollmentState {
+  NONE
+  PENDING
+  ACTIVE
+}
+
+enum WebAuthnFlowType {
+  CUSTOMER_REGISTRATION
+  ADMIN_AUTHENTICATION
+  ADMIN_BOOTSTRAP_REGISTRATION
+}
+
 model User {
   id           String        @id @default(cuid())
   email        String        @unique
@@ -49,6 +67,11 @@ model User {
   role         UserRole      @default(USER)
   stripeCustomerId String?   @unique
   planOverride SubscriptionPlan?
+  mfaPolicy    MfaPolicy      @default(NONE)
+  mfaEnrollmentState MfaEnrollmentState @default(NONE)
+  mfaEnabledAt DateTime?
+  lastMfaVerifiedAt DateTime?
+  mfaBypassUntil DateTime?
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
 
@@ -58,6 +81,43 @@ model User {
   usageEvents  UsageEvent[]
   adminAuditLogs AdminAuditLog[]
   promptVersions PromptVersion[]
+  webauthnCredentials WebAuthnCredential[]
+  webauthnChallenges WebAuthnChallenge[]
+}
+
+model WebAuthnCredential {
+  id           String   @id @default(cuid())
+  userId       String
+  credentialId String   @unique
+  publicKey    String   @db.Text
+  counter      BigInt   @default(0)
+  deviceType   String?
+  backedUp     Boolean?
+  transports   String[] @default([])
+  label        String?
+  createdAt    DateTime @default(now())
+  lastUsedAt   DateTime?
+  revokedAt    DateTime?
+
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, revokedAt])
+}
+
+model WebAuthnChallenge {
+  id         String           @id @default(cuid())
+  userId     String
+  flowType   WebAuthnFlowType
+  challenge  String
+  expiresAt  DateTime
+  consumedAt DateTime?
+  metadata   Json?
+  createdAt  DateTime         @default(now())
+
+  user       User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, flowType])
+  @@index([expiresAt])
 }
 
 model Subscription {
