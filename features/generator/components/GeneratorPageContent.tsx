@@ -73,6 +73,12 @@ type ResultSectionConfig = {
   render: (isCollapsibleLayout: boolean) => React.ReactNode;
 };
 
+function isAbortError(error: unknown): boolean {
+  return error instanceof DOMException
+    ? error.name === 'AbortError'
+    : (error as { name?: string })?.name === 'AbortError';
+}
+
 function getRandomInt(min: number, max: number): number {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
@@ -184,7 +190,15 @@ export default function GeneratorPageContent() {
   const [visibleStructureSuggestionsCount, setVisibleStructureSuggestionsCount] = useState(0);
   const autoRandomizedOnFirstLoad = useRef(false);
   const progressiveRevealTimerRef = useRef<number | null>(null);
+  const inFlightRequestControllerRef = useRef<AbortController | null>(null);
   const { showError } = useAppSnackbar();
+
+  useEffect(
+    () => () => {
+      inFlightRequestControllerRef.current?.abort();
+    },
+    [],
+  );
 
   const handleLoadArrangement = useCallback(
     (arrangement: Arrangement) => {
@@ -426,12 +440,17 @@ export default function GeneratorPageContent() {
       return;
     }
 
+    inFlightRequestControllerRef.current?.abort();
+    const controller = new AbortController();
+    inFlightRequestControllerRef.current = controller;
+
     setLoading(true);
 
     try {
       const response = await fetch('/api/chord-suggestions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        signal: controller.signal,
         body: JSON.stringify({
           seedChords: formData.seedChords
             .split(',')
@@ -455,12 +474,19 @@ export default function GeneratorPageContent() {
       setData(json);
       cacheGeneratorResult(formData, json);
     } catch (err) {
+      if (isAbortError(err)) {
+        return;
+      }
+
       console.error(err);
       const errorMessage = t('errors.requestFailed');
       setError(errorMessage);
       showError(errorMessage);
     } finally {
-      setLoading(false);
+      if (inFlightRequestControllerRef.current === controller) {
+        inFlightRequestControllerRef.current = null;
+        setLoading(false);
+      }
     }
   };
 

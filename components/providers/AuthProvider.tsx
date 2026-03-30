@@ -1,6 +1,14 @@
 'use client';
 
-import { createContext, useContext, useEffect, useState, ReactNode, useCallback } from 'react';
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  ReactNode,
+  useCallback,
+  useRef,
+} from 'react';
 
 import { createCsrfHeaders } from '../../lib/csrfClient';
 
@@ -26,6 +34,12 @@ type AuthContextType = {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 const AUTH_CACHE_KEY = 'auth_cache_v1';
 
+function isAbortError(error: unknown): boolean {
+  return error instanceof DOMException
+    ? error.name === 'AbortError'
+    : (error as { name?: string })?.name === 'AbortError';
+}
+
 // Global flag to track if auth has been initialized
 let authInitialized = false;
 
@@ -36,13 +50,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const refreshControllerRef = useRef<AbortController | null>(null);
 
   const refresh = useCallback(async () => {
+    refreshControllerRef.current?.abort();
+    const controller = new AbortController();
+    refreshControllerRef.current = controller;
+
     try {
       const response = await fetch('/api/auth/me', {
         cache: 'no-store',
         credentials: 'include',
+        signal: controller.signal,
       });
+
       if (response.ok) {
         const data = (await response.json()) as { user: User };
         setUser(data.user);
@@ -54,11 +75,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setUser(null);
         sessionStorage.setItem(AUTH_CACHE_KEY, JSON.stringify({ authenticated: false }));
       }
-    } catch {
+    } catch (error) {
+      if (isAbortError(error)) {
+        return;
+      }
+
       setIsAuthenticated(false);
       setUser(null);
+    } finally {
+      if (refreshControllerRef.current === controller) {
+        refreshControllerRef.current = null;
+      }
     }
   }, []);
+
+  useEffect(
+    () => () => {
+      refreshControllerRef.current?.abort();
+    },
+    [],
+  );
 
   useEffect(() => {
     // Only run once per app initialization
@@ -79,7 +115,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     authInitialized = true;
-    let mounted = true;
+    const controller = new AbortController();
 
     const loadAuth = async () => {
       try {
@@ -87,16 +123,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const cached = sessionStorage.getItem(AUTH_CACHE_KEY);
         if (cached) {
           const parsedCache = JSON.parse(cached) as { user?: User; authenticated?: false };
-          if (mounted) {
-            if (parsedCache.user) {
-              setUser(parsedCache.user);
-              setIsAuthenticated(true);
-            } else {
-              setIsAuthenticated(false);
-              setUser(null);
-            }
-            setIsLoading(false);
+          if (parsedCache.user) {
+            setUser(parsedCache.user);
+            setIsAuthenticated(true);
+          } else {
+            setIsAuthenticated(false);
+            setUser(null);
           }
+          setIsLoading(false);
           return;
         }
 
@@ -104,33 +138,35 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const response = await fetch('/api/auth/me', {
           cache: 'no-store',
           credentials: 'include',
+          signal: controller.signal,
         });
-        if (mounted) {
-          if (response.ok) {
-            const data = (await response.json()) as { user: User };
-            setUser(data.user);
-            setIsAuthenticated(true);
-            sessionStorage.setItem(AUTH_CACHE_KEY, JSON.stringify(data));
-          } else {
-            setIsAuthenticated(false);
-            setUser(null);
-            sessionStorage.setItem(AUTH_CACHE_KEY, JSON.stringify({ authenticated: false }));
-          }
-          setIsLoading(false);
-        }
-      } catch {
-        if (mounted) {
+
+        if (response.ok) {
+          const data = (await response.json()) as { user: User };
+          setUser(data.user);
+          setIsAuthenticated(true);
+          sessionStorage.setItem(AUTH_CACHE_KEY, JSON.stringify(data));
+        } else {
           setIsAuthenticated(false);
           setUser(null);
-          setIsLoading(false);
+          sessionStorage.setItem(AUTH_CACHE_KEY, JSON.stringify({ authenticated: false }));
         }
+        setIsLoading(false);
+      } catch (error) {
+        if (isAbortError(error)) {
+          return;
+        }
+
+        setIsAuthenticated(false);
+        setUser(null);
+        setIsLoading(false);
       }
     };
 
     loadAuth();
 
     return () => {
-      mounted = false;
+      controller.abort();
     };
   }, []);
 

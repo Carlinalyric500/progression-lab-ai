@@ -14,7 +14,7 @@ async function readErrorMessage(response: Response, fallback: string) {
   }
 }
 
-export async function createArrangement(payload: CreateArrangementRequest) {
+export async function createArrangement(payload: CreateArrangementRequest, signal?: AbortSignal) {
   await ensureCsrfCookie();
   const response = await fetch('/api/arrangements', {
     method: 'POST',
@@ -22,6 +22,7 @@ export async function createArrangement(payload: CreateArrangementRequest) {
       'Content-Type': 'application/json',
     }),
     body: JSON.stringify(payload),
+    signal,
   });
 
   if (!response.ok) {
@@ -31,8 +32,8 @@ export async function createArrangement(payload: CreateArrangementRequest) {
   return response.json();
 }
 
-export async function getMyArrangements() {
-  const response = await fetch('/api/arrangements');
+export async function getMyArrangements(signal?: AbortSignal) {
+  const response = await fetch('/api/arrangements', { signal });
 
   if (!response.ok) {
     throw new Error(await readErrorMessage(response, 'Failed to fetch arrangements'));
@@ -41,8 +42,8 @@ export async function getMyArrangements() {
   return response.json();
 }
 
-export async function getArrangement(id: string) {
-  const response = await fetch(`/api/arrangements/${id}`);
+export async function getArrangement(id: string, signal?: AbortSignal) {
+  const response = await fetch(`/api/arrangements/${id}`, { signal });
 
   if (!response.ok) {
     throw new Error(await readErrorMessage(response, 'Failed to fetch arrangement'));
@@ -51,7 +52,11 @@ export async function getArrangement(id: string) {
   return response.json();
 }
 
-export async function updateArrangement(id: string, payload: UpdateArrangementRequest) {
+export async function updateArrangement(
+  id: string,
+  payload: UpdateArrangementRequest,
+  signal?: AbortSignal,
+) {
   await ensureCsrfCookie();
   const response = await fetch(`/api/arrangements/${id}`, {
     method: 'PUT',
@@ -59,6 +64,7 @@ export async function updateArrangement(id: string, payload: UpdateArrangementRe
       'Content-Type': 'application/json',
     }),
     body: JSON.stringify(payload),
+    signal,
   });
 
   if (!response.ok) {
@@ -68,11 +74,12 @@ export async function updateArrangement(id: string, payload: UpdateArrangementRe
   return response.json();
 }
 
-export async function deleteArrangement(id: string) {
+export async function deleteArrangement(id: string, signal?: AbortSignal) {
   await ensureCsrfCookie();
   const response = await fetch(`/api/arrangements/${id}`, {
     method: 'DELETE',
     headers: createCsrfHeaders(),
+    signal,
   });
 
   if (!response.ok) {
@@ -80,8 +87,8 @@ export async function deleteArrangement(id: string) {
   }
 }
 
-export async function getSharedArrangement(shareId: string) {
-  const response = await fetch(`/api/shared-arrangements/${shareId}`);
+export async function getSharedArrangement(shareId: string, signal?: AbortSignal) {
+  const response = await fetch(`/api/shared-arrangements/${shareId}`, { signal });
 
   if (!response.ok) {
     throw new Error(await readErrorMessage(response, 'Failed to fetch shared arrangement'));
