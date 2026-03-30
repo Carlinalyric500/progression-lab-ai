@@ -93,6 +93,7 @@ export const createToneAudioEngine = (): AudioEngine => {
       applyTiming: (timing) => applyTransportTiming(Tone.Transport, timing),
       start: () => Tone.Transport.start(),
     },
+    createPart: (cb, evts) => new Tone.Part(cb, evts),
   });
 
   const { playChordVoicing, playProgression, playChordPattern } = progressionPlayback;

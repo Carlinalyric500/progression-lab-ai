@@ -1,13 +1,14 @@
 import * as Tone from 'tone';
 import { applyTransportStopPolicy } from './TransportStopPolicy';
+import type { SchedulablePart } from './AudioTimelineState';
 
 export type StopAllAudioParams = {
   scheduledPlaybackTimeouts: ReturnType<typeof setTimeout>[];
   setScheduledPlaybackTimeouts: (timeouts: ReturnType<typeof setTimeout>[]) => void;
   activeMetronomePulseTimeouts: ReturnType<typeof setTimeout>[];
   setActiveMetronomePulseTimeouts: (timeouts: ReturnType<typeof setTimeout>[]) => void;
-  activePart: Tone.Part | null;
-  setActivePart: (part: Tone.Part | null) => void;
+  activePart: SchedulablePart | null;
+  setActivePart: (part: SchedulablePart | null) => void;
   metronomeLoop: Tone.Loop | null;
   setMetronomeLoop: (loop: Tone.Loop | null) => void;
   setMetronomeClickBeat: (beat: number) => void;

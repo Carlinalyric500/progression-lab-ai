@@ -1,4 +1,5 @@
-import * as Tone from 'tone';
+import type * as Tone from 'tone';
+import type { SchedulablePart } from './AudioTimelineState';
 import type {
   MetronomeSource,
   PlayChordVoicingParams,
@@ -37,8 +38,8 @@ interface ProgressionPlaybackDeps {
     drumPath: string | null,
   ) => void;
   partState: {
-    getActivePart: () => Tone.Part | null;
-    setActivePart: (part: Tone.Part | null) => void;
+    getActivePart: () => SchedulablePart | null;
+    setActivePart: (part: SchedulablePart | null) => void;
   };
   timeoutState: {
     getScheduledPlaybackTimeouts: () => ReturnType<typeof setTimeout>[];
@@ -48,6 +49,7 @@ interface ProgressionPlaybackDeps {
     applyTiming: (timing: TransportTiming) => void;
     start: () => void;
   };
+  createPart: <T>(callback: (time: number, event: T) => void, events: T[]) => SchedulablePart;
 }
 
 interface ProgressionPlayback {
@@ -73,6 +75,7 @@ export const createProgressionPlayback = (deps: ProgressionPlaybackDeps): Progre
     partState,
     timeoutState,
     transportControl,
+    createPart,
   } = deps;
 
   const {
@@ -171,7 +174,7 @@ export const createProgressionPlayback = (deps: ProgressionPlaybackDeps): Progre
       chordDurationSeconds,
     });
 
-    const part = new Tone.Part<{
+    const part = createPart<{
       time: number;
       voicing: ProgressionVoicing;
       velocityScale: number;
@@ -284,7 +287,7 @@ export const createProgressionPlayback = (deps: ProgressionPlaybackDeps): Progre
       singleBeatSeconds,
     });
 
-    const part = new Tone.Part<{ time: number; velocityScale: number }>((time, event) => {
+    const part = createPart<{ time: number; velocityScale: number }>((time, event) => {
       triggerScheduledChordEvent({
         style: playbackStyle,
         instrument: audioInstrument,

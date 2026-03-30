@@ -1,12 +1,20 @@
-import * as Tone from 'tone';
+import type * as Tone from 'tone';
+
+export type SchedulablePart = {
+  start: (time: number) => void;
+  loop: boolean;
+  loopStart: number;
+  loopEnd: number;
+  dispose: () => void;
+};
 
 export type AudioTimelineState = {
   getScheduledPlaybackTimeouts: () => ReturnType<typeof setTimeout>[];
   setScheduledPlaybackTimeouts: (timeouts: ReturnType<typeof setTimeout>[]) => void;
   getActiveMetronomePulseTimeouts: () => ReturnType<typeof setTimeout>[];
   setActiveMetronomePulseTimeouts: (timeouts: ReturnType<typeof setTimeout>[]) => void;
-  getActivePart: () => Tone.Part | null;
-  setActivePart: (part: Tone.Part | null) => void;
+  getActivePart: () => SchedulablePart | null;
+  setActivePart: (part: SchedulablePart | null) => void;
   getMetronomeLoop: () => Tone.Loop | null;
   setMetronomeLoop: (loop: Tone.Loop | null) => void;
   getMetronomeClickBeat: () => number;
@@ -16,7 +24,7 @@ export type AudioTimelineState = {
 export const createAudioTimelineState = (): AudioTimelineState => {
   let scheduledPlaybackTimeouts: ReturnType<typeof setTimeout>[] = [];
   let activeMetronomePulseTimeouts: ReturnType<typeof setTimeout>[] = [];
-  let activePart: Tone.Part | null = null;
+  let activePart: SchedulablePart | null = null;
   let metronomeLoop: Tone.Loop | null = null;
   let metronomeClickBeat = 0;
 
