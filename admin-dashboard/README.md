@@ -16,7 +16,7 @@ Standalone Next.js admin application for ProgressionLab.
 1. Install dependencies:
 
 ```bash
-yarn --cwd admin-dashboard install
+make -C admin-dashboard install
 ```
 
 2. Copy env file:
@@ -28,13 +28,13 @@ cp admin-dashboard/.env.local.example admin-dashboard/.env.local
 3. Generate Prisma client for admin app:
 
 ```bash
-yarn admin:db:generate
+make admin-db-generate
 ```
 
 4. Seed a local ADMIN user:
 
 ```bash
-yarn admin:seed
+make db-seed
 ```
 
 Default local credentials:
@@ -51,7 +51,7 @@ Optional overrides:
 5. Start admin app:
 
 ```bash
-yarn admin:dev
+make admin-dev
 ```
 
 Or from inside the admin-dashboard directory:
@@ -59,6 +59,8 @@ Or from inside the admin-dashboard directory:
 ```bash
 make dev
 ```
+
+Prefer `make` targets from the repository root for consistency across main and admin workflows.
 
 Admin app runs at `http://localhost:3010`.
 

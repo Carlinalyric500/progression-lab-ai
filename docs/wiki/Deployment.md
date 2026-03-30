@@ -10,10 +10,10 @@ Main and admin applications are deployed independently.
 ## Production Sequence
 
 ```bash
-npx prisma generate
-npx prisma migrate deploy
-yarn build
+make build
 ```
+
+`make build` preserves the production sequence: Prisma generate, Prisma migrate deploy, and app build.
 
 ## Operational Checks
 
