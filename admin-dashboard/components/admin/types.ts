@@ -1,4 +1,6 @@
 export type Role = 'ADMIN' | 'AUDITOR';
+export type SubscriptionPlan = 'SESSION' | 'COMPOSER' | 'STUDIO' | 'COMP';
+export type UserRole = 'ADMIN' | 'AUDITOR' | 'USER';
 
 export type AdminUser = {
   id: string;
@@ -37,4 +39,19 @@ export type ProgressionDetail = {
   createdAt: string;
   updatedAt: string;
   owner: ProgressionOwner;
+};
+
+export type AdminUserRow = {
+  id: string;
+  email: string;
+  name: string | null;
+  role: UserRole;
+  resolvedPlan: SubscriptionPlan;
+  planOverride: SubscriptionPlan | null;
+  subscriptionStatus: string | null;
+  billingInterval: string | null;
+  aiGenerationsUsed: number;
+  aiGenerationsLimit: number | null;
+  createdAt: string;
+  updatedAt: string;
 };

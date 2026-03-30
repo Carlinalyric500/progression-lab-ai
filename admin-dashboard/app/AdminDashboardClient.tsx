@@ -6,6 +6,7 @@ import LoadingState from '../components/admin/LoadingState';
 import LoginCard from '../components/admin/LoginCard';
 import ProgressionDetailsDialog from '../components/admin/ProgressionDetailsDialog';
 import ProgressionsTable from '../components/admin/ProgressionsTable';
+import UsersTable from '../components/admin/UsersTable';
 import useAdminDashboard from '../components/admin/useAdminDashboard';
 
 export default function AdminDashboardClient() {
@@ -19,6 +20,13 @@ export default function AdminDashboardClient() {
     pageSize,
     isTableLoading,
     tableError,
+    userRows,
+    userTotal,
+    userPage,
+    userPageSize,
+    isUsersLoading,
+    usersError,
+    updatingUserId,
     detailsOpen,
     detailsLoading,
     details,
@@ -27,15 +35,19 @@ export default function AdminDashboardClient() {
     isSubmittingLogin,
     canDelete,
     tableLabel,
+    usersTableLabel,
     setEmail,
     setPassword,
     setPage,
+    setUserPage,
     setDetailsOpen,
     handleLogin,
     handleLogout,
     handleOpenDetails,
     handleDelete,
     handlePageSizeChange,
+    handleUsersPageSizeChange,
+    handlePlanOverrideChange,
   } = useAdminDashboard();
 
   if (isSessionLoading) {
@@ -62,6 +74,23 @@ export default function AdminDashboardClient() {
         <DashboardHeader user={user} onLogout={() => void handleLogout()} />
 
         {tableError ? <Alert severity="error">{tableError}</Alert> : null}
+        {usersError ? <Alert severity="error">{usersError}</Alert> : null}
+
+        <UsersTable
+          rows={userRows}
+          total={userTotal}
+          page={userPage}
+          pageSize={userPageSize}
+          isLoading={isUsersLoading}
+          tableLabel={usersTableLabel}
+          canEditPlanOverride={user.role === 'ADMIN'}
+          updatingUserId={updatingUserId}
+          onPageChange={setUserPage}
+          onPageSizeChange={handleUsersPageSizeChange}
+          onPlanOverrideChange={(userId, planOverride) =>
+            void handlePlanOverrideChange(userId, planOverride)
+          }
+        />
 
         <ProgressionsTable
           rows={rows}

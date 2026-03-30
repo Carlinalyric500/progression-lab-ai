@@ -1,4 +1,10 @@
-import type { AdminUser, ProgressionDetail, ProgressionRow } from './types';
+import type {
+  AdminUser,
+  AdminUserRow,
+  ProgressionDetail,
+  ProgressionRow,
+  SubscriptionPlan,
+} from './types';
 
 import { createCsrfHeaders } from '../../lib/csrfClient';
 
@@ -90,5 +96,45 @@ export async function deleteProgression(id: string): Promise<void> {
 
   if (!response.ok) {
     throw new Error(await readErrorMessage(response, 'Failed to delete progression'));
+  }
+}
+
+export async function fetchUsers(params: {
+  page: number;
+  pageSize: number;
+}): Promise<{ items: AdminUserRow[]; total: number }> {
+  const searchParams = new URLSearchParams({
+    page: String(params.page + 1),
+    pageSize: String(params.pageSize),
+  });
+
+  const response = await fetch(`/api/users?${searchParams.toString()}`, {
+    credentials: 'include',
+    cache: 'no-store',
+  });
+
+  if (!response.ok) {
+    throw new Error(await readErrorMessage(response, 'Failed to fetch users'));
+  }
+
+  return (await response.json()) as {
+    items: AdminUserRow[];
+    total: number;
+  };
+}
+
+export async function updateUserPlanOverride(params: {
+  userId: string;
+  planOverride: SubscriptionPlan | null;
+}): Promise<void> {
+  const response = await fetch(`/api/users/${params.userId}`, {
+    method: 'PATCH',
+    credentials: 'include',
+    headers: createCsrfHeaders({ 'Content-Type': 'application/json' }),
+    body: JSON.stringify({ planOverride: params.planOverride }),
+  });
+
+  if (!response.ok) {
+    throw new Error(await readErrorMessage(response, 'Failed to update plan override'));
   }
 }

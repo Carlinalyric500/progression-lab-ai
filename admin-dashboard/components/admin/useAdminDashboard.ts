@@ -1,14 +1,22 @@
 'use client';
 
 import { FormEvent, useCallback, useEffect, useMemo, useState } from 'react';
-import type { AdminUser, ProgressionDetail, ProgressionRow } from './types';
+import type {
+  AdminUser,
+  AdminUserRow,
+  ProgressionDetail,
+  ProgressionRow,
+  SubscriptionPlan,
+} from './types';
 import {
   deleteProgression,
+  fetchUsers,
   fetchProgressionDetails,
   fetchProgressions,
   fetchSession,
   login,
   logout,
+  updateUserPlanOverride,
 } from './adminApi';
 
 export default function useAdminDashboard() {
@@ -22,6 +30,14 @@ export default function useAdminDashboard() {
   const [pageSize, setPageSize] = useState(25);
   const [isTableLoading, setIsTableLoading] = useState(false);
   const [tableError, setTableError] = useState<string | null>(null);
+
+  const [userRows, setUserRows] = useState<AdminUserRow[]>([]);
+  const [userTotal, setUserTotal] = useState(0);
+  const [userPage, setUserPage] = useState(0);
+  const [userPageSize, setUserPageSize] = useState(25);
+  const [isUsersLoading, setIsUsersLoading] = useState(false);
+  const [usersError, setUsersError] = useState<string | null>(null);
+  const [updatingUserId, setUpdatingUserId] = useState<string | null>(null);
 
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [detailsLoading, setDetailsLoading] = useState(false);
@@ -42,6 +58,16 @@ export default function useAdminDashboard() {
     const to = Math.min(total, from + rows.length - 1);
     return `${from}-${to} of ${total}`;
   }, [page, pageSize, rows.length, total]);
+
+  const usersTableLabel = useMemo(() => {
+    if (userTotal === 0) {
+      return 'No users';
+    }
+
+    const from = userPage * userPageSize + 1;
+    const to = Math.min(userTotal, from + userRows.length - 1);
+    return `${from}-${to} of ${userTotal}`;
+  }, [userPage, userPageSize, userRows.length, userTotal]);
 
   const loadSession = useCallback(async () => {
     setIsSessionLoading(true);
@@ -86,6 +112,28 @@ export default function useAdminDashboard() {
     [page, pageSize, user],
   );
 
+  const loadUsers = useCallback(
+    async (nextPage = userPage, nextPageSize = userPageSize) => {
+      if (!user) {
+        return;
+      }
+
+      setIsUsersLoading(true);
+      setUsersError(null);
+
+      try {
+        const data = await fetchUsers({ page: nextPage, pageSize: nextPageSize });
+        setUserRows(data.items);
+        setUserTotal(data.total);
+      } catch (error) {
+        setUsersError((error as Error).message);
+      } finally {
+        setIsUsersLoading(false);
+      }
+    },
+    [user, userPage, userPageSize],
+  );
+
   useEffect(() => {
     void loadSession();
   }, [loadSession]);
@@ -97,6 +145,14 @@ export default function useAdminDashboard() {
 
     void loadProgressions();
   }, [loadProgressions, user, page, pageSize]);
+
+  useEffect(() => {
+    if (!user) {
+      return;
+    }
+
+    void loadUsers();
+  }, [loadUsers, user, userPage, userPageSize]);
 
   const handleLogin = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -119,6 +175,8 @@ export default function useAdminDashboard() {
     setUser(null);
     setRows([]);
     setTotal(0);
+    setUserRows([]);
+    setUserTotal(0);
     setDetails(null);
     setDetailsOpen(false);
   };
@@ -165,6 +223,31 @@ export default function useAdminDashboard() {
     setPage(0);
   };
 
+  const handleUsersPageSizeChange = (nextPageSize: number) => {
+    setUserPageSize(nextPageSize);
+    setUserPage(0);
+  };
+
+  const handlePlanOverrideChange = async (
+    targetUserId: string,
+    planOverride: SubscriptionPlan | null,
+  ) => {
+    if (user?.role !== 'ADMIN') {
+      return;
+    }
+
+    setUpdatingUserId(targetUserId);
+
+    try {
+      await updateUserPlanOverride({ userId: targetUserId, planOverride });
+      await loadUsers();
+    } catch (error) {
+      setUsersError((error as Error).message);
+    } finally {
+      setUpdatingUserId(null);
+    }
+  };
+
   return {
     user,
     isSessionLoading,
@@ -175,6 +258,13 @@ export default function useAdminDashboard() {
     pageSize,
     isTableLoading,
     tableError,
+    userRows,
+    userTotal,
+    userPage,
+    userPageSize,
+    isUsersLoading,
+    usersError,
+    updatingUserId,
     detailsOpen,
     detailsLoading,
     details,
@@ -183,14 +273,18 @@ export default function useAdminDashboard() {
     isSubmittingLogin,
     canDelete,
     tableLabel,
+    usersTableLabel,
     setEmail,
     setPassword,
     setPage,
+    setUserPage,
     setDetailsOpen,
     handleLogin,
     handleLogout,
     handleOpenDetails,
     handleDelete,
     handlePageSizeChange,
+    handleUsersPageSizeChange,
+    handlePlanOverrideChange,
   };
 }
