@@ -8,13 +8,16 @@ import type {
   ProgressionVoicing,
 } from '../audioEngine';
 import {
-  getPadPatternBeats,
-  TIME_SIGNATURE_BEATS_PER_BAR,
   TIME_SIGNATURE_NUMERATOR,
 } from '../../music/padPattern';
 import type { TimeSignature } from '../../music/padPattern';
-import { CHORD_BEATS, applyGate, getChordDurationSeconds, normalizeTempoBpm } from './AudioMath';
+import { applyGate, getChordDurationSeconds, normalizeTempoBpm } from './AudioMath';
 import { createProgressionPlaybackPolicies } from './ProgressionPlaybackPolicies';
+import {
+  buildChordPatternScheduledEvents,
+  buildProgressionScheduledEvents,
+  getBarDurationSeconds,
+} from './ProgressionSchedulingPolicy';
 import { triggerChordByStyle } from './ChordTrigger';
 
 interface ProgressionPlaybackDeps {
@@ -155,18 +158,13 @@ export const createProgressionPlayback = (deps: ProgressionPlaybackDeps): Progre
     const noteDuration = applyGate(chordDurationSeconds, gate);
     const totalDurationSeconds = voicings.length * chordDurationSeconds;
 
-    // Only use pattern beats that fall within each chord's time slot (CHORD_BEATS wide)
-    const patternBeats = getPadPatternBeats(padPattern, timeSignature).filter(
-      (beat) => beat.offsetBeats < CHORD_BEATS,
-    );
-
-    const events = voicings.flatMap((voicing, index) =>
-      patternBeats.map((beat) => ({
-        time: index * chordDurationSeconds + beat.offsetBeats * singleBeatSeconds,
-        voicing,
-        velocityScale: beat.velocityScale,
-      })),
-    );
+    const events = buildProgressionScheduledEvents({
+      voicings,
+      padPattern,
+      timeSignature,
+      singleBeatSeconds,
+      chordDurationSeconds,
+    });
 
     const part = new Tone.Part<{
       time: number;
@@ -265,8 +263,7 @@ export const createProgressionPlayback = (deps: ProgressionPlaybackDeps): Progre
     const singleBeatSeconds = 60 / normalizedTempo;
     const chordDurSeconds = getChordDurationSeconds(normalizedTempo);
     const noteDuration = gate !== 1 ? applyGate(chordDurSeconds, gate) : chordDurSeconds;
-    const beatsPerBar = TIME_SIGNATURE_BEATS_PER_BAR[timeSignature];
-    const barDurationSeconds = beatsPerBar * singleBeatSeconds;
+    const barDurationSeconds = getBarDurationSeconds(timeSignature, singleBeatSeconds);
 
     const lockedNotes = getLockedNotes({ leftHand, rightHand, octaveShift, inversionRegister });
 
@@ -274,11 +271,11 @@ export const createProgressionPlayback = (deps: ProgressionPlaybackDeps): Progre
       return;
     }
 
-    const patternBeats = getPadPatternBeats(padPattern, timeSignature);
-    const events = patternBeats.map((beat) => ({
-      time: beat.offsetBeats * singleBeatSeconds,
-      velocityScale: beat.velocityScale,
-    }));
+    const events = buildChordPatternScheduledEvents({
+      padPattern,
+      timeSignature,
+      singleBeatSeconds,
+    });
 
     const part = new Tone.Part<{ time: number; velocityScale: number }>((time, event) => {
       const timingDelay = getTimingOffset({ humanize, symmetric: false });
