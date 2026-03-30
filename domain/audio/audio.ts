@@ -5,6 +5,7 @@ import { createEffectsChain } from './engine/EffectsChain';
 import { createEffectsControl } from './engine/EffectsControl';
 import { createAudioEngineRegistry, type AudioEngineScope } from './engine/AudioEngineRegistry';
 import { createAudioFacade } from './engine/AudioFacade';
+import { createAudioTimelineState } from './engine/AudioTimelineState';
 import { createMetronomePlayback } from './engine/MetronomePlayback';
 import { createMetronomeSynthBank } from './engine/MetronomeSynthBank';
 import { createProgressionPlayback } from './engine/ProgressionPlayback';
@@ -27,11 +28,7 @@ export type { PadPattern, TimeSignature } from '../music/padPattern';
 export { PAD_PATTERN_LABELS, TIME_SIGNATURE_LABELS } from '../music/padPattern';
 
 export const createToneAudioEngine = (): AudioEngine => {
-  let scheduledPlaybackTimeouts: ReturnType<typeof setTimeout>[] = [];
-  let activePart: Tone.Part | null = null;
-  let metronomeLoop: Tone.Loop | null = null;
-  let metronomeClickBeat = 0;
-  let activeMetronomePulseTimeouts: ReturnType<typeof setTimeout>[] = [];
+  const timelineState = createAudioTimelineState();
   const metronomeSynthBank = createMetronomeSynthBank();
   const effectsChain = createEffectsChain();
   const effectsControl = createEffectsControl(effectsChain);
@@ -50,25 +47,15 @@ export const createToneAudioEngine = (): AudioEngine => {
     const { pianoSampler, rhodesSampler } = samplerBank.getSamplerRefs();
 
     stopAllAudioPlayback({
-      scheduledPlaybackTimeouts,
-      setScheduledPlaybackTimeouts: (timeouts) => {
-        scheduledPlaybackTimeouts = timeouts;
-      },
-      activeMetronomePulseTimeouts,
-      setActiveMetronomePulseTimeouts: (timeouts) => {
-        activeMetronomePulseTimeouts = timeouts;
-      },
-      activePart,
-      setActivePart: (part) => {
-        activePart = part;
-      },
-      metronomeLoop,
-      setMetronomeLoop: (loop) => {
-        metronomeLoop = loop;
-      },
-      setMetronomeClickBeat: (beat) => {
-        metronomeClickBeat = beat;
-      },
+      scheduledPlaybackTimeouts: timelineState.getScheduledPlaybackTimeouts(),
+      setScheduledPlaybackTimeouts: timelineState.setScheduledPlaybackTimeouts,
+      activeMetronomePulseTimeouts: timelineState.getActiveMetronomePulseTimeouts(),
+      setActiveMetronomePulseTimeouts: timelineState.setActiveMetronomePulseTimeouts,
+      activePart: timelineState.getActivePart(),
+      setActivePart: timelineState.setActivePart,
+      metronomeLoop: timelineState.getMetronomeLoop(),
+      setMetronomeLoop: timelineState.setMetronomeLoop,
+      setMetronomeClickBeat: timelineState.setMetronomeClickBeat,
       pianoSampler,
       rhodesSampler,
       releaseMetronomeSynths: metronomeSynthBank.releaseAll,
@@ -81,18 +68,12 @@ export const createToneAudioEngine = (): AudioEngine => {
     normalizeDrumPatternPath,
     loadPattern: loadDrumPattern,
     loopState: {
-      getMetronomeLoop: () => metronomeLoop,
-      setMetronomeLoop: (loop) => {
-        metronomeLoop = loop;
-      },
-      getMetronomeClickBeat: () => metronomeClickBeat,
-      setMetronomeClickBeat: (beat) => {
-        metronomeClickBeat = beat;
-      },
-      getActiveMetronomePulseTimeouts: () => activeMetronomePulseTimeouts,
-      setActiveMetronomePulseTimeouts: (timeouts) => {
-        activeMetronomePulseTimeouts = timeouts;
-      },
+      getMetronomeLoop: timelineState.getMetronomeLoop,
+      setMetronomeLoop: timelineState.setMetronomeLoop,
+      getMetronomeClickBeat: timelineState.getMetronomeClickBeat,
+      setMetronomeClickBeat: timelineState.setMetronomeClickBeat,
+      getActiveMetronomePulseTimeouts: timelineState.getActiveMetronomePulseTimeouts,
+      setActiveMetronomePulseTimeouts: timelineState.setActiveMetronomePulseTimeouts,
     },
   });
 
@@ -105,16 +86,12 @@ export const createToneAudioEngine = (): AudioEngine => {
     ensurePianoSamplerLoaded,
     startMetronomeLoop,
     partState: {
-      getActivePart: () => activePart,
-      setActivePart: (part) => {
-        activePart = part;
-      },
+      getActivePart: timelineState.getActivePart,
+      setActivePart: timelineState.setActivePart,
     },
     timeoutState: {
-      getScheduledPlaybackTimeouts: () => scheduledPlaybackTimeouts,
-      setScheduledPlaybackTimeouts: (timeouts) => {
-        scheduledPlaybackTimeouts = timeouts;
-      },
+      getScheduledPlaybackTimeouts: timelineState.getScheduledPlaybackTimeouts,
+      setScheduledPlaybackTimeouts: timelineState.setScheduledPlaybackTimeouts,
     },
   });
 
