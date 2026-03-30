@@ -1,4 +1,4 @@
-import { buildTransportTiming } from '../TransportTimingPolicy';
+import { applyTransportTiming, buildTransportTiming } from '../TransportTimingPolicy';
 
 describe('TransportTimingPolicy', () => {
   it('normalizes tempo and maps time signature for transport', () => {
@@ -15,5 +15,21 @@ describe('TransportTimingPolicy', () => {
     expect(timing.normalizedTempo).toBe(100);
     expect(timing.transportTimeSignature).toBe(6);
     expect(timing.singleBeatSeconds).toBeCloseTo(0.6, 8);
+  });
+
+  it('applies computed timing to transport state', () => {
+    const transport = {
+      bpm: { value: 0 },
+      timeSignature: 0,
+    };
+
+    applyTransportTiming(transport, {
+      normalizedTempo: 132,
+      transportTimeSignature: 4,
+      singleBeatSeconds: 60 / 132,
+    });
+
+    expect(transport.bpm.value).toBe(132);
+    expect(transport.timeSignature).toBe(4);
   });
 });

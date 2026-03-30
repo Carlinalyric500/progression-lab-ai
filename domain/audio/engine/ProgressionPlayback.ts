@@ -17,7 +17,7 @@ import {
 } from './ProgressionSchedulingPolicy';
 import { applyChordPatternLifecyclePolicy } from './ChordPatternLifecyclePolicy';
 import { startPartPlayback } from './PartTransportPolicy';
-import { buildTransportTiming } from './TransportTimingPolicy';
+import { applyTransportTiming, buildTransportTiming } from './TransportTimingPolicy';
 import { beginPlaybackSession } from './PlaybackSessionPolicy';
 import { schedulePlaybackCleanupTimeout } from './PlaybackCleanupTimeoutPolicy';
 import { triggerChordByStyle } from './ChordTrigger';
@@ -153,8 +153,11 @@ export const createProgressionPlayback = (deps: ProgressionPlaybackDeps): Progre
       tempoBpm,
       timeSignature,
     });
-    Tone.Transport.bpm.value = normalizedTempo;
-    Tone.Transport.timeSignature = transportTimeSignature;
+    applyTransportTiming(Tone.Transport, {
+      normalizedTempo,
+      transportTimeSignature,
+      singleBeatSeconds,
+    });
     const chordDurationSeconds = getChordDurationSeconds(normalizedTempo);
     const noteDuration = applyGate(chordDurationSeconds, gate);
     const totalDurationSeconds = voicings.length * chordDurationSeconds;
@@ -262,8 +265,11 @@ export const createProgressionPlayback = (deps: ProgressionPlaybackDeps): Progre
       tempoBpm,
       timeSignature,
     });
-    Tone.Transport.bpm.value = normalizedTempo;
-    Tone.Transport.timeSignature = transportTimeSignature;
+    applyTransportTiming(Tone.Transport, {
+      normalizedTempo,
+      transportTimeSignature,
+      singleBeatSeconds,
+    });
     const chordDurSeconds = getChordDurationSeconds(normalizedTempo);
     const noteDuration = gate !== 1 ? applyGate(chordDurSeconds, gate) : chordDurSeconds;
     const barDurationSeconds = getBarDurationSeconds(timeSignature, singleBeatSeconds);

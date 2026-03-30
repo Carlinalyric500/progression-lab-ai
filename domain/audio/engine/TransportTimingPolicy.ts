@@ -13,6 +13,13 @@ export type TransportTiming = {
   singleBeatSeconds: number;
 };
 
+type TransportLike = {
+  bpm: {
+    value: number;
+  };
+  timeSignature: number;
+};
+
 export const buildTransportTiming = ({
   tempoBpm,
   timeSignature,
@@ -23,4 +30,12 @@ export const buildTransportTiming = ({
     transportTimeSignature: TIME_SIGNATURE_NUMERATOR[timeSignature],
     singleBeatSeconds: 60 / normalizedTempo,
   };
+};
+
+export const applyTransportTiming = (
+  transport: TransportLike,
+  timing: TransportTiming,
+): void => {
+  transport.bpm.value = timing.normalizedTempo;
+  transport.timeSignature = timing.transportTimeSignature;
 };
