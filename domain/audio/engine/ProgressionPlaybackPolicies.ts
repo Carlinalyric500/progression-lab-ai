@@ -1,13 +1,13 @@
-import type * as Tone from 'tone';
 import type { PlayChordVoicingParams } from '../audioEngine';
+import type { SamplerInstrument } from './SamplerBank';
 import { applyInversionLock, shiftNotesByOctaves } from './NoteTransforms';
 
 const MAX_HUMANIZE_TIMING_S = 0.05;
 const MAX_HUMANIZE_VELOCITY = 12;
 
 type ResolveInstrumentDeps = {
-  ensureRhodesSamplerLoaded: () => Promise<Tone.Sampler>;
-  ensurePianoSamplerLoaded: () => Promise<Tone.Sampler>;
+  ensureRhodesSamplerLoaded: () => Promise<SamplerInstrument>;
+  ensurePianoSamplerLoaded: () => Promise<SamplerInstrument>;
 };
 
 type GetLockedNotesParams = {
@@ -29,7 +29,9 @@ type ToEffectiveVelocityParams = {
 };
 
 export type ProgressionPlaybackPolicies = {
-  resolveInstrument: (instrument?: PlayChordVoicingParams['instrument']) => Promise<Tone.Sampler>;
+  resolveInstrument: (
+    instrument?: PlayChordVoicingParams['instrument'],
+  ) => Promise<SamplerInstrument>;
   getLockedNotes: (params: GetLockedNotesParams) => string[];
   getTimingOffset: (params: GetTimingOffsetParams) => number;
   getVelocityJitter: (humanize: number) => number;
@@ -42,7 +44,7 @@ export const createProgressionPlaybackPolicies = ({
 }: ResolveInstrumentDeps): ProgressionPlaybackPolicies => {
   const resolveInstrument = async (
     instrument: PlayChordVoicingParams['instrument'] = 'piano',
-  ): Promise<Tone.Sampler> => {
+  ): Promise<SamplerInstrument> => {
     if (instrument === 'rhodes') {
       return ensureRhodesSamplerLoaded();
     }

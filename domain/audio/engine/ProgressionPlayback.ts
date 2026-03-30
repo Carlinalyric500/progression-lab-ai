@@ -1,5 +1,5 @@
-import type * as Tone from 'tone';
 import type { SchedulablePart } from './AudioTimelineState';
+import type { SamplerInstrument } from './SamplerBank';
 import type {
   MetronomeSource,
   PlayChordVoicingParams,
@@ -27,8 +27,8 @@ import { triggerOneShotChordEvent } from './OneShotChordEventPolicy';
 interface ProgressionPlaybackDeps {
   startAudio: () => Promise<void>;
   stopAllAudio: () => void;
-  ensureRhodesSamplerLoaded: () => Promise<Tone.Sampler>;
-  ensurePianoSamplerLoaded: () => Promise<Tone.Sampler>;
+  ensureRhodesSamplerLoaded: () => Promise<SamplerInstrument>;
+  ensurePianoSamplerLoaded: () => Promise<SamplerInstrument>;
   startMetronomeLoop: (
     tempoBpm: number,
     timeSignature: TimeSignature,

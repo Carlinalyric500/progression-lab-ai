@@ -1,12 +1,13 @@
 import * as Tone from 'tone';
 import type { PlaybackStyle } from '../audioEngine';
+import type { SamplerInstrument } from './SamplerBank';
 import { normalizeVelocity } from './AudioMath';
 import { sortNotesLowToHigh } from './NoteTransforms';
 
 const STRUM_STEP_SECONDS = 0.025;
 
 type TriggerChordParams = {
-  instrument: Tone.Sampler;
+  instrument: SamplerInstrument;
   notes: string[];
   duration: Tone.Unit.Time;
   startTime?: Tone.Unit.Time;

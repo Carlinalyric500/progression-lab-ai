@@ -1,5 +1,6 @@
 import type * as Tone from 'tone';
 import type { PlaybackStyle } from '../audioEngine';
+import type { SamplerInstrument } from './SamplerBank';
 import { triggerChordByStyle } from './ChordTrigger';
 import { computeEffectiveVelocity, computeScheduledStartTime } from './ChordEventComputationPolicy';
 
@@ -11,7 +12,7 @@ type ScheduledChordVelocityParams = {
 
 type TriggerScheduledChordEventParams = {
   style: PlaybackStyle;
-  instrument: Tone.Sampler;
+  instrument: SamplerInstrument;
   notes: string[];
   duration: Tone.Unit.Time;
   eventTime: number;
