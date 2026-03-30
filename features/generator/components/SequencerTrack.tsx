@@ -1,12 +1,13 @@
 'use client';
 
-import type { PointerEvent as ReactPointerEvent } from 'react';
+import type { DragEvent as ReactDragEvent, PointerEvent as ReactPointerEvent } from 'react';
 
 import { Box, Typography, useMediaQuery } from '@mui/material';
 import { alpha, useTheme } from '@mui/material/styles';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
 import type { ArrangementEvent } from '../../../lib/types';
+import { readPadKeyFromDataTransfer } from './padDragPayload';
 
 type SequencerTrackProps = {
   currentStep: number;
@@ -20,12 +21,22 @@ type SequencerTrackProps = {
   scrollToStep?: number;
   scrollRequestKey?: number;
   events?: ArrangementEvent[];
+  /** Optional insertion cursor step for non-transport insert workflows. */
+  insertionCursorStep?: number | null;
+  /** Called when the user drags the insertion cursor to move it to a new step. */
+  onInsertionCursorMove?: (stepIndex: number) => void;
   /** The original (non-display-offset) stepIndex of the currently selected clip, or null. */
   selectedStepIndex?: number | null;
   /** Called when the user clicks a clip (sourceStepIndex) or the empty lane area (null). */
   onClipClick?: (sourceStepIndex: number | null) => void;
   /** Called when the user drag-moves a clip to a new quantized step. */
   onClipMove?: (sourceStepIndex: number, newStepIndex: number) => void;
+  /** Called when a chord pad is dropped onto the lane. */
+  onPadDropAtStep?: (padKey: string, stepIndex: number) => void;
+  /** Called when the user taps/clicks an empty lane position. */
+  onLaneClickStep?: (stepIndex: number) => void;
+  /** Optional helper text rendered when the timeline is empty. */
+  emptyTimelineHint?: string;
 };
 
 type RenderedClip = ArrangementEvent & {
@@ -84,9 +95,14 @@ export default function SequencerTrack({
   scrollToStep,
   scrollRequestKey,
   events = [],
+  insertionCursorStep = null,
+  onInsertionCursorMove,
   selectedStepIndex = null,
   onClipClick,
   onClipMove,
+  onPadDropAtStep,
+  onLaneClickStep,
+  emptyTimelineHint,
 }: SequencerTrackProps) {
   const theme = useTheme();
   const isCompactLabels = useMediaQuery(theme.breakpoints.down('sm'));
@@ -103,6 +119,9 @@ export default function SequencerTrack({
   const [viewportWidth, setViewportWidth] = useState(0);
   const dragSourceStepRef = useRef<number | null>(null);
   const [dragGhostStep, setDragGhostStep] = useState<number | null>(null);
+  const [padDropPreviewStep, setPadDropPreviewStep] = useState<number | null>(null);
+  const cursorDragStartRef = useRef<{ x: number; step: number } | null>(null);
+  const cursorDragThresholdPx = 5;
   const stepsPerBeat = stepsPerBar / beatsPerBar;
   const normalizedLeadInBars = Math.max(0, leadInBars);
   const leadInSteps = normalizedLeadInBars * stepsPerBar;
@@ -130,6 +149,7 @@ export default function SequencerTrack({
   const laneColor = isDarkMode ? '#242A31' : '#E7ECF2';
   const labelColor = alpha(theme.palette.common.white, isDarkMode ? 0.92 : 0.5);
   const metaColor = alpha(theme.palette.common.white, isDarkMode ? 0.45 : 0.4);
+  const insertionCursorColor = appColors.accent.chordPadEditBorder;
   const loopSummary = `${loopLengthBars} bar${loopLengthBars === 1 ? '' : 's'}`;
 
   const stepDelta = displayCurrentStep - previousStepRef.current;
@@ -267,6 +287,54 @@ export default function SequencerTrack({
     };
   }, [isCenteredOverlayActive, isPlaying, maxScrollLeft, playheadAnchorPx, stepDurationMs]);
 
+  useEffect(() => {
+    if (!cursorDragStartRef.current) {
+      return;
+    }
+
+    const dragStart = cursorDragStartRef.current;
+    let isDragging = false;
+
+    const handlePointerMove = (moveEvent: Event) => {
+      if (!(moveEvent instanceof PointerEvent)) {
+        return;
+      }
+
+      const deltaX = moveEvent.clientX - dragStart.x;
+      const distance = Math.abs(deltaX);
+
+      if (!isDragging && distance < cursorDragThresholdPx) {
+        return;
+      }
+
+      if (!isDragging) {
+        isDragging = true;
+      }
+
+      const deltaPx = moveEvent.clientX - dragStart.x;
+      const deltaSteps = Math.round(deltaPx / PIXELS_PER_STEP);
+      const nextStep = Math.max(0, Math.min(totalSteps - 1, dragStart.step + deltaSteps));
+      onInsertionCursorMove?.(nextStep);
+    };
+
+    const handlePointerUp = () => {
+      window.removeEventListener('pointermove', handlePointerMove);
+      window.removeEventListener('pointerup', handlePointerUp);
+      window.removeEventListener('pointercancel', handlePointerUp);
+      cursorDragStartRef.current = null;
+    };
+
+    window.addEventListener('pointermove', handlePointerMove, false);
+    window.addEventListener('pointerup', handlePointerUp, false);
+    window.addEventListener('pointercancel', handlePointerUp, false);
+
+    return () => {
+      window.removeEventListener('pointermove', handlePointerMove);
+      window.removeEventListener('pointerup', handlePointerUp);
+      window.removeEventListener('pointercancel', handlePointerUp);
+    };
+  }, [onInsertionCursorMove, totalSteps]);
+
   const bars = useMemo(
     () =>
       Array.from({ length: normalizedLeadInBars + loopLengthBars }, (_, index) => ({
@@ -389,8 +457,20 @@ export default function SequencerTrack({
 
     return sortedEntries.map(([stepIndex, stepEvents], index) => {
       const nextStepIndex = sortedEntries[index + 1]?.[0] ?? totalSteps;
-      const spanSteps = Math.max(1, nextStepIndex - stepIndex);
       const [firstEvent] = stepEvents;
+      const explicitDurationSteps = stepEvents.reduce<number | null>((current, event) => {
+        if (!Number.isFinite(event.durationSteps)) {
+          return current;
+        }
+
+        const normalized = Math.max(1, Math.floor(event.durationSteps ?? 1));
+        if (current === null) {
+          return normalized;
+        }
+
+        return Math.max(current, normalized);
+      }, null);
+      const spanSteps = explicitDurationSteps ?? Math.max(1, nextStepIndex - stepIndex);
       const uniqueChordNames = [...new Set(stepEvents.map((stepEvent) => stepEvent.chord))];
       const label =
         uniqueChordNames.length <= 2
@@ -546,6 +626,60 @@ export default function SequencerTrack({
     window.addEventListener('pointermove', handleMove, { passive: false });
     window.addEventListener('pointerup', handleUp, { passive: false });
     window.addEventListener('pointercancel', handleUp, { passive: false });
+  };
+
+  const getLaneStepFromClientX = (clientX: number, lane: HTMLDivElement): number => {
+    const rect = lane.getBoundingClientRect();
+    const relativeX = Math.max(0, clientX - rect.left);
+    const displayStep = Math.floor(relativeX / PIXELS_PER_STEP);
+    return Math.max(0, Math.min(totalSteps - 1, displayStep - leadInSteps));
+  };
+
+  const handleLaneDragOver = (event: ReactDragEvent<HTMLDivElement>) => {
+    // Always prevent default first to allow drops
+    event.preventDefault();
+    event.dataTransfer.dropEffect = 'copy';
+
+    // Now validate that we want this drop
+    if (isPlaying || !onPadDropAtStep) {
+      return;
+    }
+
+    // Check for valid pad data
+    const padKey = readPadKeyFromDataTransfer(event.dataTransfer);
+    if (!padKey) {
+      // No valid pad data, but still consumed the drag
+      return;
+    }
+
+    // Show preview of where the drop would land
+    const nextStep = getLaneStepFromClientX(event.clientX, event.currentTarget);
+    setPadDropPreviewStep(nextStep);
+  };
+
+  const handleLaneDragLeave = (event: ReactDragEvent<HTMLDivElement>) => {
+    if (event.currentTarget.contains(event.relatedTarget as Node | null)) {
+      return;
+    }
+
+    setPadDropPreviewStep(null);
+  };
+
+  const handleLaneDrop = (event: ReactDragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    setPadDropPreviewStep(null);
+
+    if (isPlaying || !onPadDropAtStep) {
+      return;
+    }
+
+    const padKey = readPadKeyFromDataTransfer(event.dataTransfer);
+    if (!padKey) {
+      return;
+    }
+
+    const stepIndex = getLaneStepFromClientX(event.clientX, event.currentTarget);
+    onPadDropAtStep(padKey, stepIndex);
   };
 
   return (
@@ -769,8 +903,13 @@ export default function SequencerTrack({
                   height: LANE_HEIGHT,
                   backgroundColor: laneColor,
                 }}
+                onDragOver={handleLaneDragOver}
+                onDragLeave={handleLaneDragLeave}
+                onDrop={handleLaneDrop}
+                aria-label="Chord timeline lane"
                 onClick={(e) => {
                   if (e.target === e.currentTarget) {
+                    onLaneClickStep?.(getLaneStepFromClientX(e.clientX, e.currentTarget));
                     onClipClick?.(null);
                   }
                 }}
@@ -865,6 +1004,76 @@ export default function SequencerTrack({
                     );
                   })()}
 
+                {padDropPreviewStep !== null ? (
+                  <Box
+                    sx={{
+                      position: 'absolute',
+                      left: (padDropPreviewStep + leadInSteps) * PIXELS_PER_STEP + 1,
+                      top: laneTop,
+                      width: Math.max(28, PIXELS_PER_STEP - 2),
+                      height: CLIP_HEIGHT,
+                      borderRadius: 0.5,
+                      border: `2px dashed ${alpha(playheadColor, 0.72)}`,
+                      backgroundColor: alpha(playheadColor, 0.18),
+                      zIndex: 5,
+                      pointerEvents: 'none',
+                    }}
+                  />
+                ) : null}
+
+                {insertionCursorStep !== null ? (
+                  <Box
+                    aria-label={`Insertion cursor at step ${insertionCursorStep + 1}`}
+                    onPointerDown={(e) => {
+                      if (isPlaying) return;
+                      e.preventDefault();
+                      cursorDragStartRef.current = { x: e.clientX, step: insertionCursorStep };
+                    }}
+                    sx={{
+                      position: 'absolute',
+                      left: (insertionCursorStep + leadInSteps) * PIXELS_PER_STEP - 8,
+                      top: 0,
+                      bottom: 0,
+                      width: 18,
+                      backgroundColor: 'transparent',
+                      zIndex: 7,
+                      cursor: 'grab',
+                      '&:active': {
+                        cursor: 'grabbing',
+                      },
+                    }}
+                  >
+                    <Box
+                      sx={{
+                        position: 'absolute',
+                        left: '50%',
+                        top: 0,
+                        bottom: 0,
+                        width: 2,
+                        transform: 'translateX(-50%)',
+                        backgroundColor: insertionCursorColor,
+                        boxShadow: `0 0 0 1px ${alpha(insertionCursorColor, 0.2)}, 0 0 12px ${alpha(insertionCursorColor, 0.32)}`,
+                        pointerEvents: 'none',
+                      }}
+                    >
+                      <Box
+                        sx={{
+                          position: 'absolute',
+                          top: 6,
+                          left: '50%',
+                          width: 0,
+                          height: 0,
+                          borderLeft: '5px solid transparent',
+                          borderRight: '5px solid transparent',
+                          borderTop: `7px solid ${insertionCursorColor}`,
+                          transform: 'translateX(-50%)',
+                          pointerEvents: 'none',
+                        }}
+                      />
+                    </Box>
+                  </Box>
+                ) : null}
+
                 {clips.length === 0 ? (
                   <Box
                     sx={{
@@ -891,7 +1100,8 @@ export default function SequencerTrack({
                         letterSpacing: 0.2,
                       }}
                     >
-                      Record chords to place regions on the timeline
+                      {emptyTimelineHint ??
+                        'Drag pads or record chords to place regions on the timeline'}
                     </Typography>
                   </Box>
                 ) : null}
