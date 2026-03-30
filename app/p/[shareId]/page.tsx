@@ -15,7 +15,7 @@ import {
   getProgressionAutoResetMs,
   usePlaybackToggle,
 } from '../../../features/generator/hooks/usePlaybackToggle';
-import PlaybackToggleButton from '../../../features/generator/components/PlaybackToggleButton';
+import PlaybackToggleButton from '../../../features/generator/components/playback/PlaybackToggleButton';
 import PageSuspenseFallback from '../../../components/ui/PageSuspenseFallback';
 
 type SharedProgressionResource = {
