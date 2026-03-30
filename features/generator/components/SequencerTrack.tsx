@@ -21,6 +21,8 @@ type SequencerTrackProps = {
   scrollToStep?: number;
   scrollRequestKey?: number;
   events?: ArrangementEvent[];
+  /** Optional insertion cursor step for non-transport insert workflows. */
+  insertionCursorStep?: number | null;
   /** The original (non-display-offset) stepIndex of the currently selected clip, or null. */
   selectedStepIndex?: number | null;
   /** Called when the user clicks a clip (sourceStepIndex) or the empty lane area (null). */
@@ -91,6 +93,7 @@ export default function SequencerTrack({
   scrollToStep,
   scrollRequestKey,
   events = [],
+  insertionCursorStep = null,
   selectedStepIndex = null,
   onClipClick,
   onClipMove,
@@ -141,6 +144,7 @@ export default function SequencerTrack({
   const laneColor = isDarkMode ? '#242A31' : '#E7ECF2';
   const labelColor = alpha(theme.palette.common.white, isDarkMode ? 0.92 : 0.5);
   const metaColor = alpha(theme.palette.common.white, isDarkMode ? 0.45 : 0.4);
+  const insertionCursorColor = appColors.accent.chordPadEditBorder;
   const loopSummary = `${loopLengthBars} bar${loopLengthBars === 1 ? '' : 's'}`;
 
   const stepDelta = displayCurrentStep - previousStepRef.current;
@@ -962,6 +966,37 @@ export default function SequencerTrack({
                       pointerEvents: 'none',
                     }}
                   />
+                ) : null}
+
+                {insertionCursorStep !== null ? (
+                  <Box
+                    aria-label={`Insertion cursor at step ${insertionCursorStep + 1}`}
+                    sx={{
+                      position: 'absolute',
+                      left: (insertionCursorStep + leadInSteps) * PIXELS_PER_STEP,
+                      top: 0,
+                      bottom: 0,
+                      width: 2,
+                      backgroundColor: insertionCursorColor,
+                      boxShadow: `0 0 0 1px ${alpha(insertionCursorColor, 0.2)}, 0 0 12px ${alpha(insertionCursorColor, 0.32)}`,
+                      zIndex: 6,
+                      pointerEvents: 'none',
+                    }}
+                  >
+                    <Box
+                      sx={{
+                        position: 'absolute',
+                        top: 6,
+                        left: '50%',
+                        width: 0,
+                        height: 0,
+                        borderLeft: '5px solid transparent',
+                        borderRight: '5px solid transparent',
+                        borderTop: `7px solid ${insertionCursorColor}`,
+                        transform: 'translateX(-50%)',
+                      }}
+                    />
+                  </Box>
                 ) : null}
 
                 {clips.length === 0 ? (

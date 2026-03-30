@@ -92,6 +92,7 @@ const RECORDING_LEAD_IN_BARS = 1;
 const TOUCH_LONG_PRESS_MS = 360;
 const TOUCH_MOVE_CANCEL_THRESHOLD_PX = 14;
 const LOOP_LENGTH_OPTIONS = [1, 2, 3, 4, 5, 6, 7, 8] as const;
+type RecordingMode = 'continuous' | 'single-shot';
 const PAD_TRIGGER_KEYS = [
   '1',
   '2',
@@ -289,6 +290,7 @@ export default function GeneratedChordGridDialog({
   const [hasInitializedAudio, setHasInitializedAudio] = useState(false);
   const [isCountInActive, setIsCountInActive] = useState(false);
   const [isLoopEnabled, setIsLoopEnabled] = useState(true);
+  const [recordingMode, setRecordingMode] = useState<RecordingMode>('continuous');
   const [loopLengthBars, setLoopLengthBars] = useState<(typeof LOOP_LENGTH_OPTIONS)[number]>(1);
   const [currentStep, setCurrentStep] = useState(0);
   const [trackScrollRequestKey, setTrackScrollRequestKey] = useState(0);
@@ -296,6 +298,7 @@ export default function GeneratedChordGridDialog({
   const [saveArrangementDialogOpen, setSaveArrangementDialogOpen] = useState(false);
   const [selectedStepIndex, setSelectedStepIndex] = useState<number | null>(null);
   const [mobileTimelineInsertPadKey, setMobileTimelineInsertPadKey] = useState<string | null>(null);
+  const [singleShotCursorStep, setSingleShotCursorStep] = useState<number | null>(null);
   const activePadTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
   const sequencerTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const countInTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -400,6 +403,7 @@ export default function GeneratedChordGridDialog({
     setIsRecording(false);
     setIsSequencerPlaying(false);
     setIsCountInActive(false);
+    setSingleShotCursorStep(null);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pendingLoad?.key]);
 
@@ -432,6 +436,8 @@ export default function GeneratedChordGridDialog({
     setSelectedStepIndex(null);
     setCofFocusPadKey(null);
     setMobileTimelineInsertPadKey(null);
+    setSingleShotCursorStep(null);
+    setRecordingMode('continuous');
     setHasInitializedAudio(false);
     clearMobilePadLongPressTimer();
   }, [open]);
@@ -683,6 +689,10 @@ export default function GeneratedChordGridDialog({
   };
 
   const handleRecordToggle = () => {
+    if (recordingMode === 'single-shot') {
+      return;
+    }
+
     if (!hasInitializedAudio) {
       return;
     }
@@ -844,13 +854,23 @@ export default function GeneratedChordGridDialog({
     };
 
     setArrangementEvents((previous) => {
-      const filtered = previous.filter(
-        (candidate) =>
-          !(candidate.stepIndex === event.stepIndex && candidate.padKey === event.padKey),
-      );
+      const filtered = previous.filter((candidate) => candidate.stepIndex !== event.stepIndex);
       return [...filtered, event].sort((a, b) => a.stepIndex - b.stepIndex);
     });
     setSelectedStepIndex(boundedStepIndex);
+  };
+
+  const insertManualEventAtStep = (
+    entry: ChordGridEntry,
+    stepIndex: number,
+    options?: { durationSteps?: number },
+  ) => {
+    if (isSequencerPlaying || isCountInActive) {
+      return false;
+    }
+
+    insertArrangementEvent(entry, stepIndex, options);
+    return true;
   };
 
   const onPadPress = (entry: ChordGridEntry) => {
@@ -869,6 +889,15 @@ export default function GeneratedChordGridDialog({
     }
 
     triggerPad(entry);
+
+    if (recordingMode === 'single-shot') {
+      if (singleShotCursorStep === null) {
+        return;
+      }
+
+      insertManualEventAtStep(entry, singleShotCursorStep, { durationSteps: 1 });
+      return;
+    }
 
     if (isRecording) {
       const stepIndex = Math.min(currentStepRef.current, Math.max(0, totalSteps - 1));
@@ -945,7 +974,20 @@ export default function GeneratedChordGridDialog({
     }
 
     triggerPad(entry);
-    insertArrangementEvent(entry, stepIndex, { durationSteps: 1 });
+    insertManualEventAtStep(entry, stepIndex, { durationSteps: 1 });
+  };
+
+  const handleLaneClickStep = (stepIndex: number) => {
+    if (mobileTimelineInsertPadKey) {
+      handleMobileTimelineInsert(stepIndex);
+      return;
+    }
+
+    if (recordingMode !== 'single-shot' || isSequencerPlaying || isCountInActive) {
+      return;
+    }
+
+    setSingleShotCursorStep(stepIndex);
   };
 
   handleSequencerPlayToggleRef.current = handleSequencerPlayToggle;
@@ -1201,14 +1243,18 @@ export default function GeneratedChordGridDialog({
             />
             <Tooltip
               title={
-                isCountInActive
-                  ? t('ui.chordGrid.countInTooltip', {
-                      current: currentBeatInBar,
-                      total: beatsPerBar,
+                recordingMode === 'single-shot'
+                  ? t('ui.chordGrid.recordDisabledInSingleShot', {
+                      defaultValue: 'Switch to Continuous mode to use live recording.',
                     })
-                  : isRecording
-                    ? t('ui.chordGrid.stopRecording')
-                    : t('ui.chordGrid.recordArrangement')
+                  : isCountInActive
+                    ? t('ui.chordGrid.countInTooltip', {
+                        current: currentBeatInBar,
+                        total: beatsPerBar,
+                      })
+                    : isRecording
+                      ? t('ui.chordGrid.stopRecording')
+                      : t('ui.chordGrid.recordArrangement')
               }
             >
               <span>
@@ -1225,13 +1271,67 @@ export default function GeneratedChordGridDialog({
                         : t('ui.chordGrid.recordArrangement')
                   }
                   onClick={handleRecordToggle}
-                  disabled={!hasInitializedAudio}
+                  disabled={!hasInitializedAudio || recordingMode === 'single-shot'}
                   sx={getTransportIconButtonSx(isRecording || isCountInActive, 'error')}
                 >
                   <FiberManualRecordIcon fontSize="small" />
                 </IconButton>
               </span>
             </Tooltip>
+            <ToggleButtonGroup
+              exclusive
+              size="small"
+              value={recordingMode}
+              onChange={(_event, mode: RecordingMode | null) => {
+                if (!mode) {
+                  return;
+                }
+
+                setRecordingMode(mode);
+                if (mode === 'continuous') {
+                  setSingleShotCursorStep(null);
+                  return;
+                }
+
+                setIsRecording(false);
+                if (singleShotCursorStep === null) {
+                  setSingleShotCursorStep(Math.max(0, Math.min(totalSteps - 1, currentStep)));
+                }
+              }}
+              aria-label={t('ui.chordGrid.recordingModeLabel', {
+                defaultValue: 'Recording mode',
+              })}
+              sx={{
+                '& .MuiToggleButton-root': {
+                  textTransform: 'none',
+                  px: 0.9,
+                  py: 0.5,
+                  fontWeight: 600,
+                  fontSize: { xs: '0.67rem', sm: '0.72rem' },
+                },
+              }}
+            >
+              <ToggleButton
+                value="continuous"
+                aria-label={t('ui.chordGrid.recordingModeContinuous', {
+                  defaultValue: 'Continuous recording',
+                })}
+              >
+                {t('ui.chordGrid.recordingModeContinuous', {
+                  defaultValue: 'Continuous',
+                })}
+              </ToggleButton>
+              <ToggleButton
+                value="single-shot"
+                aria-label={t('ui.chordGrid.recordingModeSingleShot', {
+                  defaultValue: 'Single-shot recording',
+                })}
+              >
+                {t('ui.chordGrid.recordingModeSingleShot', {
+                  defaultValue: 'Single-shot',
+                })}
+              </ToggleButton>
+            </ToggleButtonGroup>
             <Tooltip
               title={isLoopEnabled ? t('ui.chordGrid.disableLoop') : t('ui.chordGrid.enableLoop')}
             >
@@ -1413,6 +1513,20 @@ export default function GeneratedChordGridDialog({
             {arrangementEvents.length === 1
               ? t('ui.chordGrid.eventSingular', { count: arrangementEvents.length })
               : t('ui.chordGrid.eventPlural', { count: arrangementEvents.length })}
+            {recordingMode === 'single-shot' ? (
+              <>
+                {' '}
+                •{' '}
+                {singleShotCursorStep === null
+                  ? t('ui.chordGrid.singleShotCursorUnset', {
+                      defaultValue: 'Single-shot: click timeline to place cursor',
+                    })
+                  : t('ui.chordGrid.singleShotCursorSet', {
+                      defaultValue: 'Single-shot cursor: step {{step}}',
+                      step: singleShotCursorStep + 1,
+                    })}
+              </>
+            ) : null}
           </Typography>
         </Box>
 
@@ -1429,12 +1543,13 @@ export default function GeneratedChordGridDialog({
           scrollToStep={showRecordingLeadIn ? stepsPerBar * RECORDING_LEAD_IN_BARS : 0}
           scrollRequestKey={trackScrollRequestKey}
           events={arrangementEvents}
+          insertionCursorStep={recordingMode === 'single-shot' ? singleShotCursorStep : null}
           selectedStepIndex={selectedStepIndex}
           onClipClick={(sourceStepIndex) => {
             setSelectedStepIndex((prev) => (prev === sourceStepIndex ? null : sourceStepIndex));
           }}
           onClipMove={moveClipStep}
-          onLaneClickStep={handleMobileTimelineInsert}
+          onLaneClickStep={handleLaneClickStep}
           onPadDropAtStep={(padKey, stepIndex) => {
             const entry = editableChords.find((candidate) => candidate.key === padKey);
             if (!entry) {
@@ -1446,7 +1561,7 @@ export default function GeneratedChordGridDialog({
             }
 
             triggerPad(entry);
-            insertArrangementEvent(entry, stepIndex, { durationSteps: 1 });
+            insertManualEventAtStep(entry, stepIndex, { durationSteps: 1 });
             setMobileTimelineInsertPadKey(null);
           }}
           emptyTimelineHint={t('ui.chordGrid.dragOrRecordHint', {
@@ -1485,6 +1600,15 @@ export default function GeneratedChordGridDialog({
               {t('ui.buttons.cancel', { defaultValue: 'Cancel' })}
             </Button>
           </Box>
+        ) : null}
+
+        {recordingMode === 'single-shot' ? (
+          <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 1.25 }}>
+            {t('ui.chordGrid.singleShotHint', {
+              defaultValue:
+                'Single-shot mode: place the timeline cursor, then tap pads to insert. Insertion is paused while playback runs.',
+            })}
+          </Typography>
         ) : null}
 
         {selectedStepIndex !== null && isMobile ? (

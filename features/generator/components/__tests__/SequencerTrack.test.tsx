@@ -185,4 +185,12 @@ describe('SequencerTrack', () => {
 
     expect(onLaneClickStep).toHaveBeenCalledWith(4);
   });
+
+  it('renders insertion cursor when provided', () => {
+    setMatchMedia({ mobile: false });
+
+    renderTrack({ insertionCursorStep: 6 });
+
+    expect(screen.getByLabelText('Insertion cursor at step 7')).toBeInTheDocument();
+  });
 });
