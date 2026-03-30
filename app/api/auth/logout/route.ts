@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-import { clearSessionCookie } from '../../../../lib/auth';
+import { clearPendingAuthCookie, clearSessionCookie } from '../../../../lib/auth';
 import { checkCsrfToken, clearCsrfToken } from '../../../../lib/csrf';
 
 /**
@@ -14,6 +14,7 @@ export async function POST(request: NextRequest) {
 
   const response = NextResponse.json({ ok: true });
   clearSessionCookie(response);
+  clearPendingAuthCookie(response);
   clearCsrfToken(response);
   return response;
 }

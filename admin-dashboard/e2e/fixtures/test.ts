@@ -87,7 +87,7 @@ class AdminApiMocker {
 
     await this.page.route('**/api/auth/login', async (route) => {
       this.loggedIn = true;
-      await fulfillJson(route, { user: adminUser });
+      await fulfillJson(route, { status: 'AUTHENTICATED', user: adminUser });
     });
 
     await this.page.route('**/api/auth/logout', async (route) => {

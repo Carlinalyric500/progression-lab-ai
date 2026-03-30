@@ -2,7 +2,9 @@ import { createHmac, randomBytes, scryptSync, timingSafeEqual } from 'crypto';
 import type { NextRequest, NextResponse } from 'next/server';
 
 const AUTH_COOKIE_NAME = 'progressionlab_session';
+const PENDING_AUTH_COOKIE_NAME = 'progressionlab_pending_auth';
 const SESSION_MAX_AGE_SECONDS = 60 * 60 * 24 * 7;
+const PENDING_AUTH_MAX_AGE_SECONDS = 10 * 60;
 
 /**
  * Signed session payload stored in the auth cookie.
@@ -12,6 +14,14 @@ type SessionPayload = {
   email: string;
   role: UserRole;
   exp: number;
+};
+
+export type PendingAuthPayload = {
+  userId: string;
+  email: string;
+  role: UserRole;
+  exp: number;
+  purpose: 'CUSTOMER_WEBAUTHN';
 };
 
 export type UserRole = 'ADMIN' | 'AUDITOR' | 'USER';
@@ -161,6 +171,23 @@ export function createSessionToken(userId: string, email: string, role: UserRole
 }
 
 /**
+ * Creates a short-lived token used between password and WebAuthn verification.
+ */
+export function createPendingAuthToken(userId: string, email: string, role: UserRole): string {
+  const payload: PendingAuthPayload = {
+    userId,
+    email,
+    role,
+    exp: Math.floor(Date.now() / 1000) + PENDING_AUTH_MAX_AGE_SECONDS,
+    purpose: 'CUSTOMER_WEBAUTHN',
+  };
+
+  const encodedPayload = base64UrlEncode(JSON.stringify(payload));
+  const signature = sign(encodedPayload);
+  return `${encodedPayload}.${signature}`;
+}
+
+/**
  * Parses and validates a session token from cookie value.
  */
 export function parseSessionToken(token: string | undefined): SessionPayload | null {
@@ -208,11 +235,70 @@ export function parseSessionToken(token: string | undefined): SessionPayload | n
 }
 
 /**
+ * Parses and validates a pending-auth token from cookie value.
+ */
+export function parsePendingAuthToken(token: string | undefined): PendingAuthPayload | null {
+  if (!token) {
+    return null;
+  }
+
+  const [encodedPayload, encodedSignature] = token.split('.');
+  if (!encodedPayload || !encodedSignature) {
+    return null;
+  }
+
+  const expectedSignature = sign(encodedPayload);
+  const providedSignatureBuffer = Buffer.from(encodedSignature);
+  const expectedSignatureBuffer = Buffer.from(expectedSignature);
+
+  if (providedSignatureBuffer.length !== expectedSignatureBuffer.length) {
+    return null;
+  }
+
+  const signaturesMatch = timingSafeEqual(providedSignatureBuffer, expectedSignatureBuffer);
+
+  if (!signaturesMatch) {
+    return null;
+  }
+
+  try {
+    const payload = JSON.parse(base64UrlDecode(encodedPayload)) as PendingAuthPayload;
+    if (!payload.userId || !payload.email || !payload.role || !payload.exp || !payload.purpose) {
+      return null;
+    }
+
+    if (payload.role !== 'ADMIN' && payload.role !== 'AUDITOR' && payload.role !== 'USER') {
+      return null;
+    }
+
+    if (payload.purpose !== 'CUSTOMER_WEBAUTHN') {
+      return null;
+    }
+
+    if (payload.exp < Math.floor(Date.now() / 1000)) {
+      return null;
+    }
+
+    return payload;
+  } catch {
+    return null;
+  }
+}
+
+/**
  * Reads and verifies the current session from request cookies.
  */
 export function getSessionFromRequest(request: NextRequest): SessionPayload | null {
   const token = request.cookies.get(AUTH_COOKIE_NAME)?.value;
   return parseSessionToken(token);
+}
+
+/**
+ * Reads and verifies the pending-auth token from request cookies.
+ */
+export function getPendingAuthFromRequest(request: NextRequest): PendingAuthPayload | null {
+  const token = request.cookies.get(PENDING_AUTH_COOKIE_NAME)?.value;
+  return parsePendingAuthToken(token);
 }
 
 /**
@@ -229,10 +315,36 @@ export function setSessionCookie(response: NextResponse, token: string): void {
 }
 
 /**
+ * Sets the short-lived pending-auth cookie on a response.
+ */
+export function setPendingAuthCookie(response: NextResponse, token: string): void {
+  response.cookies.set(PENDING_AUTH_COOKIE_NAME, token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+    path: '/',
+    maxAge: PENDING_AUTH_MAX_AGE_SECONDS,
+  });
+}
+
+/**
  * Clears the session cookie on a response.
  */
 export function clearSessionCookie(response: NextResponse): void {
   response.cookies.set(AUTH_COOKIE_NAME, '', {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+    path: '/',
+    maxAge: 0,
+  });
+}
+
+/**
+ * Clears the pending-auth cookie on a response.
+ */
+export function clearPendingAuthCookie(response: NextResponse): void {
+  response.cookies.set(PENDING_AUTH_COOKIE_NAME, '', {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax',

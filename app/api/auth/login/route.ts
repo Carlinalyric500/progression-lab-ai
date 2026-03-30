@@ -1,14 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import {
+  clearPendingAuthCookie,
+  createPendingAuthToken,
   createSessionToken,
   normalizeAuthCredentials,
+  setPendingAuthCookie,
   setSessionCookie,
   validateAuthCredentials,
   verifyPassword,
 } from '../../../../lib/auth';
 import { issueCsrfToken } from '../../../../lib/csrf';
 import { createRateLimitResponse } from '../../../../lib/rateLimiting';
+import { createAuthenticationOptions, listActiveCredentials } from '../../../../lib/webauthn';
+import { WebAuthnFlowType } from '@prisma/client';
 import { prisma } from '../../../../lib/prisma';
 
 /**
@@ -38,7 +43,29 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ message: 'Invalid email or password' }, { status: 401 });
     }
 
+    const activeCredentials = await listActiveCredentials(user.id);
+
+    if (activeCredentials.length > 0) {
+      const response = NextResponse.json({
+        status: 'MFA_REQUIRED',
+        user: {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          role: user.role,
+        },
+        options: await createAuthenticationOptions({
+          userId: user.id,
+          flowType: WebAuthnFlowType.ADMIN_AUTHENTICATION,
+        }),
+      });
+
+      setPendingAuthCookie(response, createPendingAuthToken(user.id, user.email, user.role));
+      return response;
+    }
+
     const response = NextResponse.json({
+      status: 'AUTHENTICATED',
       user: {
         id: user.id,
         email: user.email,
@@ -47,6 +74,7 @@ export async function POST(request: NextRequest) {
       },
     });
 
+    clearPendingAuthCookie(response);
     setSessionCookie(response, createSessionToken(user.id, user.email, user.role));
     issueCsrfToken(response, request);
     return response;

@@ -3,21 +3,27 @@ import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 
 import PageSuspenseFallback from '../../../components/ui/PageSuspenseFallback';
-import BillingPageContent from '../../../features/billing/components/BillingPageContent';
+import SecuritySettingsContent from '../../../features/auth/components/SecuritySettingsContent';
 import { parseSessionToken } from '../../../lib/auth';
 
-export default async function BillingSettingsPage() {
+export const metadata = {
+  title: 'Security Keys',
+};
+
+export default async function SecuritySettingsPage() {
   const cookieStore = await cookies();
   const sessionToken = cookieStore.get('progressionlab_session')?.value;
   const session = parseSessionToken(sessionToken);
 
   if (!session) {
-    redirect('/auth?reason=settings-billing');
+    redirect('/auth?reason=settings-security');
   }
 
   return (
-    <Suspense fallback={<PageSuspenseFallback message="Loading billing..." maxWidth="lg" />}>
-      <BillingPageContent />
+    <Suspense
+      fallback={<PageSuspenseFallback message="Loading security settings..." maxWidth="md" />}
+    >
+      <SecuritySettingsContent />
     </Suspense>
   );
 }

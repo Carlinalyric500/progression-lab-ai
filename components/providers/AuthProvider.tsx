@@ -172,7 +172,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => {
       controller.abort();
     };
-  }, []);
+  }, [refresh]);
 
   const logout = async () => {
     await fetch('/api/auth/logout', {

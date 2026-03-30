@@ -70,9 +70,14 @@ Required env vars:
 
 - `DATABASE_URL`
 - `ADMIN_AUTH_SECRET`
+- `WEBAUTHN_RP_ID`
+- `WEBAUTHN_RP_NAME`
+- `ADMIN_WEBAUTHN_ORIGIN`
 
 ## Notes
 
 - This app authenticates directly against the shared `User` table.
 - Only users with role `ADMIN` or `AUDITOR` can sign in.
+- Admin hardware MFA will use WebAuthn with exact origin matching, so local development should
+  keep the admin app running at the configured origin.
 - The main app still owns schema migrations; keep Prisma schema in sync when role/data models change.
