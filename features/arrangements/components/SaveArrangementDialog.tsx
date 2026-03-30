@@ -12,7 +12,10 @@ import {
   Stack,
   Switch,
   Typography,
+  IconButton,
+  InputAdornment,
 } from '@mui/material';
+import RefreshIcon from '@mui/icons-material/Refresh';
 
 import AppTextField from '../../../components/ui/TextField';
 import { useAppSnackbar } from '../../../components/providers/AppSnackbarProvider';
@@ -79,6 +82,10 @@ export default function SaveArrangementDialog({
     }
   }, [open, reset, setValue]);
 
+  const handleRefreshTitle = () => {
+    setValue('title', getRandomTitleSuggestion());
+  };
+
   const onSubmit = async (data: SaveArrangementFormData) => {
     const payload: CreateArrangementRequest = {
       title: data.title.trim() || undefined,
@@ -120,6 +127,23 @@ export default function SaveArrangementDialog({
                 disabled={isSubmitting}
                 error={!!error}
                 helperText={error?.message}
+                slotProps={{
+                  input: {
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <IconButton
+                          onClick={handleRefreshTitle}
+                          disabled={isSubmitting}
+                          edge="end"
+                          size="small"
+                          aria-label="regenerate title"
+                        >
+                          <RefreshIcon fontSize="small" />
+                        </IconButton>
+                      </InputAdornment>
+                    ),
+                  },
+                }}
               />
             )}
           />
