@@ -2,9 +2,7 @@ import * as Tone from 'tone';
 import type { AudioEngine } from './audioEngine';
 import { loadDrumPattern, normalizeDrumPatternPath } from './engine/DrumPatternRepository';
 import { createEffectsChain } from './engine/EffectsChain';
-import { createEffectsControl } from './engine/EffectsControl';
 import { createAudioEngineRegistry, type AudioEngineScope } from './engine/AudioEngineRegistry';
-import { createAudioFacade } from './engine/AudioFacade';
 import { createAudioTimelineState } from './engine/AudioTimelineState';
 import { createMetronomePlayback } from './engine/MetronomePlayback';
 import { createMetronomeSynthBank } from './engine/MetronomeSynthBank';
@@ -31,7 +29,6 @@ export const createToneAudioEngine = (): AudioEngine => {
   const timelineState = createAudioTimelineState();
   const metronomeSynthBank = createMetronomeSynthBank();
   const effectsChain = createEffectsChain();
-  const effectsControl = createEffectsControl(effectsChain);
   const samplerBank = createSamplerBank({
     connectSamplerToCurrentOutput: effectsChain.connectSamplerToCurrentOutput,
     ensureReverbReady: effectsChain.ensureReverbReady,
@@ -98,7 +95,7 @@ export const createToneAudioEngine = (): AudioEngine => {
   const { playChordVoicing, playProgression, playChordPattern } = progressionPlayback;
 
   return {
-    ...effectsControl,
+    ...effectsChain,
     startAudio,
     playMetronomeClick,
     playMetronomePulse,
@@ -112,12 +109,6 @@ export const createToneAudioEngine = (): AudioEngine => {
 export type { AudioEngineScope };
 
 const audioEngineRegistry = createAudioEngineRegistry(createToneAudioEngine);
-
-const audioFacade = createAudioFacade({
-  getAudioEngine: () => audioEngineRegistry.getAudioEngine(),
-  setAudioEngine: (engine) => audioEngineRegistry.setAudioEngine(engine),
-  resetAudioEngine: () => audioEngineRegistry.resetAudioEngine(),
-});
 
 export const getAudioEngine = (): AudioEngine => audioEngineRegistry.getAudioEngine();
 
@@ -134,42 +125,77 @@ export const createAudioEngineScope = (engine?: AudioEngine): AudioEngineScope =
 };
 
 // Effects control delegation
-export const setReverbWet = audioFacade.setReverbWet;
-export const setChorusWet = audioFacade.setChorusWet;
-export const setReverbRoomSize = audioFacade.setReverbRoomSize;
-export const setReverbEnabled = audioFacade.setReverbEnabled;
-export const setChorusEnabled = audioFacade.setChorusEnabled;
-export const setChorusFrequency = audioFacade.setChorusFrequency;
-export const setChorusDelayTime = audioFacade.setChorusDelayTime;
-export const setChorusDepth = audioFacade.setChorusDepth;
-export const setFeedbackDelayEnabled = audioFacade.setFeedbackDelayEnabled;
-export const setFeedbackDelayWet = audioFacade.setFeedbackDelayWet;
-export const setFeedbackDelayTime = audioFacade.setFeedbackDelayTime;
-export const setFeedbackDelayFeedback = audioFacade.setFeedbackDelayFeedback;
-export const setTremoloEnabled = audioFacade.setTremoloEnabled;
-export const setTremoloWet = audioFacade.setTremoloWet;
-export const setTremoloFrequency = audioFacade.setTremoloFrequency;
-export const setTremoloDepth = audioFacade.setTremoloDepth;
-export const setVibratoEnabled = audioFacade.setVibratoEnabled;
-export const setVibratoWet = audioFacade.setVibratoWet;
-export const setVibratoFrequency = audioFacade.setVibratoFrequency;
-export const setVibratoDepth = audioFacade.setVibratoDepth;
-export const setPhaserEnabled = audioFacade.setPhaserEnabled;
-export const setPhaserWet = audioFacade.setPhaserWet;
-export const setPhaserFrequency = audioFacade.setPhaserFrequency;
-export const setPhaserOctaves = audioFacade.setPhaserOctaves;
-export const setPhaserQ = audioFacade.setPhaserQ;
+export const setReverbWet: AudioEngine['setReverbWet'] = (wet) =>
+  getAudioEngine().setReverbWet(wet);
+export const setChorusWet: AudioEngine['setChorusWet'] = (wet) =>
+  getAudioEngine().setChorusWet(wet);
+export const setReverbRoomSize: AudioEngine['setReverbRoomSize'] = (roomSize) =>
+  getAudioEngine().setReverbRoomSize(roomSize);
+export const setReverbEnabled: AudioEngine['setReverbEnabled'] = (enabled) =>
+  getAudioEngine().setReverbEnabled(enabled);
+export const setChorusEnabled: AudioEngine['setChorusEnabled'] = (enabled) =>
+  getAudioEngine().setChorusEnabled(enabled);
+export const setChorusFrequency: AudioEngine['setChorusFrequency'] = (value) =>
+  getAudioEngine().setChorusFrequency(value);
+export const setChorusDelayTime: AudioEngine['setChorusDelayTime'] = (value) =>
+  getAudioEngine().setChorusDelayTime(value);
+export const setChorusDepth: AudioEngine['setChorusDepth'] = (value) =>
+  getAudioEngine().setChorusDepth(value);
+export const setFeedbackDelayEnabled: AudioEngine['setFeedbackDelayEnabled'] = (enabled) =>
+  getAudioEngine().setFeedbackDelayEnabled(enabled);
+export const setFeedbackDelayWet: AudioEngine['setFeedbackDelayWet'] = (wet) =>
+  getAudioEngine().setFeedbackDelayWet(wet);
+export const setFeedbackDelayTime: AudioEngine['setFeedbackDelayTime'] = (value) =>
+  getAudioEngine().setFeedbackDelayTime(value);
+export const setFeedbackDelayFeedback: AudioEngine['setFeedbackDelayFeedback'] = (value) =>
+  getAudioEngine().setFeedbackDelayFeedback(value);
+export const setTremoloEnabled: AudioEngine['setTremoloEnabled'] = (enabled) =>
+  getAudioEngine().setTremoloEnabled(enabled);
+export const setTremoloWet: AudioEngine['setTremoloWet'] = (wet) =>
+  getAudioEngine().setTremoloWet(wet);
+export const setTremoloFrequency: AudioEngine['setTremoloFrequency'] = (value) =>
+  getAudioEngine().setTremoloFrequency(value);
+export const setTremoloDepth: AudioEngine['setTremoloDepth'] = (value) =>
+  getAudioEngine().setTremoloDepth(value);
+export const setVibratoEnabled: AudioEngine['setVibratoEnabled'] = (enabled) =>
+  getAudioEngine().setVibratoEnabled(enabled);
+export const setVibratoWet: AudioEngine['setVibratoWet'] = (wet) =>
+  getAudioEngine().setVibratoWet(wet);
+export const setVibratoFrequency: AudioEngine['setVibratoFrequency'] = (value) =>
+  getAudioEngine().setVibratoFrequency(value);
+export const setVibratoDepth: AudioEngine['setVibratoDepth'] = (value) =>
+  getAudioEngine().setVibratoDepth(value);
+export const setPhaserEnabled: AudioEngine['setPhaserEnabled'] = (enabled) =>
+  getAudioEngine().setPhaserEnabled(enabled);
+export const setPhaserWet: AudioEngine['setPhaserWet'] = (wet) =>
+  getAudioEngine().setPhaserWet(wet);
+export const setPhaserFrequency: AudioEngine['setPhaserFrequency'] = (value) =>
+  getAudioEngine().setPhaserFrequency(value);
+export const setPhaserOctaves: AudioEngine['setPhaserOctaves'] = (value) =>
+  getAudioEngine().setPhaserOctaves(value);
+export const setPhaserQ: AudioEngine['setPhaserQ'] = (value) => getAudioEngine().setPhaserQ(value);
 
 // Lifecycle delegation
-export const startAudio = audioFacade.startAudio;
-export const stopAllAudio = audioFacade.stopAllAudio;
+export const startAudio: AudioEngine['startAudio'] = () => getAudioEngine().startAudio();
+export const stopAllAudio: AudioEngine['stopAllAudio'] = () => getAudioEngine().stopAllAudio();
 export const isAudioInitialized = (): boolean => Tone.context.state === 'running';
 
 // Playback delegation
-export const playMetronomeClick = audioFacade.playMetronomeClick;
-export const playMetronomePulse = audioFacade.playMetronomePulse;
-export const playChordVoicing = audioFacade.playChordVoicing;
-export const playProgression = audioFacade.playProgression;
-export const playChordPattern = audioFacade.playChordPattern;
+export const playMetronomeClick: AudioEngine['playMetronomeClick'] = (volume, isDownbeat) =>
+  getAudioEngine().playMetronomeClick(volume, isDownbeat);
+export const playMetronomePulse: AudioEngine['playMetronomePulse'] = (volume, isDownbeat, opts) =>
+  getAudioEngine().playMetronomePulse(volume, isDownbeat, opts);
+export const playChordVoicing: AudioEngine['playChordVoicing'] = (params) =>
+  getAudioEngine().playChordVoicing(params);
+export const playProgression: AudioEngine['playProgression'] = (
+  voicings,
+  tempoBpm,
+  playbackStyle,
+  attack,
+  decay,
+  opts,
+) => getAudioEngine().playProgression(voicings, tempoBpm, playbackStyle, attack, decay, opts);
+export const playChordPattern: AudioEngine['playChordPattern'] = (params) =>
+  getAudioEngine().playChordPattern(params);
 
 export const getAudioClockSeconds = (): number => Tone.now();
