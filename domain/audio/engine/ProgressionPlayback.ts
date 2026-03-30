@@ -19,6 +19,7 @@ import {
   getBarDurationSeconds,
 } from './ProgressionSchedulingPolicy';
 import { applyChordPatternLifecyclePolicy } from './ChordPatternLifecyclePolicy';
+import { startPartPlayback } from './PartTransportPolicy';
 import { triggerChordByStyle } from './ChordTrigger';
 
 interface ProgressionPlaybackDeps {
@@ -201,9 +202,6 @@ export const createProgressionPlayback = (deps: ProgressionPlaybackDeps): Progre
       }
     }, events);
 
-    partState.setActivePart(part);
-    part.start(0);
-
     if (metronomeEnabled) {
       startMetronomeLoop(
         normalizedTempo,
@@ -215,7 +213,12 @@ export const createProgressionPlayback = (deps: ProgressionPlaybackDeps): Progre
       );
     }
 
-    Tone.Transport.start();
+    startPartPlayback({
+      part,
+      setActivePart: partState.setActivePart,
+      startPart: (nextPart) => nextPart.start(0),
+      startTransport: () => Tone.Transport.start(),
+    });
   };
 
   const playChordPattern = async ({
@@ -312,9 +315,12 @@ export const createProgressionPlayback = (deps: ProgressionPlaybackDeps): Progre
       },
     });
 
-    partState.setActivePart(part);
-    part.start(0);
-    Tone.Transport.start();
+    startPartPlayback({
+      part,
+      setActivePart: partState.setActivePart,
+      startPart: (nextPart) => nextPart.start(0),
+      startTransport: () => Tone.Transport.start(),
+    });
   };
 
   return {
