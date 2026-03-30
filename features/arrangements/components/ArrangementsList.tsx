@@ -25,6 +25,12 @@ type Props = {
   onAvailabilityChange?: (hasAny: boolean) => void;
 };
 
+function isAbortError(error: unknown): boolean {
+  return error instanceof DOMException
+    ? error.name === 'AbortError'
+    : (error as { name?: string })?.name === 'AbortError';
+}
+
 function timeAgo(dateStr: string | Date): string {
   const ms = Date.now() - new Date(dateStr).getTime();
   const minutes = Math.floor(ms / 60_000);
@@ -47,22 +53,36 @@ export default function ArrangementsList({ onLoad, refreshSignal, onAvailability
   const [downloadingPdfId, setDownloadingPdfId] = useState<string | null>(null);
   const [downloadingMidiId, setDownloadingMidiId] = useState<string | null>(null);
 
-  const load = useCallback(async () => {
-    setIsLoading(true);
-    setFetchError(null);
-    try {
-      const data = (await getMyArrangements()) as Arrangement[];
-      setArrangements(data);
-      onAvailabilityChange?.(data.length > 0);
-    } catch (err) {
-      setFetchError((err as Error).message || 'Failed to load arrangements');
-    } finally {
-      setIsLoading(false);
-    }
-  }, [onAvailabilityChange]);
+  const load = useCallback(
+    async (signal?: AbortSignal) => {
+      setIsLoading(true);
+      setFetchError(null);
+      try {
+        const data = (await getMyArrangements(signal)) as Arrangement[];
+        setArrangements(data);
+        onAvailabilityChange?.(data.length > 0);
+      } catch (err) {
+        if (isAbortError(err)) {
+          return;
+        }
+
+        setFetchError((err as Error).message || 'Failed to load arrangements');
+      } finally {
+        if (!signal?.aborted) {
+          setIsLoading(false);
+        }
+      }
+    },
+    [onAvailabilityChange],
+  );
 
   useEffect(() => {
-    void load();
+    const controller = new AbortController();
+    void load(controller.signal);
+
+    return () => {
+      controller.abort();
+    };
   }, [load, refreshSignal]);
 
   const handleDelete = useCallback(
@@ -131,7 +151,7 @@ export default function ArrangementsList({ onLoad, refreshSignal, onAvailability
           {fetchError}
         </Typography>
         <Tooltip title="Retry">
-          <IconButton size="small" onClick={load}>
+          <IconButton size="small" onClick={() => void load()}>
             <RefreshIcon fontSize="small" />
           </IconButton>
         </Tooltip>

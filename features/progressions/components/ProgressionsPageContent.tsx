@@ -44,6 +44,12 @@ type FilterFormData = {
   keyQuery: string[];
 };
 
+function isAbortError(error: unknown): boolean {
+  return error instanceof DOMException
+    ? error.name === 'AbortError'
+    : (error as { name?: string })?.name === 'AbortError';
+}
+
 function getFirstChordName(progression: Progression): string {
   const firstChord = progression.chords?.[0] as { name?: string } | string | undefined;
 
@@ -106,22 +112,34 @@ export default function ProgressionsPageContent() {
       return;
     }
 
+    const controller = new AbortController();
+
     const loadMyProgressions = async () => {
       try {
         setLoading(true);
         setError('');
-        const data = await getMyProgressions();
+        const data = await getMyProgressions(controller.signal);
         setMyProgressions(data);
       } catch (err) {
+        if (isAbortError(err)) {
+          return;
+        }
+
         const message = (err as Error).message || 'Failed to load progressions';
         setError(message);
         showError(message);
       } finally {
-        setLoading(false);
+        if (!controller.signal.aborted) {
+          setLoading(false);
+        }
       }
     };
 
     loadMyProgressions();
+
+    return () => {
+      controller.abort();
+    };
   }, [isAuthenticated, showError]);
 
   useEffect(() => {
@@ -129,22 +147,37 @@ export default function ProgressionsPageContent() {
       return;
     }
 
+    const controller = new AbortController();
+
     const loadPublicProgressions = async () => {
       try {
         setLoading(true);
         setError('');
-        const data = await getPublicProgressions({ tags: tagQuery, keys: keyQuery });
+        const data = await getPublicProgressions(
+          { tags: tagQuery, keys: keyQuery },
+          controller.signal,
+        );
         setPublicProgressions(data);
       } catch (err) {
+        if (isAbortError(err)) {
+          return;
+        }
+
         const message = (err as Error).message || 'Failed to load public progressions';
         setError(message);
         showError(message);
       } finally {
-        setLoading(false);
+        if (!controller.signal.aborted) {
+          setLoading(false);
+        }
       }
     };
 
     loadPublicProgressions();
+
+    return () => {
+      controller.abort();
+    };
   }, [viewMode, tagQuery, keyQuery, showError]);
 
   const filteredMyProgressions = useMemo(() => {

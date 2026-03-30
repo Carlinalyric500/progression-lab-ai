@@ -15,13 +15,14 @@ async function readErrorMessage(response: Response, fallback: string) {
   }
 }
 
-export async function createProgression(payload: CreateProgressionRequest) {
+export async function createProgression(payload: CreateProgressionRequest, signal?: AbortSignal) {
   const response = await fetch('/api/progressions', {
     method: 'POST',
     headers: createCsrfHeaders({
       'Content-Type': 'application/json',
     }),
     body: JSON.stringify(payload),
+    signal,
   });
 
   if (!response.ok) {
@@ -31,8 +32,8 @@ export async function createProgression(payload: CreateProgressionRequest) {
   return response.json();
 }
 
-export async function getMyProgressions() {
-  const response = await fetch('/api/progressions');
+export async function getMyProgressions(signal?: AbortSignal) {
+  const response = await fetch('/api/progressions', { signal });
 
   if (!response.ok) {
     throw new Error(await readErrorMessage(response, 'Failed to fetch progressions'));
@@ -41,8 +42,8 @@ export async function getMyProgressions() {
   return response.json();
 }
 
-export async function getProgression(id: string) {
-  const response = await fetch(`/api/progressions/${id}`);
+export async function getProgression(id: string, signal?: AbortSignal) {
+  const response = await fetch(`/api/progressions/${id}`, { signal });
 
   if (!response.ok) {
     throw new Error(await readErrorMessage(response, 'Failed to fetch progression'));
@@ -51,13 +52,18 @@ export async function getProgression(id: string) {
   return response.json();
 }
 
-export async function updateProgression(id: string, payload: UpdateProgressionRequest) {
+export async function updateProgression(
+  id: string,
+  payload: UpdateProgressionRequest,
+  signal?: AbortSignal,
+) {
   const response = await fetch(`/api/progressions/${id}`, {
     method: 'PUT',
     headers: createCsrfHeaders({
       'Content-Type': 'application/json',
     }),
     body: JSON.stringify(payload),
+    signal,
   });
 
   if (!response.ok) {
@@ -67,10 +73,11 @@ export async function updateProgression(id: string, payload: UpdateProgressionRe
   return response.json();
 }
 
-export async function deleteProgression(id: string) {
+export async function deleteProgression(id: string, signal?: AbortSignal) {
   const response = await fetch(`/api/progressions/${id}`, {
     method: 'DELETE',
     headers: createCsrfHeaders(),
+    signal,
   });
 
   if (!response.ok) {
@@ -78,8 +85,8 @@ export async function deleteProgression(id: string) {
   }
 }
 
-export async function getSharedProgression(shareId: string) {
-  const response = await fetch(`/api/shared/${shareId}`);
+export async function getSharedProgression(shareId: string, signal?: AbortSignal) {
+  const response = await fetch(`/api/shared/${shareId}`, { signal });
 
   if (!response.ok) {
     throw new Error(await readErrorMessage(response, 'Failed to fetch shared progression'));
@@ -88,7 +95,10 @@ export async function getSharedProgression(shareId: string) {
   return response.json();
 }
 
-export async function getPublicProgressions(filters?: { tags?: string[]; keys?: string[] }) {
+export async function getPublicProgressions(
+  filters?: { tags?: string[]; keys?: string[] },
+  signal?: AbortSignal,
+) {
   const searchParams = new URLSearchParams();
 
   const tags =
@@ -108,7 +118,7 @@ export async function getPublicProgressions(filters?: { tags?: string[]; keys?: 
   }
 
   const query = searchParams.toString();
-  const response = await fetch(query ? `/api/shared?${query}` : '/api/shared');
+  const response = await fetch(query ? `/api/shared?${query}` : '/api/shared', { signal });
 
   if (!response.ok) {
     throw new Error(await readErrorMessage(response, 'Failed to fetch public progressions'));
