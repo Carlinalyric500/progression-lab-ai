@@ -13,9 +13,12 @@ import {
 } from '@mui/material';
 import SecurityIcon from '@mui/icons-material/Security';
 import { startRegistration } from '@simplewebauthn/browser';
-import type { PublicKeyCredentialCreationOptionsJSON, RegistrationResponseJSON } from '@simplewebauthn/browser';
+import type {
+  PublicKeyCredentialCreationOptionsJSON,
+  RegistrationResponseJSON,
+} from '@simplewebauthn/browser';
 
-import { createCsrfHeaders } from '../../../lib/csrfClient';
+import { createCsrfHeaders, ensureCsrfCookie } from '../../../lib/csrfClient';
 
 type WebAuthnEnrollmentModalProps = {
   open: boolean;
@@ -23,6 +26,8 @@ type WebAuthnEnrollmentModalProps = {
 };
 
 async function getRegistrationOptions(): Promise<PublicKeyCredentialCreationOptionsJSON> {
+  await ensureCsrfCookie();
+
   const response = await fetch('/api/auth/webauthn/register/options', {
     method: 'POST',
     credentials: 'include',
@@ -39,6 +44,8 @@ async function getRegistrationOptions(): Promise<PublicKeyCredentialCreationOpti
 }
 
 async function saveRegistration(regResponse: RegistrationResponseJSON): Promise<void> {
+  await ensureCsrfCookie();
+
   const response = await fetch('/api/auth/webauthn/register/verify', {
     method: 'POST',
     credentials: 'include',
@@ -98,13 +105,14 @@ export default function WebAuthnEnrollmentModal({ open, onClose }: WebAuthnEnrol
         <Stack spacing={2} sx={{ pt: 1 }}>
           {success ? (
             <Alert severity="success">
-              Security key enrolled successfully! You can add more keys from your security settings later.
+              Security key enrolled successfully! You can add more keys from your security settings
+              later.
             </Alert>
           ) : (
             <>
               <Typography>
-                Protect your account with a hardware security key (like a YubiKey). This is optional but
-                highly recommended.
+                Protect your account with a hardware security key (like a YubiKey). This is optional
+                but highly recommended.
               </Typography>
 
               {error && <Alert severity="error">{error}</Alert>}
