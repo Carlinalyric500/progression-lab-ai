@@ -1,6 +1,6 @@
 import * as Tone from 'tone';
 
-export type SamplerInstrument = Pick<Tone.Sampler, 'triggerAttackRelease'>;
+export type SamplerInstrument = Pick<Tone.Sampler, 'triggerAttackRelease' | 'attack' | 'release'>;
 
 export type SamplerBank = {
   ensurePianoSamplerLoaded: () => Promise<SamplerInstrument>;

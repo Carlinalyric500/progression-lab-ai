@@ -1,4 +1,4 @@
-import * as Tone from 'tone';
+import type * as Tone from 'tone';
 import type { PlaybackStyle } from '../audioEngine';
 import type { SamplerInstrument } from './SamplerBank';
 import { normalizeVelocity } from './AudioMath';
@@ -26,7 +26,7 @@ export const triggerStrummedChord = ({
 
   orderedNotes.forEach((note, index) => {
     if (startTime !== undefined) {
-      const noteTime = Tone.Time(startTime).toSeconds() + index * STRUM_STEP_SECONDS;
+      const noteTime = Number(startTime) + index * STRUM_STEP_SECONDS;
       instrument.triggerAttackRelease(note, duration, noteTime, normalizedVelocity);
       return;
     }
