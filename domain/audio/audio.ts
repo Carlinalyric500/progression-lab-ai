@@ -1,7 +1,6 @@
 import * as Tone from 'tone';
 import type {
   AudioEngine,
-  MetronomeSource,
   PlayChordVoicingParams,
   PlayChordPatternParams,
   PlayMetronomePulseOptions,
@@ -15,19 +14,17 @@ import {
   TIME_SIGNATURE_BEATS_PER_BAR,
   TIME_SIGNATURE_NUMERATOR,
 } from '../music/padPattern';
-import type { TimeSignature } from '../music/padPattern';
 import {
   CHORD_BEATS,
   applyGate,
-  getBeatDurationSeconds,
   getChordDurationSeconds,
-  inferFallbackDrumDurationBeats,
   normalizeTempoBpm,
 } from './engine/AudioMath';
 import { createAudioEngineRegistry, type AudioEngineScope } from './engine/AudioEngineRegistry';
 import { triggerChordByStyle } from './engine/ChordTrigger';
 import { loadDrumPattern, normalizeDrumPatternPath } from './engine/DrumPatternRepository';
 import { createEffectsChain } from './engine/EffectsChain';
+import { createMetronomePlayback } from './engine/MetronomePlayback';
 import { createMetronomeSynthBank } from './engine/MetronomeSynthBank';
 import { applyInversionLock, shiftNotesByOctaves } from './engine/NoteTransforms';
 import { createSamplerBank } from './engine/SamplerBank';
@@ -127,6 +124,29 @@ export const createToneAudioEngine = (): AudioEngine => {
     });
   };
 
+  const metronomePlayback = createMetronomePlayback({
+    startAudio,
+    synthBank: metronomeSynthBank,
+    normalizeDrumPatternPath,
+    loadPattern: loadDrumPattern,
+    loopState: {
+      getMetronomeLoop: () => metronomeLoop,
+      setMetronomeLoop: (loop) => {
+        metronomeLoop = loop;
+      },
+      getMetronomeClickBeat: () => metronomeClickBeat,
+      setMetronomeClickBeat: (beat) => {
+        metronomeClickBeat = beat;
+      },
+      getActiveMetronomePulseTimeouts: () => activeMetronomePulseTimeouts,
+      setActiveMetronomePulseTimeouts: (timeouts) => {
+        activeMetronomePulseTimeouts = timeouts;
+      },
+    },
+  });
+
+  const { playMetronomePulse, playMetronomeClick, startMetronomeLoop } = metronomePlayback;
+
   const playChordVoicing = async ({
     leftHand,
     rightHand,
@@ -183,124 +203,6 @@ export const createToneAudioEngine = (): AudioEngine => {
         velocity: effectiveVelocity,
       });
     }
-  };
-
-  const playMetronomePulse = async (
-    volume: number,
-    isDownbeat: boolean,
-    opts?: PlayMetronomePulseOptions,
-  ): Promise<void> => {
-    await startAudio();
-
-    const source: MetronomeSource = opts?.source ?? 'click';
-    const normalizedVolume = clampUnitValue(volume);
-    if (normalizedVolume <= 0) {
-      return;
-    }
-
-    if (source === 'click') {
-      const synth = metronomeSynthBank.getClickSynth();
-      synth.volume.value = Tone.gainToDb(normalizedVolume * 0.45);
-      synth.triggerAttackRelease(isDownbeat ? 'C6' : 'A5', '32n', Tone.now());
-      return;
-    }
-
-    const drumPath = normalizeDrumPatternPath(opts?.drumPath);
-    if (!drumPath) {
-      const synth = metronomeSynthBank.getClickSynth();
-      synth.volume.value = Tone.gainToDb(normalizedVolume * 0.45);
-      synth.triggerAttackRelease(isDownbeat ? 'C6' : 'A5', '32n', Tone.now());
-      return;
-    }
-
-    const pattern = await loadDrumPattern(drumPath);
-    if (!pattern) {
-      const synth = metronomeSynthBank.getClickSynth();
-      synth.volume.value = Tone.gainToDb(normalizedVolume * 0.45);
-      synth.triggerAttackRelease(isDownbeat ? 'C6' : 'A5', '32n', Tone.now());
-      return;
-    }
-
-    const tempo = normalizeTempoBpm(opts?.tempoBpm);
-    const beatDurationSeconds = getBeatDurationSeconds(tempo);
-    const beatIndex = Math.max(0, opts?.beatIndex ?? 0);
-    const patternDuration = Math.max(
-      pattern.durationBeats,
-      inferFallbackDrumDurationBeats(opts?.timeSignature ?? '4/4'),
-    );
-    const beatStartInPattern = beatIndex % patternDuration;
-    const now = Tone.now();
-
-    pattern.events.forEach((event) => {
-      const eventBeatInPattern =
-        ((event.beat % patternDuration) + patternDuration) % patternDuration;
-      if (eventBeatInPattern < beatStartInPattern || eventBeatInPattern >= beatStartInPattern + 1) {
-        return;
-      }
-
-      const offsetBeats = eventBeatInPattern - beatStartInPattern;
-      const eventTime = now + offsetBeats * beatDurationSeconds;
-      const eventDurationSeconds = Math.max(0.02, event.durationBeats * beatDurationSeconds);
-      metronomeSynthBank.triggerDrumHit(
-        event.midi,
-        eventTime,
-        eventDurationSeconds,
-        event.velocity * normalizedVolume,
-      );
-    });
-  };
-
-  const playMetronomeClick = async (volume: number, isDownbeat: boolean): Promise<void> => {
-    await playMetronomePulse(volume, isDownbeat, { source: 'click' });
-  };
-
-  const startMetronomeLoop = (
-    tempoBpm: number,
-    timeSignature: TimeSignature,
-    volume: number,
-    totalDurationSeconds: number,
-    source: MetronomeSource,
-    drumPath: string | null,
-  ): void => {
-    const singleBeatSeconds = getBeatDurationSeconds(tempoBpm);
-    const beatsPerBar = TIME_SIGNATURE_BEATS_PER_BAR[timeSignature];
-    const totalBeats = Math.ceil(totalDurationSeconds / singleBeatSeconds);
-    metronomeClickBeat = 0;
-
-    if (source === 'drum' && drumPath) {
-      void loadDrumPattern(drumPath);
-    }
-
-    metronomeLoop = new Tone.Loop((time) => {
-      if (metronomeClickBeat >= totalBeats) {
-        return;
-      }
-      const isDownbeat = metronomeClickBeat % beatsPerBar === 0;
-      if (source === 'click') {
-        const synth = metronomeSynthBank.getClickSynth();
-        synth.volume.value = volume > 0 ? Tone.gainToDb(volume * 0.45) : -Infinity;
-        synth.triggerAttackRelease(isDownbeat ? 'C6' : 'A5', '32n', time);
-      } else {
-        const beatIndex = metronomeClickBeat;
-        const delayMs = Math.max(0, (time - Tone.now()) * 1000);
-        const timeoutId = setTimeout(() => {
-          activeMetronomePulseTimeouts = activeMetronomePulseTimeouts.filter(
-            (id) => id !== timeoutId,
-          );
-          void playMetronomePulse(volume, isDownbeat, {
-            source,
-            drumPath,
-            timeSignature,
-            tempoBpm,
-            beatIndex,
-          });
-        }, delayMs);
-        activeMetronomePulseTimeouts.push(timeoutId);
-      }
-      metronomeClickBeat += 1;
-    }, singleBeatSeconds);
-
-    metronomeLoop.start(0);
   };
 
   const playProgression = async (
