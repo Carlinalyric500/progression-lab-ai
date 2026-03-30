@@ -81,6 +81,11 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
     }
 
+    const accessContext = await getAccessContextForSession(session);
+    if (!accessContext) {
+      return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
+    }
+
     const { id } = await params;
     const body = (await request.json()) as UpdateArrangementRequest;
     const { title, timeline, playbackSnapshot, sourceChords, notes, tags, isPublic } = body;

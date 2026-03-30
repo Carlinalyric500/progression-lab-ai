@@ -152,6 +152,11 @@ export async function syncStripeSubscription(subscription: Stripe.Subscription) 
     typeof subscription.customer === 'string' ? subscription.customer : subscription.customer.id;
   const stripePriceId = getPrimaryPriceId(subscription);
   const plan = resolvePlanFromPriceId(stripePriceId);
+  const subscriptionPeriod = subscription as Stripe.Subscription & {
+    current_period_start?: number | null;
+    current_period_end?: number | null;
+    cancel_at_period_end?: boolean | null;
+  };
 
   if (!plan) {
     throw new Error(`Unsupported Stripe price ID: ${stripePriceId ?? 'missing'}`);
@@ -168,6 +173,12 @@ export async function syncStripeSubscription(subscription: Stripe.Subscription) 
 
   const interval = subscription.items.data[0]?.price.recurring?.interval;
   const billingInterval = interval === 'year' ? 'YEARLY' : interval === 'month' ? 'MONTHLY' : null;
+  const currentPeriodStart = subscriptionPeriod.current_period_start;
+  const currentPeriodEnd = subscriptionPeriod.current_period_end;
+
+  if (typeof currentPeriodStart !== 'number' || typeof currentPeriodEnd !== 'number') {
+    throw new Error(`Stripe subscription ${subscription.id} is missing current period boundaries`);
+  }
 
   return prisma.subscription.upsert({
     where: { userId: user.id },
@@ -178,9 +189,9 @@ export async function syncStripeSubscription(subscription: Stripe.Subscription) 
       plan,
       billingInterval: billingInterval ?? undefined,
       status: mapStripeSubscriptionStatus(subscription.status),
-      currentPeriodStart: new Date(subscription.current_period_start * 1000),
-      currentPeriodEnd: new Date(subscription.current_period_end * 1000),
-      cancelAtPeriodEnd: subscription.cancel_at_period_end,
+      currentPeriodStart: new Date(currentPeriodStart * 1000),
+      currentPeriodEnd: new Date(currentPeriodEnd * 1000),
+      cancelAtPeriodEnd: subscriptionPeriod.cancel_at_period_end ?? false,
     },
     update: {
       stripeSubscriptionId: subscription.id,
@@ -188,9 +199,9 @@ export async function syncStripeSubscription(subscription: Stripe.Subscription) 
       plan,
       billingInterval,
       status: mapStripeSubscriptionStatus(subscription.status),
-      currentPeriodStart: new Date(subscription.current_period_start * 1000),
-      currentPeriodEnd: new Date(subscription.current_period_end * 1000),
-      cancelAtPeriodEnd: subscription.cancel_at_period_end,
+      currentPeriodStart: new Date(currentPeriodStart * 1000),
+      currentPeriodEnd: new Date(currentPeriodEnd * 1000),
+      cancelAtPeriodEnd: subscriptionPeriod.cancel_at_period_end ?? false,
     },
   });
 }

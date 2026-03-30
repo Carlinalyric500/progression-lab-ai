@@ -22,10 +22,24 @@ function constructWebhookEvent(stripe: Stripe, payload: string, signature: strin
 }
 
 async function syncInvoiceSubscription(invoice: Stripe.Invoice) {
+  const legacySubscription = (
+    invoice as Stripe.Invoice & {
+      subscription?: string | Stripe.Subscription | null;
+    }
+  ).subscription;
+  const parentSubscriptionDetails = (
+    invoice as Stripe.Invoice & {
+      parent?: {
+        subscription_details?: {
+          subscription?: string | null;
+        } | null;
+      } | null;
+    }
+  ).parent?.subscription_details;
   const subscriptionId =
-    typeof invoice.subscription === 'string'
-      ? invoice.subscription
-      : (invoice.subscription?.id ?? null);
+    typeof legacySubscription === 'string'
+      ? legacySubscription
+      : (legacySubscription?.id ?? parentSubscriptionDetails?.subscription ?? null);
 
   if (!subscriptionId) {
     return;
