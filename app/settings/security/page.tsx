@@ -9,7 +9,9 @@ export const metadata = {
 
 export default function SecuritySettingsPage() {
   return (
-    <Suspense fallback={<PageSuspenseFallback message="Loading security settings..." maxWidth="md" />}>
+    <Suspense
+      fallback={<PageSuspenseFallback message="Loading security settings..." maxWidth="md" />}
+    >
       <SecuritySettingsContent />
     </Suspense>
   );

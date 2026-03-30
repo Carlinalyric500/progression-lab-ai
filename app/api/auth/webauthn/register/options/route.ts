@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-import { getSessionFromRequest } from '../../../../../lib/auth';
-import { createRegistrationOptions } from '../../../../../lib/webauthn';
+import { getSessionFromRequest } from '../../../../../../lib/auth';
+import { createRegistrationOptions } from '../../../../../../lib/webauthn';
 import { WebAuthnFlowType } from '@prisma/client';
 
 export async function POST(request: NextRequest) {
@@ -23,6 +23,9 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ options });
   } catch (error) {
     console.error('WebAuthn registration options failed:', error);
-    return NextResponse.json({ message: 'Failed to generate registration options' }, { status: 500 });
+    return NextResponse.json(
+      { message: 'Failed to generate registration options' },
+      { status: 500 },
+    );
   }
 }

@@ -58,11 +58,14 @@ function encodeBase64Url(value: Buffer | Uint8Array): string {
     .replace(/=+$/g, '');
 }
 
-function decodeBase64Url(value: string): Uint8Array {
+function decodeBase64Url(value: string): Uint8Array<ArrayBuffer> {
   const normalized = value.replace(/-/g, '+').replace(/_/g, '/');
   const padding = normalized.length % 4;
   const base64 = padding ? normalized + '='.repeat(4 - padding) : normalized;
-  return new Uint8Array(Buffer.from(base64, 'base64'));
+  const buffer = Buffer.from(base64, 'base64');
+  const bytes = new Uint8Array(new ArrayBuffer(buffer.length));
+  bytes.set(buffer);
+  return bytes;
 }
 
 function getRequiredEnvVar(name: string): string {
@@ -82,17 +85,10 @@ function buildChallengeMetadata(
     return undefined;
   }
 
-  const base: Prisma.JsonObject = {};
-
-  if (label != null) {
-    base.label = label;
-  }
-
-  if (metadata != null) {
-    base.context = metadata;
-  }
-
-  return base;
+  return {
+    ...(label != null ? { label } : {}),
+    ...(metadata != null ? { context: metadata } : {}),
+  } satisfies Prisma.InputJsonObject;
 }
 
 function readChallengeLabel(metadata: Prisma.JsonValue | null): string | null {
@@ -104,9 +100,7 @@ function readChallengeLabel(metadata: Prisma.JsonValue | null): string | null {
   return typeof value === 'string' ? value : null;
 }
 
-function toVerificationCredential(
-  credential: PrismaWebAuthnCredential,
-): WebAuthnCredential {
+function toVerificationCredential(credential: PrismaWebAuthnCredential): WebAuthnCredential {
   const counter = Number(credential.counter);
 
   if (!Number.isSafeInteger(counter)) {
