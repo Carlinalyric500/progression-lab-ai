@@ -51,9 +51,9 @@ Admin dashboard additionally requires:
 
 This repository includes a standalone admin app in [admin-dashboard](admin-dashboard) that is deployed independently from the main app.
 
-- Admin local dev: `yarn admin:dev`
-- Admin lint: `yarn admin:lint`
-- Admin build: `yarn admin:build`
+- Admin local dev: `make admin-dev`
+- Admin lint: `make admin-lint`
+- Admin build: `make admin-build`
 
 See [admin-dashboard/README.md](admin-dashboard/README.md) for admin setup and deployment details.
 
@@ -62,7 +62,7 @@ See [admin-dashboard/README.md](admin-dashboard/README.md) for admin setup and d
 1. Install dependencies.
 
 ```bash
-yarn install
+make install
 ```
 
 2. Create your local environment file.
@@ -75,14 +75,14 @@ cp .env.local.example .env.local
 
 ```bash
 docker-compose up -d
-yarn db:push
-yarn db:seed
+make db-push
+make db-seed
 ```
 
 4. Run the app.
 
 ```bash
-yarn dev
+make dev
 ```
 
 Main app: `http://localhost:3000`
@@ -145,18 +145,23 @@ The migration map for moved README sections is tracked in [docs/README_TO_WIKI_M
 ## Common Commands
 
 ```bash
-yarn dev
-yarn build
-yarn start
-yarn lint:check
-yarn lint:fix
-yarn test
-yarn test:e2e
-yarn db:generate
-yarn db:push
-yarn db:studio
-yarn wiki:publish
+make dev
+make build
+make build-app
+make start
+make lint
+make lint-fix
+make test
+make test-e2e
+make db-generate
+make db-push
+make db-studio
+make admin-dev
+make admin-build
+make wiki-publish
 ```
+
+Prefer `make` as the default command surface for local workflows. Direct Yarn commands remain available when needed.
 
 ## Contributing
 
@@ -165,9 +170,9 @@ yarn wiki:publish
 3. Run checks before opening a PR.
 
 ```bash
-yarn lint:check
-yarn test
-yarn build
+make lint
+make test
+make build
 ```
 
 4. Open a pull request with a clear summary and validation notes.

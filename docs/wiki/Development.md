@@ -5,16 +5,17 @@
 - Node version aligned with `.nvmrc`
 - Yarn package manager
 - Docker for local Postgres
+- GNU Make
 
 ## Local Setup
 
 ```bash
-yarn install
+make install
 cp .env.local.example .env.local
 docker-compose up -d
-yarn db:push
-yarn db:seed
-yarn dev
+make db-push
+make db-seed
+make dev
 ```
 
 Main app URL:
@@ -24,20 +25,20 @@ Main app URL:
 Admin app URL depends on admin config; run with:
 
 ```bash
-yarn admin:dev
+make admin-dev
 ```
 
 ## Common Commands
 
 ```bash
-yarn dev
-yarn build
-yarn lint:check
-yarn lint:fix
-yarn test
-yarn test:e2e
-yarn db:generate
-yarn db:studio
+make dev
+make build
+make lint
+make lint-fix
+make test
+make test-e2e
+make db-generate
+make db-studio
 ```
 
 ## Testing
@@ -45,7 +46,7 @@ yarn db:studio
 ### Unit and Component
 
 ```bash
-yarn test
+make test
 yarn test:watch
 yarn test:coverage
 ```
@@ -54,7 +55,7 @@ yarn test:coverage
 
 ```bash
 yarn playwright install chromium
-yarn test:e2e
+make test-e2e
 ```
 
 ## Storybook
@@ -63,6 +64,8 @@ yarn test:e2e
 yarn storybook
 yarn build-storybook
 ```
+
+Use `make help` to list all supported workflow commands. Direct Yarn commands are still available for scripts that are not wrapped by Make targets.
 
 ## Related References
 
