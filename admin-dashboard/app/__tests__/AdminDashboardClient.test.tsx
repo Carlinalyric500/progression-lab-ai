@@ -3,7 +3,12 @@ import userEvent from '@testing-library/user-event';
 
 import AdminDashboardClient from '../AdminDashboardClient';
 import useAdminDashboard from '../../components/admin/useAdminDashboard';
-import type { ProgressionDetail, ProgressionRow } from '../../components/admin/types';
+import type {
+  AdminProgressionFilters,
+  AdminUserFilters,
+  ProgressionDetail,
+  ProgressionRow,
+} from '../../components/admin/types';
 
 jest.mock('../../components/admin/useAdminDashboard', () => jest.fn());
 
@@ -46,16 +51,44 @@ const details: ProgressionDetail = {
   },
 };
 
+const defaultUserFilters: AdminUserFilters = {
+  query: '',
+  role: 'ALL',
+  resolvedPlan: 'ALL',
+  subscriptionStatus: 'ALL',
+  overrideState: 'ALL',
+};
+
+const defaultProgressionFilters: AdminProgressionFilters = {
+  query: '',
+  visibility: 'ALL',
+};
+
 const createHookState = (overrides: Partial<ReturnType<typeof useAdminDashboard>> = {}) => ({
   user: null,
   isSessionLoading: false,
   authError: null,
   rows: [],
   total: 0,
+  progressionFilters: defaultProgressionFilters,
   page: 0,
   pageSize: 25,
   isTableLoading: false,
   tableError: null,
+  userRows: [],
+  userTotal: 0,
+  userSummary: {
+    totalUsers: 0,
+    payingUsers: 0,
+    compedUsers: 0,
+    monthlyAiGenerations: 0,
+  },
+  userFilters: defaultUserFilters,
+  userPage: 0,
+  userPageSize: 25,
+  isUsersLoading: false,
+  usersError: null,
+  updatingUserId: null,
   detailsOpen: false,
   detailsLoading: false,
   details: null,
@@ -64,15 +97,25 @@ const createHookState = (overrides: Partial<ReturnType<typeof useAdminDashboard>
   isSubmittingLogin: false,
   canDelete: false,
   tableLabel: 'No records',
+  usersTableLabel: 'No users',
+  hasActiveProgressionFilters: false,
+  hasActiveUserFilters: false,
   setEmail: jest.fn(),
   setPassword: jest.fn(),
   setPage: jest.fn(),
+  setUserPage: jest.fn(),
   setDetailsOpen: jest.fn(),
   handleLogin: jest.fn(),
   handleLogout: jest.fn(),
   handleOpenDetails: jest.fn(),
   handleDelete: jest.fn(),
   handlePageSizeChange: jest.fn(),
+  handleProgressionFiltersChange: jest.fn(),
+  handleResetProgressionFilters: jest.fn(),
+  handleUsersPageSizeChange: jest.fn(),
+  handleUserFiltersChange: jest.fn(),
+  handleResetUserFilters: jest.fn(),
+  handlePlanOverrideChange: jest.fn(),
   ...overrides,
 });
 

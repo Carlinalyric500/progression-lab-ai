@@ -1,4 +1,6 @@
 export type Role = 'ADMIN' | 'AUDITOR';
+export type SubscriptionPlan = 'SESSION' | 'COMPOSER' | 'STUDIO' | 'COMP';
+export type UserRole = 'ADMIN' | 'AUDITOR' | 'USER';
 
 export type AdminUser = {
   id: string;
@@ -37,4 +39,55 @@ export type ProgressionDetail = {
   createdAt: string;
   updatedAt: string;
   owner: ProgressionOwner;
+};
+
+export type ProgressionVisibilityFilter = 'ALL' | 'PUBLIC' | 'PRIVATE';
+
+export type AdminProgressionFilters = {
+  query: string;
+  visibility: ProgressionVisibilityFilter;
+};
+
+export type AdminUserRow = {
+  id: string;
+  email: string;
+  name: string | null;
+  role: UserRole;
+  resolvedPlan: SubscriptionPlan;
+  planOverride: SubscriptionPlan | null;
+  subscriptionStatus: string | null;
+  billingInterval: string | null;
+  aiGenerationsUsed: number;
+  aiGenerationsLimit: number | null;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type AdminUserSummary = {
+  totalUsers: number;
+  payingUsers: number;
+  compedUsers: number;
+  monthlyAiGenerations: number;
+};
+
+export type UserRoleFilter = UserRole | 'ALL';
+export type UserResolvedPlanFilter = SubscriptionPlan | 'ALL';
+export type UserSubscriptionStatusFilter =
+  | 'ALL'
+  | 'ACTIVE'
+  | 'TRIALING'
+  | 'PAST_DUE'
+  | 'CANCELED'
+  | 'INCOMPLETE'
+  | 'INCOMPLETE_EXPIRED'
+  | 'UNPAID'
+  | 'NONE';
+export type UserOverrideFilter = 'ALL' | 'OVERRIDDEN' | 'NONE';
+
+export type AdminUserFilters = {
+  query: string;
+  role: UserRoleFilter;
+  resolvedPlan: UserResolvedPlanFilter;
+  subscriptionStatus: UserSubscriptionStatusFilter;
+  overrideState: UserOverrideFilter;
 };

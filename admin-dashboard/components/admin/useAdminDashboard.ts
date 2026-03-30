@@ -1,15 +1,39 @@
 'use client';
 
-import { FormEvent, useCallback, useEffect, useMemo, useState } from 'react';
-import type { AdminUser, ProgressionDetail, ProgressionRow } from './types';
+import { FormEvent, useCallback, useDeferredValue, useEffect, useMemo, useState } from 'react';
+import type {
+  AdminUser,
+  AdminProgressionFilters,
+  AdminUserFilters,
+  AdminUserRow,
+  AdminUserSummary,
+  ProgressionDetail,
+  ProgressionRow,
+  SubscriptionPlan,
+} from './types';
 import {
   deleteProgression,
+  fetchUsers,
   fetchProgressionDetails,
   fetchProgressions,
   fetchSession,
   login,
   logout,
+  updateUserPlanOverride,
 } from './adminApi';
+
+const DEFAULT_USER_FILTERS: AdminUserFilters = {
+  query: '',
+  role: 'ALL',
+  resolvedPlan: 'ALL',
+  subscriptionStatus: 'ALL',
+  overrideState: 'ALL',
+};
+
+const DEFAULT_PROGRESSION_FILTERS: AdminProgressionFilters = {
+  query: '',
+  visibility: 'ALL',
+};
 
 export default function useAdminDashboard() {
   const [user, setUser] = useState<AdminUser | null>(null);
@@ -18,10 +42,28 @@ export default function useAdminDashboard() {
 
   const [rows, setRows] = useState<ProgressionRow[]>([]);
   const [total, setTotal] = useState(0);
+  const [progressionFilters, setProgressionFilters] = useState<AdminProgressionFilters>(
+    DEFAULT_PROGRESSION_FILTERS,
+  );
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState(25);
   const [isTableLoading, setIsTableLoading] = useState(false);
   const [tableError, setTableError] = useState<string | null>(null);
+
+  const [userRows, setUserRows] = useState<AdminUserRow[]>([]);
+  const [userTotal, setUserTotal] = useState(0);
+  const [userSummary, setUserSummary] = useState<AdminUserSummary>({
+    totalUsers: 0,
+    payingUsers: 0,
+    compedUsers: 0,
+    monthlyAiGenerations: 0,
+  });
+  const [userFilters, setUserFilters] = useState<AdminUserFilters>(DEFAULT_USER_FILTERS);
+  const [userPage, setUserPage] = useState(0);
+  const [userPageSize, setUserPageSize] = useState(25);
+  const [isUsersLoading, setIsUsersLoading] = useState(false);
+  const [usersError, setUsersError] = useState<string | null>(null);
+  const [updatingUserId, setUpdatingUserId] = useState<string | null>(null);
 
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [detailsLoading, setDetailsLoading] = useState(false);
@@ -32,6 +74,39 @@ export default function useAdminDashboard() {
   const [isSubmittingLogin, setIsSubmittingLogin] = useState(false);
 
   const canDelete = user?.role === 'ADMIN';
+  const deferredProgressionQuery = useDeferredValue(progressionFilters.query);
+  const deferredUserQuery = useDeferredValue(userFilters.query);
+
+  const effectiveProgressionFilters = useMemo(
+    () => ({
+      ...progressionFilters,
+      query: deferredProgressionQuery.trim(),
+    }),
+    [deferredProgressionQuery, progressionFilters],
+  );
+
+  const effectiveUserFilters = useMemo(
+    () => ({
+      ...userFilters,
+      query: deferredUserQuery.trim(),
+    }),
+    [deferredUserQuery, userFilters],
+  );
+
+  const hasActiveProgressionFilters = useMemo(
+    () => progressionFilters.query.trim().length > 0 || progressionFilters.visibility !== 'ALL',
+    [progressionFilters],
+  );
+
+  const hasActiveUserFilters = useMemo(
+    () =>
+      userFilters.query.trim().length > 0 ||
+      userFilters.role !== 'ALL' ||
+      userFilters.resolvedPlan !== 'ALL' ||
+      userFilters.subscriptionStatus !== 'ALL' ||
+      userFilters.overrideState !== 'ALL',
+    [userFilters],
+  );
 
   const tableLabel = useMemo(() => {
     if (total === 0) {
@@ -42,6 +117,16 @@ export default function useAdminDashboard() {
     const to = Math.min(total, from + rows.length - 1);
     return `${from}-${to} of ${total}`;
   }, [page, pageSize, rows.length, total]);
+
+  const usersTableLabel = useMemo(() => {
+    if (userTotal === 0) {
+      return 'No users';
+    }
+
+    const from = userPage * userPageSize + 1;
+    const to = Math.min(userTotal, from + userRows.length - 1);
+    return `${from}-${to} of ${userTotal}`;
+  }, [userPage, userPageSize, userRows.length, userTotal]);
 
   const loadSession = useCallback(async () => {
     setIsSessionLoading(true);
@@ -73,7 +158,11 @@ export default function useAdminDashboard() {
       setTableError(null);
 
       try {
-        const data = await fetchProgressions({ page: nextPage, pageSize: nextPageSize });
+        const data = await fetchProgressions({
+          page: nextPage,
+          pageSize: nextPageSize,
+          filters: effectiveProgressionFilters,
+        });
 
         setRows(data.items);
         setTotal(data.total);
@@ -83,7 +172,34 @@ export default function useAdminDashboard() {
         setIsTableLoading(false);
       }
     },
-    [page, pageSize, user],
+    [effectiveProgressionFilters, page, pageSize, user],
+  );
+
+  const loadUsers = useCallback(
+    async (nextPage = userPage, nextPageSize = userPageSize) => {
+      if (!user) {
+        return;
+      }
+
+      setIsUsersLoading(true);
+      setUsersError(null);
+
+      try {
+        const data = await fetchUsers({
+          page: nextPage,
+          pageSize: nextPageSize,
+          filters: effectiveUserFilters,
+        });
+        setUserRows(data.items);
+        setUserTotal(data.total);
+        setUserSummary(data.summary);
+      } catch (error) {
+        setUsersError((error as Error).message);
+      } finally {
+        setIsUsersLoading(false);
+      }
+    },
+    [effectiveUserFilters, user, userPage, userPageSize],
   );
 
   useEffect(() => {
@@ -97,6 +213,14 @@ export default function useAdminDashboard() {
 
     void loadProgressions();
   }, [loadProgressions, user, page, pageSize]);
+
+  useEffect(() => {
+    if (!user) {
+      return;
+    }
+
+    void loadUsers();
+  }, [loadUsers, user, userPage, userPageSize]);
 
   const handleLogin = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -119,6 +243,16 @@ export default function useAdminDashboard() {
     setUser(null);
     setRows([]);
     setTotal(0);
+    setProgressionFilters({ ...DEFAULT_PROGRESSION_FILTERS });
+    setUserRows([]);
+    setUserTotal(0);
+    setUserFilters({ ...DEFAULT_USER_FILTERS });
+    setUserSummary({
+      totalUsers: 0,
+      payingUsers: 0,
+      compedUsers: 0,
+      monthlyAiGenerations: 0,
+    });
     setDetails(null);
     setDetailsOpen(false);
   };
@@ -165,16 +299,77 @@ export default function useAdminDashboard() {
     setPage(0);
   };
 
+  const handleProgressionFiltersChange = (nextFilters: Partial<AdminProgressionFilters>) => {
+    setProgressionFilters((currentFilters) => ({
+      ...currentFilters,
+      ...nextFilters,
+    }));
+    setPage(0);
+  };
+
+  const handleResetProgressionFilters = () => {
+    setProgressionFilters({ ...DEFAULT_PROGRESSION_FILTERS });
+    setPage(0);
+  };
+
+  const handleUsersPageSizeChange = (nextPageSize: number) => {
+    setUserPageSize(nextPageSize);
+    setUserPage(0);
+  };
+
+  const handleUserFiltersChange = (nextFilters: Partial<AdminUserFilters>) => {
+    setUserFilters((currentFilters) => ({
+      ...currentFilters,
+      ...nextFilters,
+    }));
+    setUserPage(0);
+  };
+
+  const handleResetUserFilters = () => {
+    setUserFilters({ ...DEFAULT_USER_FILTERS });
+    setUserPage(0);
+  };
+
+  const handlePlanOverrideChange = async (
+    targetUserId: string,
+    planOverride: SubscriptionPlan | null,
+  ) => {
+    if (user?.role !== 'ADMIN') {
+      return;
+    }
+
+    setUpdatingUserId(targetUserId);
+
+    try {
+      await updateUserPlanOverride({ userId: targetUserId, planOverride });
+      await loadUsers();
+    } catch (error) {
+      setUsersError((error as Error).message);
+    } finally {
+      setUpdatingUserId(null);
+    }
+  };
+
   return {
     user,
     isSessionLoading,
     authError,
     rows,
     total,
+    progressionFilters,
     page,
     pageSize,
     isTableLoading,
     tableError,
+    userRows,
+    userTotal,
+    userSummary,
+    userFilters,
+    userPage,
+    userPageSize,
+    isUsersLoading,
+    usersError,
+    updatingUserId,
     detailsOpen,
     detailsLoading,
     details,
@@ -183,14 +378,24 @@ export default function useAdminDashboard() {
     isSubmittingLogin,
     canDelete,
     tableLabel,
+    usersTableLabel,
+    hasActiveProgressionFilters,
+    hasActiveUserFilters,
     setEmail,
     setPassword,
     setPage,
+    setUserPage,
     setDetailsOpen,
     handleLogin,
     handleLogout,
     handleOpenDetails,
     handleDelete,
     handlePageSizeChange,
+    handleProgressionFiltersChange,
+    handleResetProgressionFilters,
+    handleUsersPageSizeChange,
+    handleUserFiltersChange,
+    handleResetUserFilters,
+    handlePlanOverrideChange,
   };
 }

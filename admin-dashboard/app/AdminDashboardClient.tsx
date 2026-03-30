@@ -1,11 +1,13 @@
 'use client';
 
 import { Alert, Container, Stack } from '@mui/material';
+import AdminSummaryCards from '../components/admin/AdminSummaryCards';
 import DashboardHeader from '../components/admin/DashboardHeader';
 import LoadingState from '../components/admin/LoadingState';
 import LoginCard from '../components/admin/LoginCard';
 import ProgressionDetailsDialog from '../components/admin/ProgressionDetailsDialog';
 import ProgressionsTable from '../components/admin/ProgressionsTable';
+import UsersTable from '../components/admin/UsersTable';
 import useAdminDashboard from '../components/admin/useAdminDashboard';
 
 export default function AdminDashboardClient() {
@@ -15,10 +17,20 @@ export default function AdminDashboardClient() {
     authError,
     rows,
     total,
+    progressionFilters,
     page,
     pageSize,
     isTableLoading,
     tableError,
+    userRows,
+    userTotal,
+    userSummary,
+    userFilters,
+    userPage,
+    userPageSize,
+    isUsersLoading,
+    usersError,
+    updatingUserId,
     detailsOpen,
     detailsLoading,
     details,
@@ -27,15 +39,25 @@ export default function AdminDashboardClient() {
     isSubmittingLogin,
     canDelete,
     tableLabel,
+    usersTableLabel,
+    hasActiveProgressionFilters,
+    hasActiveUserFilters,
     setEmail,
     setPassword,
     setPage,
+    setUserPage,
     setDetailsOpen,
     handleLogin,
     handleLogout,
     handleOpenDetails,
     handleDelete,
     handlePageSizeChange,
+    handleProgressionFiltersChange,
+    handleResetProgressionFilters,
+    handleUsersPageSizeChange,
+    handleUserFiltersChange,
+    handleResetUserFilters,
+    handlePlanOverrideChange,
   } = useAdminDashboard();
 
   if (isSessionLoading) {
@@ -62,6 +84,29 @@ export default function AdminDashboardClient() {
         <DashboardHeader user={user} onLogout={() => void handleLogout()} />
 
         {tableError ? <Alert severity="error">{tableError}</Alert> : null}
+        {usersError ? <Alert severity="error">{usersError}</Alert> : null}
+
+        <AdminSummaryCards summary={userSummary} />
+
+        <UsersTable
+          rows={userRows}
+          total={userTotal}
+          page={userPage}
+          pageSize={userPageSize}
+          isLoading={isUsersLoading}
+          filters={userFilters}
+          hasActiveFilters={hasActiveUserFilters}
+          tableLabel={usersTableLabel}
+          canEditPlanOverride={user.role === 'ADMIN'}
+          updatingUserId={updatingUserId}
+          onPageChange={setUserPage}
+          onPageSizeChange={handleUsersPageSizeChange}
+          onFiltersChange={handleUserFiltersChange}
+          onResetFilters={handleResetUserFilters}
+          onPlanOverrideChange={(userId, planOverride) =>
+            void handlePlanOverrideChange(userId, planOverride)
+          }
+        />
 
         <ProgressionsTable
           rows={rows}
@@ -70,11 +115,15 @@ export default function AdminDashboardClient() {
           pageSize={pageSize}
           isLoading={isTableLoading}
           canDelete={canDelete}
+          filters={progressionFilters}
+          hasActiveFilters={hasActiveProgressionFilters}
           tableLabel={tableLabel}
           onView={(id) => void handleOpenDetails(id)}
           onDelete={(id) => void handleDelete(id)}
           onPageChange={setPage}
           onPageSizeChange={handlePageSizeChange}
+          onFiltersChange={handleProgressionFiltersChange}
+          onResetFilters={handleResetProgressionFilters}
         />
 
         <ProgressionDetailsDialog

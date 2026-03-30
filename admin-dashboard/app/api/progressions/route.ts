@@ -1,3 +1,4 @@
+import type { Prisma } from '@prisma/client';
 import { NextRequest, NextResponse } from 'next/server';
 
 import { getAdminUserFromRequest, maskEmail } from '../../../lib/adminAccess';
@@ -5,6 +6,7 @@ import { prisma } from '../../../lib/prisma';
 
 const DEFAULT_PAGE_SIZE = 25;
 const MAX_PAGE_SIZE = 100;
+const VISIBILITY_FILTER_VALUES = ['PUBLIC', 'PRIVATE'] as const;
 
 function normalizePositiveInt(rawValue: string | null, fallback: number): number {
   const parsed = Number.parseInt(rawValue ?? '', 10);
@@ -13,6 +15,36 @@ function normalizePositiveInt(rawValue: string | null, fallback: number): number
   }
 
   return parsed;
+}
+
+function parseFilterValue<T extends string>(rawValue: string | null, allowedValues: readonly T[]) {
+  return rawValue && allowedValues.includes(rawValue as T) ? (rawValue as T) : 'ALL';
+}
+
+function buildProgressionsWhere(searchParams: URLSearchParams): Prisma.ProgressionWhereInput {
+  const query = searchParams.get('query')?.trim() ?? '';
+  const visibility = parseFilterValue(searchParams.get('visibility'), VISIBILITY_FILTER_VALUES);
+
+  const andFilters: Prisma.ProgressionWhereInput[] = [];
+
+  if (query) {
+    andFilters.push({
+      OR: [
+        { title: { contains: query, mode: 'insensitive' } },
+        { genre: { contains: query, mode: 'insensitive' } },
+        { user: { is: { email: { contains: query, mode: 'insensitive' } } } },
+        { user: { is: { name: { contains: query, mode: 'insensitive' } } } },
+      ],
+    });
+  }
+
+  if (visibility === 'PUBLIC') {
+    andFilters.push({ isPublic: true });
+  } else if (visibility === 'PRIVATE') {
+    andFilters.push({ isPublic: false });
+  }
+
+  return andFilters.length > 0 ? { AND: andFilters } : {};
 }
 
 export async function GET(request: NextRequest) {
@@ -27,10 +59,12 @@ export async function GET(request: NextRequest) {
       normalizePositiveInt(request.nextUrl.searchParams.get('pageSize'), DEFAULT_PAGE_SIZE),
       MAX_PAGE_SIZE,
     );
+    const progressionsWhere = buildProgressionsWhere(request.nextUrl.searchParams);
 
     const [total, rows] = await Promise.all([
-      prisma.progression.count(),
+      prisma.progression.count({ where: progressionsWhere }),
       prisma.progression.findMany({
+        where: progressionsWhere,
         orderBy: { updatedAt: 'desc' },
         skip: (page - 1) * pageSize,
         take: pageSize,
