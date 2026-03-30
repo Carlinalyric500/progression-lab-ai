@@ -10,13 +10,14 @@ import LoadingState from '../components/admin/LoadingState';
 import LoginCard from '../components/admin/LoginCard';
 import ProgressionDetailsDialog from '../components/admin/ProgressionDetailsDialog';
 import ProgressionsTable from '../components/admin/ProgressionsTable';
+import PromptBuilderPanel from '../components/admin/PromptBuilderPanel';
 import TierConfigTable from '../components/admin/TierConfigTable';
 import UsersTable from '../components/admin/UsersTable';
 import useAdminDashboard from '../components/admin/useAdminDashboard';
 
 export default function AdminDashboardClient() {
   const [activeTab, setActiveTab] = useState<
-    'overview' | 'progressions' | 'tier-config' | 'audit-log'
+    'overview' | 'progressions' | 'tier-config' | 'prompt-builder' | 'audit-log'
   >('overview');
 
   const {
@@ -95,12 +96,20 @@ export default function AdminDashboardClient() {
           <Tabs
             value={activeTab}
             onChange={(_, newValue) =>
-              setActiveTab(newValue as 'overview' | 'progressions' | 'tier-config' | 'audit-log')
+              setActiveTab(
+                newValue as
+                  | 'overview'
+                  | 'progressions'
+                  | 'tier-config'
+                  | 'prompt-builder'
+                  | 'audit-log',
+              )
             }
           >
             <Tab label="Users & Overview" value="overview" />
             <Tab label="Progressions" value="progressions" />
             {user.role === 'ADMIN' && <Tab label="Tier Configuration" value="tier-config" />}
+            <Tab label="Prompt Builder" value="prompt-builder" />
             <Tab label="Audit Log" value="audit-log" />
           </Tabs>
         </Box>
@@ -155,6 +164,8 @@ export default function AdminDashboardClient() {
         )}
 
         {activeTab === 'tier-config' && user.role === 'ADMIN' && <TierConfigTable />}
+
+        {activeTab === 'prompt-builder' && <PromptBuilderPanel role={user.role} />}
 
         {activeTab === 'audit-log' && <AdminAuditLogTable />}
 

@@ -1,8 +1,56 @@
-export const CHORD_SUGGESTION_PROMPT_KEY = 'chord_suggestions';
-const OUTPUT_LANGUAGE_PLACEHOLDER = '{{outputLanguage}}';
+-- CreateTable PromptVersion
+CREATE TABLE "PromptVersion" (
+    "id" text NOT NULL,
+    "promptKey" text NOT NULL,
+    "versionNumber" integer NOT NULL,
+    "contentTemplate" text NOT NULL,
+    "notes" text,
+    "isDraft" boolean NOT NULL DEFAULT false,
+    "isActive" boolean NOT NULL DEFAULT false,
+    "createdByUserId" text,
+    "createdByEmail" text,
+    "publishedAt" timestamp(3),
+    "createdAt" timestamp(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" timestamp(3) NOT NULL,
 
-export const DEFAULT_CHORD_SUGGESTION_PROMPT_TEMPLATE = `
-You are a songwriting and harmony assistant.
+    CONSTRAINT "PromptVersion_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateIndex
+CREATE UNIQUE INDEX "PromptVersion_promptKey_versionNumber_key" ON "PromptVersion"("promptKey", "versionNumber");
+
+-- CreateIndex
+CREATE INDEX "PromptVersion_promptKey_isActive_idx" ON "PromptVersion"("promptKey", "isActive");
+
+-- CreateIndex
+CREATE INDEX "PromptVersion_promptKey_isDraft_idx" ON "PromptVersion"("promptKey", "isDraft");
+
+-- CreateIndex
+CREATE INDEX "PromptVersion_promptKey_createdAt_idx" ON "PromptVersion"("promptKey", "createdAt");
+
+-- AddForeignKey
+ALTER TABLE "PromptVersion"
+ADD CONSTRAINT "PromptVersion_createdByUserId_fkey"
+FOREIGN KEY ("createdByUserId") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- Seed initial published prompt version for chord suggestions
+INSERT INTO "PromptVersion" (
+  "id",
+  "promptKey",
+  "versionNumber",
+  "contentTemplate",
+  "notes",
+  "isDraft",
+  "isActive",
+  "createdByEmail",
+  "publishedAt",
+  "createdAt",
+  "updatedAt"
+) VALUES (
+  'seed_chord_suggestions_v1',
+  'chord_suggestions',
+  1,
+  $$You are a songwriting and harmony assistant.
 
 Return:
 - 4 next chord suggestions
@@ -17,7 +65,7 @@ Rules:
 - You may use tasteful modal borrowing.
 - Prefer readable chord names like Fmaj7, Am7, Cmaj7, G7sus4.
 - Return only JSON matching the schema.
-- Write all explanatory prose fields in ${OUTPUT_LANGUAGE_PLACEHOLDER}.
+- Write all explanatory prose fields in {{outputLanguage}}.
 - Keep chord symbols, note names, and schema enum values in their original schema-compatible form.
 - Echo inputSummary.language exactly as the requested language code.
 
@@ -62,13 +110,12 @@ Rules:
 - make the voicings playable and stylistically appropriate for the requested genre and mood
 - for add2/add9/sus2 chords, keep the 2/9 close to the root in the right hand when that serves a pop or R&B feel
 
-When returning progressionIdeas, ensure pianoVoicings.length exactly matches chords.length.
-`.trim();
-
-export function renderPromptTemplate(template: string, outputLanguage: string): string {
-  return template.replaceAll(OUTPUT_LANGUAGE_PLACEHOLDER, outputLanguage);
-}
-
-export function buildChordSuggestionInstructions(outputLanguage: string): string {
-  return renderPromptTemplate(DEFAULT_CHORD_SUGGESTION_PROMPT_TEMPLATE, outputLanguage);
-}
+When returning progressionIdeas, ensure pianoVoicings.length exactly matches chords.length.$$, 
+  'Seeded from hardcoded default prompt',
+  false,
+  true,
+  'system-seed',
+  CURRENT_TIMESTAMP,
+  CURRENT_TIMESTAMP,
+  CURRENT_TIMESTAMP
+);

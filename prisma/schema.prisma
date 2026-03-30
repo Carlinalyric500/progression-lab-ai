@@ -57,6 +57,7 @@ model User {
   subscription Subscription?
   usageEvents  UsageEvent[]
   adminAuditLogs AdminAuditLog[]
+  promptVersions PromptVersion[]
 }
 
 model Subscription {
@@ -121,6 +122,28 @@ model AdminAuditLog {
   @@index([createdAt])
   @@index([targetType, targetId, createdAt])
   @@index([actorUserId, createdAt])
+}
+
+model PromptVersion {
+  id              String   @id @default(cuid())
+  promptKey       String
+  versionNumber   Int
+  contentTemplate String
+  notes           String?
+  isDraft         Boolean  @default(false)
+  isActive        Boolean  @default(false)
+  createdByUserId String?
+  createdByEmail  String?
+  publishedAt     DateTime?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  createdByUser User? @relation(fields: [createdByUserId], references: [id], onDelete: SetNull)
+
+  @@unique([promptKey, versionNumber])
+  @@index([promptKey, isActive])
+  @@index([promptKey, isDraft])
+  @@index([promptKey, createdAt])
 }
 
 model Progression {

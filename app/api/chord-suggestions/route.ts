@@ -10,7 +10,8 @@ import { createPlanLimitResponse } from '../../../lib/subscriptionResponses';
 import type { ChordSuggestionResponse, PianoVoicing } from '../../../lib/types';
 import { getCurrentMonthUsageCount, recordUsageEvent } from '../../../lib/usage';
 import { NOTE_TO_SEMITONE } from '../../../lib/noteToSemitone';
-import { buildChordSuggestionInstructions } from './instructions';
+import { getRenderedPrompt } from '../../../lib/promptVersionConfig';
+import { CHORD_SUGGESTION_PROMPT_KEY } from './instructions';
 import { chordSuggestionSchema } from './schema';
 
 const client = new OpenAI({
@@ -325,10 +326,14 @@ export async function POST(req: NextRequest) {
     const input = JSON.stringify(modelInput);
     const localeDefinition = getLocaleDefinition(modelInput.language);
     const model = accessContext.entitlements.gptModel;
+    const prompt = await getRenderedPrompt({
+      promptKey: CHORD_SUGGESTION_PROMPT_KEY,
+      outputLanguage: localeDefinition.modelLanguage,
+    });
 
     const response = await client.responses.create({
       model,
-      instructions: buildChordSuggestionInstructions(localeDefinition.modelLanguage),
+      instructions: prompt.text,
       input,
       text: {
         format: {
@@ -343,7 +348,12 @@ export async function POST(req: NextRequest) {
     await recordUsageEvent({
       userId: session.userId,
       eventType: UsageEventType.AI_GENERATION,
-      metadata: { model },
+      metadata: {
+        model,
+        promptKey: CHORD_SUGGESTION_PROMPT_KEY,
+        promptVersion: prompt.versionNumber,
+        promptSource: prompt.source,
+      },
     });
 
     const raw = response.output_text;

@@ -5,6 +5,8 @@ import type {
   AdminUserRow,
   AdminUserSummary,
   AdminAuditLogItem,
+  PromptBuilderState,
+  PromptVersion,
   ProgressionDetail,
   ProgressionRow,
   SubscriptionPlan,
@@ -208,4 +210,78 @@ export async function fetchAdminAuditLogs(limit = 100): Promise<AdminAuditLogIte
 
   const data = (await response.json()) as { items: AdminAuditLogItem[] };
   return data.items;
+}
+
+export async function fetchPromptBuilderState(promptKey?: string): Promise<PromptBuilderState> {
+  const searchParams = new URLSearchParams();
+  if (promptKey) {
+    searchParams.set('promptKey', promptKey);
+  }
+
+  const query = searchParams.toString();
+  const response = await fetch(`/api/prompt-versions${query ? `?${query}` : ''}`, {
+    credentials: 'include',
+    cache: 'no-store',
+  });
+
+  if (!response.ok) {
+    throw new Error(await readErrorMessage(response, 'Failed to fetch prompt versions'));
+  }
+
+  return (await response.json()) as PromptBuilderState;
+}
+
+export async function savePromptDraft(params: {
+  promptKey: string;
+  contentTemplate: string;
+  notes?: string | null;
+}): Promise<PromptVersion> {
+  const response = await fetch('/api/prompt-versions', {
+    method: 'POST',
+    credentials: 'include',
+    headers: createCsrfHeaders({ 'Content-Type': 'application/json' }),
+    body: JSON.stringify(params),
+  });
+
+  if (!response.ok) {
+    throw new Error(await readErrorMessage(response, 'Failed to save prompt draft'));
+  }
+
+  const data = (await response.json()) as { item: PromptVersion };
+  return data.item;
+}
+
+export async function publishPromptDraft(promptKey: string): Promise<PromptVersion> {
+  const response = await fetch('/api/prompt-versions/publish', {
+    method: 'POST',
+    credentials: 'include',
+    headers: createCsrfHeaders({ 'Content-Type': 'application/json' }),
+    body: JSON.stringify({ promptKey }),
+  });
+
+  if (!response.ok) {
+    throw new Error(await readErrorMessage(response, 'Failed to publish prompt draft'));
+  }
+
+  const data = (await response.json()) as { item: PromptVersion };
+  return data.item;
+}
+
+export async function rollbackPromptVersion(params: {
+  promptKey: string;
+  versionId: string;
+}): Promise<PromptVersion> {
+  const response = await fetch('/api/prompt-versions/rollback', {
+    method: 'POST',
+    credentials: 'include',
+    headers: createCsrfHeaders({ 'Content-Type': 'application/json' }),
+    body: JSON.stringify(params),
+  });
+
+  if (!response.ok) {
+    throw new Error(await readErrorMessage(response, 'Failed to rollback prompt version'));
+  }
+
+  const data = (await response.json()) as { item: PromptVersion };
+  return data.item;
 }

@@ -93,6 +93,29 @@ export type AdminAuditLogItem = {
   createdAt: string;
 };
 
+export type PromptVersion = {
+  id: string;
+  promptKey: string;
+  versionNumber: number;
+  contentTemplate: string;
+  notes: string | null;
+  isDraft: boolean;
+  isActive: boolean;
+  createdByUserId: string | null;
+  createdByEmail: string | null;
+  publishedAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type PromptBuilderState = {
+  promptKey: string;
+  keys: string[];
+  active: PromptVersion | null;
+  draft: PromptVersion | null;
+  versions: PromptVersion[];
+};
+
 export type UserRoleFilter = UserRole | 'ALL';
 export type UserResolvedPlanFilter = SubscriptionPlan | 'ALL';
 export type UserSubscriptionStatusFilter =

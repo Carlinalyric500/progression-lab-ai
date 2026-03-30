@@ -1,4 +1,4 @@
-import type { SubscriptionPlan } from '@prisma/client';
+import { Prisma, type SubscriptionPlan } from '@prisma/client';
 
 import type { AdminUser } from './adminAccess';
 import { prisma } from './prisma';
@@ -6,6 +6,10 @@ import type { SubscriptionTierConfig } from './subscriptionConfig';
 
 export const AUDIT_ACTION_TIER_CONFIG_UPDATED = 'UPDATE_SUBSCRIPTION_TIER_CONFIG';
 export const AUDIT_TARGET_TYPE_TIER_CONFIG = 'SUBSCRIPTION_TIER_CONFIG';
+export const AUDIT_TARGET_TYPE_PROMPT_VERSION = 'PROMPT_VERSION';
+export const AUDIT_ACTION_PROMPT_DRAFT_SAVED = 'SAVE_PROMPT_DRAFT';
+export const AUDIT_ACTION_PROMPT_PUBLISHED = 'PUBLISH_PROMPT_DRAFT';
+export const AUDIT_ACTION_PROMPT_ROLLED_BACK = 'ROLLBACK_PROMPT_VERSION';
 
 export type TierConfigAuditMetadata = {
   updatedFields: string[];
@@ -48,5 +52,29 @@ export async function getRecentTierConfigAuditLogs(limit: number) {
       createdAt: 'desc',
     },
     take: limit,
+  });
+}
+
+export async function recordPromptVersionAuditLog(params: {
+  actor: AdminUser;
+  action:
+    | typeof AUDIT_ACTION_PROMPT_DRAFT_SAVED
+    | typeof AUDIT_ACTION_PROMPT_PUBLISHED
+    | typeof AUDIT_ACTION_PROMPT_ROLLED_BACK;
+  promptKey: string;
+  metadata?: Record<string, unknown>;
+}): Promise<void> {
+  const metadata = params.metadata as Prisma.InputJsonValue | undefined;
+
+  await prisma.adminAuditLog.create({
+    data: {
+      actorUserId: params.actor.id,
+      actorEmail: params.actor.email,
+      actorRole: params.actor.role,
+      action: params.action,
+      targetType: AUDIT_TARGET_TYPE_PROMPT_VERSION,
+      targetId: params.promptKey,
+      metadata,
+    },
   });
 }
