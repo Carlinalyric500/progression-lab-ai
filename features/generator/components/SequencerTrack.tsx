@@ -23,6 +23,8 @@ type SequencerTrackProps = {
   events?: ArrangementEvent[];
   /** Optional insertion cursor step for non-transport insert workflows. */
   insertionCursorStep?: number | null;
+  /** Called when the user drags the insertion cursor to move it to a new step. */
+  onInsertionCursorMove?: (stepIndex: number) => void;
   /** The original (non-display-offset) stepIndex of the currently selected clip, or null. */
   selectedStepIndex?: number | null;
   /** Called when the user clicks a clip (sourceStepIndex) or the empty lane area (null). */
@@ -94,6 +96,7 @@ export default function SequencerTrack({
   scrollRequestKey,
   events = [],
   insertionCursorStep = null,
+  onInsertionCursorMove,
   selectedStepIndex = null,
   onClipClick,
   onClipMove,
@@ -117,6 +120,8 @@ export default function SequencerTrack({
   const dragSourceStepRef = useRef<number | null>(null);
   const [dragGhostStep, setDragGhostStep] = useState<number | null>(null);
   const [padDropPreviewStep, setPadDropPreviewStep] = useState<number | null>(null);
+  const cursorDragStartRef = useRef<{ x: number; step: number } | null>(null);
+  const cursorDragThresholdPx = 5;
   const stepsPerBeat = stepsPerBar / beatsPerBar;
   const normalizedLeadInBars = Math.max(0, leadInBars);
   const leadInSteps = normalizedLeadInBars * stepsPerBar;
@@ -281,6 +286,50 @@ export default function SequencerTrack({
       }
     };
   }, [isCenteredOverlayActive, isPlaying, maxScrollLeft, playheadAnchorPx, stepDurationMs]);
+
+  useEffect(() => {
+    if (!cursorDragStartRef.current) {
+      return;
+    }
+
+    const dragStart = cursorDragStartRef.current;
+    let isDragging = false;
+
+    const handlePointerMove = (moveEvent: PointerEvent) => {
+      const deltaX = moveEvent.clientX - dragStart.x;
+      const distance = Math.abs(deltaX);
+
+      if (!isDragging && distance < cursorDragThresholdPx) {
+        return;
+      }
+
+      if (!isDragging) {
+        isDragging = true;
+      }
+
+      const deltaPx = moveEvent.clientX - dragStart.x;
+      const deltaSteps = Math.round(deltaPx / PIXELS_PER_STEP);
+      const nextStep = Math.max(0, Math.min(totalSteps - 1, dragStart.step + deltaSteps));
+      onInsertionCursorMove?.(nextStep);
+    };
+
+    const handlePointerUp = () => {
+      window.removeEventListener('pointermove', handlePointerMove, { passive: false });
+      window.removeEventListener('pointerup', handlePointerUp, { passive: false });
+      window.removeEventListener('pointercancel', handlePointerUp, { passive: false });
+      cursorDragStartRef.current = null;
+    };
+
+    window.addEventListener('pointermove', handlePointerMove, { passive: false });
+    window.addEventListener('pointerup', handlePointerUp, { passive: false });
+    window.addEventListener('pointercancel', handlePointerUp, { passive: false });
+
+    return () => {
+      window.removeEventListener('pointermove', handlePointerMove);
+      window.removeEventListener('pointerup', handlePointerUp);
+      window.removeEventListener('pointercancel', handlePointerUp);
+    };
+  }, [onInsertionCursorMove, totalSteps]);
 
   const bars = useMemo(
     () =>
@@ -971,31 +1020,53 @@ export default function SequencerTrack({
                 {insertionCursorStep !== null ? (
                   <Box
                     aria-label={`Insertion cursor at step ${insertionCursorStep + 1}`}
+                    onPointerDown={(e) => {
+                      if (isPlaying) return;
+                      e.preventDefault();
+                      cursorDragStartRef.current = { x: e.clientX, step: insertionCursorStep };
+                    }}
                     sx={{
                       position: 'absolute',
-                      left: (insertionCursorStep + leadInSteps) * PIXELS_PER_STEP,
+                      left: (insertionCursorStep + leadInSteps) * PIXELS_PER_STEP - 8,
                       top: 0,
                       bottom: 0,
-                      width: 2,
-                      backgroundColor: insertionCursorColor,
-                      boxShadow: `0 0 0 1px ${alpha(insertionCursorColor, 0.2)}, 0 0 12px ${alpha(insertionCursorColor, 0.32)}`,
-                      zIndex: 6,
-                      pointerEvents: 'none',
+                      width: 18,
+                      backgroundColor: 'transparent',
+                      zIndex: 7,
+                      cursor: 'grab',
+                      '&:active': {
+                        cursor: 'grabbing',
+                      },
                     }}
                   >
                     <Box
                       sx={{
                         position: 'absolute',
-                        top: 6,
                         left: '50%',
-                        width: 0,
-                        height: 0,
-                        borderLeft: '5px solid transparent',
-                        borderRight: '5px solid transparent',
-                        borderTop: `7px solid ${insertionCursorColor}`,
+                        top: 0,
+                        bottom: 0,
+                        width: 2,
                         transform: 'translateX(-50%)',
+                        backgroundColor: insertionCursorColor,
+                        boxShadow: `0 0 0 1px ${alpha(insertionCursorColor, 0.2)}, 0 0 12px ${alpha(insertionCursorColor, 0.32)}`,
+                        pointerEvents: 'none',
                       }}
-                    />
+                    >
+                      <Box
+                        sx={{
+                          position: 'absolute',
+                          top: 6,
+                          left: '50%',
+                          width: 0,
+                          height: 0,
+                          borderLeft: '5px solid transparent',
+                          borderRight: '5px solid transparent',
+                          borderTop: `7px solid ${insertionCursorColor}`,
+                          transform: 'translateX(-50%)',
+                          pointerEvents: 'none',
+                        }}
+                      />
+                    </Box>
                   </Box>
                 ) : null}
 

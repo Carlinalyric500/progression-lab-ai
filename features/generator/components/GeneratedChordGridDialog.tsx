@@ -1544,6 +1544,9 @@ export default function GeneratedChordGridDialog({
           scrollRequestKey={trackScrollRequestKey}
           events={arrangementEvents}
           insertionCursorStep={recordingMode === 'single-shot' ? singleShotCursorStep : null}
+          onInsertionCursorMove={(stepIndex) => {
+            setSingleShotCursorStep(stepIndex);
+          }}
           selectedStepIndex={selectedStepIndex}
           onClipClick={(sourceStepIndex) => {
             setSelectedStepIndex((prev) => (prev === sourceStepIndex ? null : sourceStepIndex));
