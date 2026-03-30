@@ -14,6 +14,8 @@ import {
   ToggleButtonGroup,
   Typography,
 } from '@mui/material';
+import { startAuthentication } from '@simplewebauthn/browser';
+import type { PublicKeyCredentialRequestOptionsJSON } from '@simplewebauthn/browser';
 
 import { useAuth } from '../../../components/providers/AuthProvider';
 import { useAppSnackbar } from '../../../components/providers/AppSnackbarProvider';
@@ -27,6 +29,12 @@ type AuthFormData = {
   name: string;
   email: string;
   password: string;
+};
+
+type LoginResponseBody = {
+  status?: 'AUTHENTICATED' | 'MFA_REQUIRED';
+  options?: PublicKeyCredentialRequestOptionsJSON;
+  message?: string;
 };
 
 type AuthModalDialogProps = {
@@ -107,6 +115,29 @@ export default function AuthModalDialog({
         throw new Error(body.message ?? 'Authentication failed');
       }
 
+      if (mode === 'login') {
+        const body = (await response.json()) as LoginResponseBody;
+
+        if (body.status === 'MFA_REQUIRED') {
+          if (!body.options) {
+            throw new Error('Security key authentication options are missing');
+          }
+
+          const assertionResponse = await startAuthentication({ optionsJSON: body.options });
+          const verifyResponse = await fetch('/api/auth/webauthn/authenticate', {
+            method: 'POST',
+            credentials: 'include',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ response: assertionResponse }),
+          });
+
+          if (!verifyResponse.ok) {
+            const verifyBody = (await verifyResponse.json()) as { message?: string };
+            throw new Error(verifyBody.message ?? 'Security key verification failed');
+          }
+        }
+      }
+
       await refresh();
       showSuccess(mode === 'login' ? 'Signed in successfully.' : 'Account created successfully.');
 
@@ -138,47 +169,70 @@ export default function AuthModalDialog({
         maxWidth="sm"
         fullWidth
       >
-      <DialogTitle>Account</DialogTitle>
-      <DialogContent>
-        <Stack spacing={2.5} component="form" sx={{ mt: 1 }} onSubmit={handleSubmit(onSubmit)}>
-          <Box>
-            <Typography color="text.secondary">
-              Register or sign in without leaving your current work.
-            </Typography>
-          </Box>
+        <DialogTitle>Account</DialogTitle>
+        <DialogContent>
+          <Stack spacing={2.5} component="form" sx={{ mt: 1 }} onSubmit={handleSubmit(onSubmit)}>
+            <Box>
+              <Typography color="text.secondary">
+                Register or sign in without leaving your current work.
+              </Typography>
+            </Box>
 
-          {reasonMessage ? <Alert severity="info">{reasonMessage}</Alert> : null}
+            {reasonMessage ? <Alert severity="info">{reasonMessage}</Alert> : null}
 
-          <ToggleButtonGroup
-            exclusive
-            value={mode}
-            onChange={(_e, value: AuthMode | null) => {
-              if (value) {
-                setMode(value);
-                setApiError('');
-                reset();
-              }
-            }}
-            size="small"
-          >
-            <ToggleButton value="login">Login</ToggleButton>
-            <ToggleButton value="register">Register</ToggleButton>
-          </ToggleButtonGroup>
+            <ToggleButtonGroup
+              exclusive
+              value={mode}
+              onChange={(_e, value: AuthMode | null) => {
+                if (value) {
+                  setMode(value);
+                  setApiError('');
+                  reset();
+                }
+              }}
+              size="small"
+            >
+              <ToggleButton value="login">Login</ToggleButton>
+              <ToggleButton value="register">Register</ToggleButton>
+            </ToggleButtonGroup>
 
-          {mode === 'register' ? (
+            {mode === 'register' ? (
+              <Controller
+                name="name"
+                control={control}
+                rules={{
+                  required: 'Name is required',
+                  minLength: {
+                    value: 2,
+                    message: 'Name must be at least 2 characters',
+                  },
+                }}
+                render={({ field, fieldState: { error } }) => (
+                  <TextField
+                    label="Name"
+                    {...field}
+                    disabled={isSubmitting}
+                    error={!!error}
+                    helperText={error?.message}
+                  />
+                )}
+              />
+            ) : null}
+
             <Controller
-              name="name"
+              name="email"
               control={control}
               rules={{
-                required: 'Name is required',
-                minLength: {
-                  value: 2,
-                  message: 'Name must be at least 2 characters',
+                required: 'Email is required',
+                pattern: {
+                  value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                  message: 'Please enter a valid email address',
                 },
               }}
               render={({ field, fieldState: { error } }) => (
                 <TextField
-                  label="Name"
+                  label="Email"
+                  type="email"
                   {...field}
                   disabled={isSubmitting}
                   error={!!error}
@@ -186,80 +240,57 @@ export default function AuthModalDialog({
                 />
               )}
             />
-          ) : null}
 
-          <Controller
-            name="email"
-            control={control}
-            rules={{
-              required: 'Email is required',
-              pattern: {
-                value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                message: 'Please enter a valid email address',
-              },
-            }}
-            render={({ field, fieldState: { error } }) => (
-              <TextField
-                label="Email"
-                type="email"
-                {...field}
-                disabled={isSubmitting}
-                error={!!error}
-                helperText={error?.message}
-              />
-            )}
-          />
+            <Controller
+              name="password"
+              control={control}
+              rules={{
+                required: 'Password is required',
+                ...(mode === 'register' && {
+                  minLength: {
+                    value: 8,
+                    message: 'Password must be at least 8 characters',
+                  },
+                }),
+              }}
+              render={({ field, fieldState: { error } }) => (
+                <TextField
+                  label="Password"
+                  type="password"
+                  {...field}
+                  disabled={isSubmitting}
+                  error={!!error}
+                  helperText={
+                    error?.message || (mode === 'register' ? 'Minimum 8 characters' : undefined)
+                  }
+                />
+              )}
+            />
 
-          <Controller
-            name="password"
-            control={control}
-            rules={{
-              required: 'Password is required',
-              ...(mode === 'register' && {
-                minLength: {
-                  value: 8,
-                  message: 'Password must be at least 8 characters',
-                },
-              }),
-            }}
-            render={({ field, fieldState: { error } }) => (
-              <TextField
-                label="Password"
-                type="password"
-                {...field}
-                disabled={isSubmitting}
-                error={!!error}
-                helperText={
-                  error?.message || (mode === 'register' ? 'Minimum 8 characters' : undefined)
-                }
-              />
-            )}
-          />
+            {apiError ? <Alert severity="error">{apiError}</Alert> : null}
 
-          {apiError ? <Alert severity="error">{apiError}</Alert> : null}
-
-          <Stack direction="row" spacing={1.5} justifyContent="flex-end">
-            <Button onClick={onClose} disabled={isSubmitting}>
-              Cancel
-            </Button>
-            <Button
-              variant="contained"
-              type="submit"
-              disabled={isSubmitting || Object.keys(errors).length > 0}
-            >
-              {isSubmitting
-                ? mode === 'login'
-                  ? 'Signing in...'
-                  : 'Creating account...'
-                : mode === 'login'
-                  ? 'Sign in'
-                  : 'Create account'}
-            </Button>
+            <Stack direction="row" spacing={1.5} justifyContent="flex-end">
+              <Button onClick={onClose} disabled={isSubmitting}>
+                Cancel
+              </Button>
+              <Button
+                variant="contained"
+                type="submit"
+                disabled={isSubmitting || Object.keys(errors).length > 0}
+              >
+                {isSubmitting
+                  ? mode === 'login'
+                    ? 'Signing in...'
+                    : 'Creating account...'
+                  : mode === 'login'
+                    ? 'Sign in'
+                    : 'Create account'}
+              </Button>
+            </Stack>
           </Stack>
-        </Stack>
-      </DialogContent>
-    </Dialog>
-    <WebAuthnEnrollmentModal open={showEnrollmentModal} onClose={handleEnrollmentClose} />
+        </DialogContent>
+      </Dialog>
+      <WebAuthnEnrollmentModal open={showEnrollmentModal} onClose={handleEnrollmentClose} />
     </>
   );
 }

@@ -53,9 +53,13 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ message: 'Invalid credentials' }, { status: 401 });
     }
 
-    const requiresAdminWebAuthn = user.role === 'ADMIN' && !hasActiveBypass(user.mfaBypassUntil);
+    const bypassActive = hasActiveBypass(user.mfaBypassUntil);
+    const activeCredentials = await listActiveCredentials(user.id);
+    const hasActiveCredentials = activeCredentials.length > 0;
+    const requiresWebAuthn =
+      !bypassActive && (user.role === 'ADMIN' || (user.role === 'AUDITOR' && hasActiveCredentials));
 
-    if (!requiresAdminWebAuthn) {
+    if (!requiresWebAuthn) {
       const response = NextResponse.json({
         status: 'AUTHENTICATED',
         user: {
@@ -72,9 +76,8 @@ export async function POST(request: NextRequest) {
       return response;
     }
 
-    const activeCredentials = await listActiveCredentials(user.id);
     const response = NextResponse.json(
-      activeCredentials.length > 0
+      hasActiveCredentials
         ? {
             status: 'MFA_REQUIRED',
             user: {

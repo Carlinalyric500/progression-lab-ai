@@ -25,6 +25,19 @@ type WebAuthnEnrollmentModalProps = {
   onClose: () => void;
 };
 
+async function getResponseMessage(response: Response, fallback: string): Promise<string> {
+  try {
+    const data = (await response.json()) as { message?: string };
+    if (data.message) {
+      return data.message;
+    }
+  } catch {
+    // Ignore parse errors and return fallback.
+  }
+
+  return fallback;
+}
+
 async function getRegistrationOptions(): Promise<PublicKeyCredentialCreationOptionsJSON> {
   await ensureCsrfCookie();
 
@@ -36,7 +49,9 @@ async function getRegistrationOptions(): Promise<PublicKeyCredentialCreationOpti
   });
 
   if (!response.ok) {
-    throw new Error('Failed to start security key registration');
+    throw new Error(
+      await getResponseMessage(response, 'Failed to start security key registration'),
+    );
   }
 
   const data = (await response.json()) as { options: PublicKeyCredentialCreationOptionsJSON };
@@ -57,7 +72,7 @@ async function saveRegistration(regResponse: RegistrationResponseJSON): Promise<
   });
 
   if (!response.ok) {
-    throw new Error('Security key enrollment failed');
+    throw new Error(await getResponseMessage(response, 'Security key enrollment failed'));
   }
 }
 

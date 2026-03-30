@@ -22,9 +22,12 @@ import {
 import DeleteIcon from '@mui/icons-material/Delete';
 import SecurityIcon from '@mui/icons-material/Security';
 import { startRegistration } from '@simplewebauthn/browser';
-import type { PublicKeyCredentialCreationOptionsJSON, RegistrationResponseJSON } from '@simplewebauthn/browser';
+import type {
+  PublicKeyCredentialCreationOptionsJSON,
+  RegistrationResponseJSON,
+} from '@simplewebauthn/browser';
 
-import { createCsrfHeaders } from '../../../lib/csrfClient';
+import { createCsrfHeaders, ensureCsrfCookie } from '../../../lib/csrfClient';
 
 type Credential = {
   id: string;
@@ -36,6 +39,19 @@ type Credential = {
   createdAt: string;
   lastUsedAt: string | null;
 };
+
+async function getResponseMessage(response: Response, fallback: string): Promise<string> {
+  try {
+    const data = (await response.json()) as { message?: string };
+    if (data.message) {
+      return data.message;
+    }
+  } catch {
+    // Ignore parse errors and return fallback.
+  }
+
+  return fallback;
+}
 
 async function fetchCredentials(): Promise<Credential[]> {
   const response = await fetch('/api/auth/webauthn/credentials', {
@@ -52,6 +68,8 @@ async function fetchCredentials(): Promise<Credential[]> {
 }
 
 async function getRegistrationOptions(): Promise<PublicKeyCredentialCreationOptionsJSON> {
+  await ensureCsrfCookie();
+
   const response = await fetch('/api/auth/webauthn/register/options', {
     method: 'POST',
     credentials: 'include',
@@ -60,7 +78,9 @@ async function getRegistrationOptions(): Promise<PublicKeyCredentialCreationOpti
   });
 
   if (!response.ok) {
-    throw new Error('Failed to start security key registration');
+    throw new Error(
+      await getResponseMessage(response, 'Failed to start security key registration'),
+    );
   }
 
   const data = (await response.json()) as { options: PublicKeyCredentialCreationOptionsJSON };
@@ -68,6 +88,8 @@ async function getRegistrationOptions(): Promise<PublicKeyCredentialCreationOpti
 }
 
 async function saveRegistration(response: RegistrationResponseJSON, label?: string): Promise<void> {
+  await ensureCsrfCookie();
+
   const res = await fetch('/api/auth/webauthn/register/verify', {
     method: 'POST',
     credentials: 'include',
@@ -76,11 +98,13 @@ async function saveRegistration(response: RegistrationResponseJSON, label?: stri
   });
 
   if (!res.ok) {
-    throw new Error('Security key enrollment failed');
+    throw new Error(await getResponseMessage(res, 'Security key enrollment failed'));
   }
 }
 
 async function revokeCredential(credentialId: string): Promise<void> {
+  await ensureCsrfCookie();
+
   const response = await fetch('/api/auth/webauthn/credentials', {
     method: 'DELETE',
     credentials: 'include',
@@ -89,7 +113,7 @@ async function revokeCredential(credentialId: string): Promise<void> {
   });
 
   if (!response.ok) {
-    throw new Error('Failed to remove security key');
+    throw new Error(await getResponseMessage(response, 'Failed to remove security key'));
   }
 }
 
@@ -228,7 +252,12 @@ export default function SecuritySettingsContent() {
                         secondary={
                           <Stack direction="row" spacing={1} sx={{ mt: 0.5 }} alignItems="center">
                             {credential.backedUp ? (
-                              <Chip label="Backed up" size="small" color="success" variant="outlined" />
+                              <Chip
+                                label="Backed up"
+                                size="small"
+                                color="success"
+                                variant="outlined"
+                              />
                             ) : (
                               <Chip label="Single device" size="small" variant="outlined" />
                             )}
