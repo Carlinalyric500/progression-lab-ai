@@ -31,6 +31,7 @@ import RestoringState from './RestoringState';
 import { useAppLocale } from '../../../../components/providers/LocaleProvider';
 import { useAppSnackbar } from '../../../../components/providers/AppSnackbarProvider';
 import { useAuth } from '../../../../components/providers/AuthProvider';
+import { useAuthModal } from '../../../../components/providers/AuthModalProvider';
 import usePlaybackSettings from '../../hooks/usePlaybackSettings';
 import useGeneratorSessionCache from '../../hooks/useGeneratorSessionCache';
 import { applyPlaybackSettings, sanitizePlaybackSettings } from '../../lib/playbackSettingsModel';
@@ -55,9 +56,13 @@ const MAX_RANDOM_SELECTIONS = 7;
 const ADVENTUROUSNESS_INPUT_OPTIONS = [...ADVENTUROUSNESS_OPTIONS];
 const RANDOM_MODE_OPTIONS = MODE_INPUT_OPTIONS;
 const RANDOM_GENRE_OPTIONS = GENRE_INPUT_OPTIONS;
-const NextChordSuggestionsSection = lazy(() => import('../suggestions/NextChordSuggestionsSection'));
+const NextChordSuggestionsSection = lazy(
+  () => import('../suggestions/NextChordSuggestionsSection'),
+);
 const ProgressionIdeasSection = lazy(() => import('../suggestions/ProgressionIdeasSection'));
-const StructureSuggestionsSection = lazy(() => import('../suggestions/StructureSuggestionsSection'));
+const StructureSuggestionsSection = lazy(
+  () => import('../suggestions/StructureSuggestionsSection'),
+);
 const INITIAL_NEXT_SUGGESTIONS = 3;
 const INITIAL_PROGRESSION_IDEAS = 3;
 const INITIAL_STRUCTURE_SUGGESTIONS = 3;
@@ -98,6 +103,7 @@ export default function GeneratorPageContent() {
   const { t } = useTranslation('generator');
   const { locale } = useAppLocale();
   const { isAuthenticated } = useAuth();
+  const { openAuthModal } = useAuthModal();
   const {
     control,
     handleSubmit,
@@ -474,6 +480,7 @@ export default function GeneratorPageContent() {
     try {
       const response = await fetch('/api/chord-suggestions', {
         method: 'POST',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         signal: controller.signal,
         body: JSON.stringify({
@@ -492,6 +499,10 @@ export default function GeneratorPageContent() {
       });
 
       if (!response.ok) {
+        if (response.status === 401) {
+          openAuthModal({ mode: 'login', reason: 'generic' });
+          throw new Error('Authentication required');
+        }
         throw new Error('Request failed');
       }
 
@@ -500,6 +511,10 @@ export default function GeneratorPageContent() {
       cacheGeneratorResult(formData, json);
     } catch (err) {
       if (isAbortError(err)) {
+        return;
+      }
+
+      if (err instanceof Error && err.message === 'Authentication required') {
         return;
       }
 

@@ -131,6 +131,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             setUser(null);
           }
           setIsLoading(false);
+
+          // Revalidate cached auth state in the background so stale sessionStorage
+          // cannot keep the UI in an authenticated state after the cookie expires.
+          void refresh();
           return;
         }
 

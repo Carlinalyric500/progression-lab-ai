@@ -91,6 +91,7 @@ export default function AuthModalDialog({
     try {
       const response = await fetch(`/api/auth/${mode}`, {
         method: 'POST',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           name: data.name,
