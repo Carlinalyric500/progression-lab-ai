@@ -22,6 +22,21 @@ export function getStripeWebhookSecret(): string {
   return secret;
 }
 
+export function getStripeWebhookSecrets(): string[] {
+  const primary = getStripeWebhookSecret();
+  const additional = process.env.STRIPE_WEBHOOK_SECRETS ?? '';
+
+  const secrets = [
+    primary,
+    ...additional
+      .split(/[\n,]/)
+      .map((value) => value.trim())
+      .filter(Boolean),
+  ];
+
+  return Array.from(new Set(secrets));
+}
+
 export function getStripeClient(): Stripe {
   if (stripeClient) {
     return stripeClient;

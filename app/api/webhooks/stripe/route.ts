@@ -2,9 +2,24 @@ import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 
 import { syncStripeSubscription, updateUserStripeCustomerId } from '../../../../lib/billing';
-import { getStripeClient, getStripeWebhookSecret } from '../../../../lib/stripe';
+import { getStripeClient, getStripeWebhookSecrets } from '../../../../lib/stripe';
 
 export const runtime = 'nodejs';
+
+function constructWebhookEvent(stripe: Stripe, payload: string, signature: string): Stripe.Event {
+  const secrets = getStripeWebhookSecrets();
+  let lastError: unknown = null;
+
+  for (const secret of secrets) {
+    try {
+      return stripe.webhooks.constructEvent(payload, signature, secret);
+    } catch (error) {
+      lastError = error;
+    }
+  }
+
+  throw lastError ?? new Error('Unable to verify webhook signature');
+}
 
 async function syncInvoiceSubscription(invoice: Stripe.Invoice) {
   const subscriptionId =
@@ -30,7 +45,7 @@ export async function POST(request: NextRequest) {
 
     const body = await request.text();
     const stripe = getStripeClient();
-    const event = stripe.webhooks.constructEvent(body, stripeSignature, getStripeWebhookSecret());
+    const event = constructWebhookEvent(stripe, body, stripeSignature);
 
     switch (event.type) {
       case 'checkout.session.completed': {
