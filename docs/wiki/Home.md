@@ -11,13 +11,13 @@ If you are new to the project, start with:
 
 ## Quick Links
 
-- Architecture: `Architecture`
-- API: `API`
-- Database: `Database`
-- Development: `Development`
-- Deployment: `Deployment`
-- Security: `Security`
-- Prompt Versioning: `Features-Prompt-Versioning`
+- Architecture: [Architecture](Architecture.md)
+- API: [API](API.md)
+- Database: [Database](Database.md)
+- Development: [Development](Development.md)
+- Deployment: [Deployment](Deployment.md)
+- Security: [Security](Security.md)
+- Prompt Versioning: [Features-Prompt-Versioning](Features-Prompt-Versioning.md)
 
 ## Repository Runbooks
 
