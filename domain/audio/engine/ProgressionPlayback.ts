@@ -20,6 +20,7 @@ import { startPartPlayback } from './PartTransportPolicy';
 import { applyTransportTiming, buildTransportTiming } from './TransportTimingPolicy';
 import { beginPlaybackSession } from './PlaybackSessionPolicy';
 import { schedulePlaybackCleanupTimeout } from './PlaybackCleanupTimeoutPolicy';
+import { triggerScheduledChordEvent } from './ScheduledChordEventPolicy';
 import { triggerChordByStyle } from './ChordTrigger';
 
 interface ProgressionPlaybackDeps {
@@ -183,25 +184,22 @@ export const createProgressionPlayback = (deps: ProgressionPlaybackDeps): Progre
         inversionRegister,
       });
 
-      if (lockedNotes.length > 0) {
-        const timingJitter = getTimingOffset({ humanize, symmetric: true });
-        const effectiveVelocity = toEffectiveVelocity({
-          velocity,
-          velocityScale,
-          velocityJitter: getVelocityJitter(humanize),
-        });
-
-        triggerChordByStyle({
-          style: playbackStyle,
-          instrument: audioInstrument,
-          notes: lockedNotes,
-          duration: noteDuration,
-          startTime: timingJitter !== 0 ? time + timingJitter : time,
-          attack,
-          decay,
-          velocity: effectiveVelocity,
-        });
-      }
+      triggerScheduledChordEvent({
+        style: playbackStyle,
+        instrument: audioInstrument,
+        notes: lockedNotes,
+        duration: noteDuration,
+        eventTime: time,
+        attack,
+        decay,
+        velocity,
+        velocityScale,
+        humanize,
+        symmetricTiming: true,
+        getTimingOffset,
+        getVelocityJitter,
+        toEffectiveVelocity,
+      });
     }, events);
 
     if (metronomeEnabled) {
@@ -287,22 +285,21 @@ export const createProgressionPlayback = (deps: ProgressionPlaybackDeps): Progre
     });
 
     const part = new Tone.Part<{ time: number; velocityScale: number }>((time, event) => {
-      const timingDelay = getTimingOffset({ humanize, symmetric: false });
-      const scaledVelocity = toEffectiveVelocity({
-        velocity,
-        velocityScale: event.velocityScale,
-        velocityJitter: getVelocityJitter(humanize),
-      });
-
-      triggerChordByStyle({
+      triggerScheduledChordEvent({
         style: playbackStyle,
         instrument: audioInstrument,
         notes: lockedNotes,
         duration: noteDuration,
-        startTime: timingDelay > 0 ? time + timingDelay : time,
+        eventTime: time,
         attack,
         decay,
-        velocity: scaledVelocity,
+        velocity,
+        velocityScale: event.velocityScale,
+        humanize,
+        symmetricTiming: false,
+        getTimingOffset,
+        getVelocityJitter,
+        toEffectiveVelocity,
       });
     }, events);
 
