@@ -5,15 +5,15 @@ import { getSessionFromRequest } from '../../../../../../lib/auth';
 import { getAccessContextForSession } from '../../../../../../lib/entitlements';
 import { buildSessionPdfBytes } from '../../../../../../lib/pdf';
 import { prisma } from '../../../../../../lib/prisma';
-import { progressionToPdfOptions, getProgressionFileName } from '../../../../../../features/progressions/utils/progressionDownloadUtils';
+import {
+  progressionToPdfOptions,
+  getProgressionFileName,
+} from '../../../../../../features/progressions/utils/progressionDownloadUtils';
 import type { Progression } from '../../../../../../lib/types';
 
 export const runtime = 'nodejs';
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
-) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const session = getSessionFromRequest(request);
     if (!session) {

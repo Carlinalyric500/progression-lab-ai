@@ -10,8 +10,7 @@ jest.mock('../../../../../../../lib/auth', () => ({
 }));
 
 jest.mock('../../../../../../../lib/entitlements', () => ({
-  getAccessContextForSession: (...args: unknown[]) =>
-    mockGetAccessContextForSession(...args),
+  getAccessContextForSession: (...args: unknown[]) => mockGetAccessContextForSession(...args),
 }));
 
 jest.mock('../../../../../../../lib/prisma', () => ({
@@ -83,7 +82,7 @@ describe('GET /api/progressions/[id]/export/pdf', () => {
     });
     const res = await GET(makeRequest(), makeParams());
     expect(res.status).toBe(403);
-    const body = await res.json() as { message: string };
+    const body = (await res.json()) as { message: string };
     expect(body.message).toMatch(/Composer or Studio/);
   });
 

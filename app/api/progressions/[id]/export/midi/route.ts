@@ -10,10 +10,7 @@ import { getProgressionFileName } from '../../../../../../features/progressions/
 
 export const runtime = 'nodejs';
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
-) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const session = getSessionFromRequest(request);
     if (!session) {

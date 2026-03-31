@@ -10,8 +10,7 @@ jest.mock('../../../../../../../lib/auth', () => ({
 }));
 
 jest.mock('../../../../../../../lib/entitlements', () => ({
-  getAccessContextForSession: (...args: unknown[]) =>
-    mockGetAccessContextForSession(...args),
+  getAccessContextForSession: (...args: unknown[]) => mockGetAccessContextForSession(...args),
 }));
 
 jest.mock('../../../../../../../lib/prisma', () => ({
@@ -48,9 +47,7 @@ const ENTITLED_CONTEXT = {
 const PROGRESSION = {
   id: 'prog-1',
   title: 'My Jazz Suite',
-  pianoVoicings: [
-    { leftHand: ['C3', 'E3'], rightHand: ['G3', 'B3'] },
-  ],
+  pianoVoicings: [{ leftHand: ['C3', 'E3'], rightHand: ['G3', 'B3'] }],
 };
 
 describe('GET /api/progressions/[id]/export/midi', () => {
@@ -82,7 +79,7 @@ describe('GET /api/progressions/[id]/export/midi', () => {
     });
     const res = await GET(makeRequest(), makeParams());
     expect(res.status).toBe(403);
-    const body = await res.json() as { message: string };
+    const body = (await res.json()) as { message: string };
     expect(body.message).toMatch(/Composer or Studio/);
   });
 
