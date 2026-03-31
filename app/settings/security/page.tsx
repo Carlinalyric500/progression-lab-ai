@@ -21,7 +21,7 @@ export default async function SecuritySettingsPage() {
 
   return (
     <Suspense
-      fallback={<PageSuspenseFallback message="Loading security settings..." maxWidth="md" />}
+      fallback={<PageSuspenseFallback messageKey="settings.loadingSecurity" maxWidth="md" />}
     >
       <SecuritySettingsContent />
     </Suspense>

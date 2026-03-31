@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event';
 import type { ReactElement } from 'react';
 
 import { AppSnackbarProvider } from '../../../../components/providers/AppSnackbarProvider';
+import { LocaleProvider } from '../../../../components/providers/LocaleProvider';
 import SaveProgressionDialog from '../SaveProgressionDialog';
 import * as progressionsApi from '../../api/progressionsApi';
 import type { GeneratorSnapshot } from '../../../../lib/types';
@@ -15,7 +16,11 @@ jest.mock('../../../../components/providers/AuthProvider', () => ({
 }));
 
 const renderWithProviders = (ui: ReactElement) =>
-  render(<AppSnackbarProvider>{ui}</AppSnackbarProvider>);
+  render(
+    <LocaleProvider>
+      <AppSnackbarProvider>{ui}</AppSnackbarProvider>
+    </LocaleProvider>,
+  );
 
 describe('SaveProgressionDialog', () => {
   const mockGeneratorSnapshot: GeneratorSnapshot = {
@@ -123,6 +128,9 @@ describe('SaveProgressionDialog', () => {
       />,
     );
 
+    const titleInput = screen.getByLabelText('Title (optional)');
+    await userEvent.clear(titleInput);
+
     await userEvent.click(screen.getByText('Save'));
 
     await waitFor(() => {
@@ -163,6 +171,7 @@ describe('SaveProgressionDialog', () => {
     );
 
     const titleInput = screen.getByLabelText('Title (optional)');
+    await userEvent.clear(titleInput);
     await userEvent.type(titleInput, 'My Progress');
 
     const saveButton = screen.getByText('Save');

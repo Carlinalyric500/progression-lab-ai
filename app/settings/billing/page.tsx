@@ -16,7 +16,9 @@ export default async function BillingSettingsPage() {
   }
 
   return (
-    <Suspense fallback={<PageSuspenseFallback message="Loading billing..." maxWidth="lg" />}>
+    <Suspense
+      fallback={<PageSuspenseFallback messageKey="settings.loadingBilling" maxWidth="lg" />}
+    >
       <BillingPageContent />
     </Suspense>
   );

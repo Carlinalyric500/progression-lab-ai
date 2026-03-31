@@ -90,20 +90,14 @@ export default function TransportBar({
   const { appColors } = theme.palette;
 
   const keyboardShortcutItems = [
-    t('ui.chordGrid.keyboardShortcutPads', { defaultValue: 'Pads: 1-0, then A-Z.' }),
-    t('ui.chordGrid.keyboardShortcutTransport', { defaultValue: 'Space: play or stop the track.' }),
-    t('ui.chordGrid.keyboardShortcutRecord', { defaultValue: 'Shift: toggle recording.' }),
+    t('ui.chordGrid.keyboardShortcutPads'),
+    t('ui.chordGrid.keyboardShortcutTransport'),
+    t('ui.chordGrid.keyboardShortcutRecord'),
   ];
   const desktopKeyboardShortcutItems = [
-    t('ui.chordGrid.keyboardShortcutDelete', {
-      defaultValue: 'Delete / Backspace: remove all events at the selected step.',
-    }),
-    t('ui.chordGrid.keyboardShortcutEscape', {
-      defaultValue: 'Escape: clear the current selection.',
-    }),
-    t('ui.chordGrid.keyboardShortcutNudge', {
-      defaultValue: 'Left / Right arrows: nudge the selected clip within the loop.',
-    }),
+    t('ui.chordGrid.keyboardShortcutDelete'),
+    t('ui.chordGrid.keyboardShortcutEscape'),
+    t('ui.chordGrid.keyboardShortcutNudge'),
   ];
 
   return (
@@ -134,9 +128,7 @@ export default function TransportBar({
         <Tooltip
           title={
             recordingMode === 'single-shot'
-              ? t('ui.chordGrid.recordDisabledInSingleShot', {
-                  defaultValue: 'Switch to Continuous mode to use live recording.',
-                })
+              ? t('ui.chordGrid.recordDisabledInSingleShot')
               : isCountInActive
                 ? t('ui.chordGrid.countInTooltip', {
                     current: currentBeatInBar,
@@ -183,7 +175,7 @@ export default function TransportBar({
               onSingleShotCursorStepChange(null);
             }
           }}
-          aria-label={t('ui.chordGrid.recordingModeLabel', { defaultValue: 'Recording mode' })}
+          aria-label={t('ui.chordGrid.recordingModeLabel')}
           sx={{
             '& .MuiToggleButton-root': {
               textTransform: 'none',
@@ -196,19 +188,15 @@ export default function TransportBar({
         >
           <ToggleButton
             value="continuous"
-            aria-label={t('ui.chordGrid.recordingModeContinuous', {
-              defaultValue: 'Continuous recording',
-            })}
+            aria-label={t('ui.chordGrid.recordingModeContinuous')}
           >
-            {t('ui.chordGrid.recordingModeContinuous', { defaultValue: 'Continuous' })}
+            {t('ui.chordGrid.recordingModeContinuous')}
           </ToggleButton>
           <ToggleButton
             value="single-shot"
-            aria-label={t('ui.chordGrid.recordingModeSingleShot', {
-              defaultValue: 'Single-shot recording',
-            })}
+            aria-label={t('ui.chordGrid.recordingModeSingleShot')}
           >
-            {t('ui.chordGrid.recordingModeSingleShot', { defaultValue: 'Single-shot' })}
+            {t('ui.chordGrid.recordingModeSingleShot')}
           </ToggleButton>
         </ToggleButtonGroup>
 
@@ -292,9 +280,7 @@ export default function TransportBar({
               title={
                 <Box sx={{ maxWidth: 340, py: 0.25 }}>
                   <Typography variant="subtitle2" sx={{ mb: 0.5 }}>
-                    {t('ui.chordGrid.keyboardShortcutsLabel', {
-                      defaultValue: 'Keyboard shortcuts',
-                    })}
+                    {t('ui.chordGrid.keyboardShortcutsLabel')}
                   </Typography>
                   <Box component="ul" sx={{ m: 0, pl: 2.25 }}>
                     {keyboardShortcutItems.map((item) => (
@@ -306,9 +292,7 @@ export default function TransportBar({
                   {isDesktopKeyboardUi ? (
                     <>
                       <Typography variant="subtitle2" sx={{ mt: 1.25, mb: 0.5 }}>
-                        {t('ui.chordGrid.keyboardShortcutDesktopTitle', {
-                          defaultValue: 'Desktop clip editing',
-                        })}
+                        {t('ui.chordGrid.keyboardShortcutDesktopTitle')}
                       </Typography>
                       <Box component="ul" sx={{ m: 0, pl: 2.25 }}>
                         {desktopKeyboardShortcutItems.map((item) => (
@@ -326,9 +310,7 @@ export default function TransportBar({
                 size="small"
                 variant="text"
                 startIcon={<KeyboardIcon fontSize="small" />}
-                aria-label={t('ui.chordGrid.keyboardShortcutsButtonLabel', {
-                  defaultValue: 'Tips',
-                })}
+                aria-label={t('ui.chordGrid.keyboardShortcutsButtonLabel')}
                 sx={{
                   px: 0.75,
                   minWidth: 0,
@@ -338,7 +320,7 @@ export default function TransportBar({
                 }}
               >
                 <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}>
-                  {t('ui.chordGrid.keyboardShortcutsButtonLabel', { defaultValue: 'Tips' })}
+                  {t('ui.chordGrid.keyboardShortcutsButtonLabel')}
                 </Box>
               </Button>
             </Tooltip>
@@ -392,13 +374,8 @@ export default function TransportBar({
             {' '}
             •{' '}
             {singleShotCursorStep === null
-              ? t('ui.chordGrid.singleShotCursorUnset', {
-                  defaultValue: 'Single-shot: click timeline to place cursor',
-                })
-              : t('ui.chordGrid.singleShotCursorSet', {
-                  defaultValue: 'Single-shot cursor: step {{step}}',
-                  step: singleShotCursorStep + 1,
-                })}
+              ? t('ui.chordGrid.singleShotCursorUnset')
+              : t('ui.chordGrid.singleShotCursorSet', { step: singleShotCursorStep + 1 })}
           </>
         ) : null}
       </Typography>

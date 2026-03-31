@@ -15,7 +15,7 @@ export async function POST(request: NextRequest) {
 
     const session = getSessionFromRequest(request);
     if (!session) {
-      return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ code: 'UNAUTHORIZED', message: 'Unauthorized' }, { status: 401 });
     }
 
     const payload = (await request.json()) as {
@@ -23,7 +23,13 @@ export async function POST(request: NextRequest) {
       label?: string | null;
     };
     if (!payload.response) {
-      return NextResponse.json({ message: 'Registration response is required' }, { status: 400 });
+      return NextResponse.json(
+        {
+          code: 'WEBAUTHN_REGISTRATION_RESPONSE_REQUIRED',
+          message: 'Registration response is required',
+        },
+        { status: 400 },
+      );
     }
 
     const { credential } = await verifyRegistrationAndStoreCredential({
@@ -45,6 +51,9 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.error('WebAuthn registration verify failed:', error);
-    return NextResponse.json({ message: 'WebAuthn enrollment failed' }, { status: 500 });
+    return NextResponse.json(
+      { code: 'WEBAUTHN_REGISTER_VERIFY_FAILED', message: 'WebAuthn enrollment failed' },
+      { status: 500 },
+    );
   }
 }

@@ -14,6 +14,7 @@ import {
   ToggleButtonGroup,
   Typography,
 } from '@mui/material';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../../components/providers/AuthProvider';
 import { useAppSnackbar } from '../../../components/providers/AppSnackbarProvider';
 import TextField from '../../../components/ui/TextField';
@@ -27,6 +28,7 @@ type AuthFormData = {
 };
 
 export default function AuthPageContent() {
+  const { t } = useTranslation('common');
   const searchParams = useSearchParams();
   const initialMode = searchParams.get('mode') === 'register' ? 'register' : 'login';
   const reason = searchParams.get('reason');
@@ -64,14 +66,18 @@ export default function AuthPageContent() {
 
       if (!response.ok) {
         const body = (await response.json()) as { message?: string };
-        throw new Error(body.message ?? 'Authentication failed');
+        throw new Error(body.message ?? t('auth.errors.authenticationFailed'));
       }
 
       // Refresh auth context with new user data
       await refresh();
-      showSuccess(mode === 'login' ? 'Signed in successfully.' : 'Account created successfully.');
+      showSuccess(
+        mode === 'login'
+          ? t('auth.messages.signedInSuccessfully')
+          : t('auth.messages.accountCreatedSuccessfully'),
+      );
     } catch (err) {
-      const message = (err as Error).message || 'Authentication failed';
+      const message = (err as Error).message || t('auth.errors.authenticationFailed');
       setApiError(message);
       showError(message);
     }
@@ -83,17 +89,15 @@ export default function AuthPageContent() {
         <Stack spacing={3} component="form" onSubmit={handleSubmit(onSubmit)}>
           <Box>
             <Typography variant="h4" component="h1" gutterBottom>
-              Account
+              {t('auth.dialog.title')}
             </Typography>
             <Typography color="text.secondary">
-              Register or sign in to access your saved progressions.
+              {t('auth.dialog.description')}
             </Typography>
           </Box>
 
           {reason === 'my-progressions' ? (
-            <Alert severity="info">
-              Create an account to access your personal saved progressions.
-            </Alert>
+            <Alert severity="info">{t('auth.reason.myProgressions')}</Alert>
           ) : null}
 
           <ToggleButtonGroup
@@ -108,8 +112,8 @@ export default function AuthPageContent() {
             }}
             size="small"
           >
-            <ToggleButton value="login">Login</ToggleButton>
-            <ToggleButton value="register">Register</ToggleButton>
+            <ToggleButton value="login">{t('auth.actions.login')}</ToggleButton>
+            <ToggleButton value="register">{t('auth.actions.register')}</ToggleButton>
           </ToggleButtonGroup>
 
           {mode === 'register' ? (
@@ -117,15 +121,15 @@ export default function AuthPageContent() {
               name="name"
               control={control}
               rules={{
-                required: 'Name is required',
+                required: t('auth.form.nameRequired'),
                 minLength: {
                   value: 2,
-                  message: 'Name must be at least 2 characters',
+                  message: t('auth.form.nameMinLength'),
                 },
               }}
               render={({ field, fieldState: { error } }) => (
                 <TextField
-                  label="Name"
+                  label={t('auth.form.nameLabel')}
                   {...field}
                   disabled={isSubmitting}
                   error={!!error}
@@ -139,15 +143,15 @@ export default function AuthPageContent() {
             name="email"
             control={control}
             rules={{
-              required: 'Email is required',
+              required: t('auth.form.emailRequired'),
               pattern: {
                 value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                message: 'Please enter a valid email address',
+                message: t('auth.form.emailInvalid'),
               },
             }}
             render={({ field, fieldState: { error } }) => (
               <TextField
-                label="Email"
+                label={t('auth.form.emailLabel')}
                 type="email"
                 {...field}
                 disabled={isSubmitting}
@@ -161,23 +165,23 @@ export default function AuthPageContent() {
             name="password"
             control={control}
             rules={{
-              required: 'Password is required',
+              required: t('auth.form.passwordRequired'),
               ...(mode === 'register' && {
                 minLength: {
                   value: 8,
-                  message: 'Password must be at least 8 characters',
+                  message: t('auth.form.passwordMinLength'),
                 },
               }),
             }}
             render={({ field, fieldState: { error } }) => (
               <TextField
-                label="Password"
+                label={t('auth.form.passwordLabel')}
                 type="password"
                 {...field}
                 disabled={isSubmitting}
                 error={!!error}
                 helperText={
-                  error?.message || (mode === 'register' ? 'Minimum 8 characters' : undefined)
+                  error?.message || (mode === 'register' ? t('auth.form.passwordMinLengthHint') : undefined)
                 }
               />
             )}
@@ -191,11 +195,11 @@ export default function AuthPageContent() {
           >
             {isSubmitting
               ? mode === 'login'
-                ? 'Signing in...'
-                : 'Creating account...'
+                ? t('auth.actions.signingIn')
+                : t('auth.actions.creatingAccount')
               : mode === 'login'
-                ? 'Sign in'
-                : 'Create account'}
+                ? t('auth.actions.signIn')
+                : t('auth.actions.createAccount')}
           </Button>
         </Stack>
       </CardContent>

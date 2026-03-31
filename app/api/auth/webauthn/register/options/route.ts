@@ -8,7 +8,7 @@ export async function POST(request: NextRequest) {
   try {
     const session = getSessionFromRequest(request);
     if (!session) {
-      return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ code: 'UNAUTHORIZED', message: 'Unauthorized' }, { status: 401 });
     }
 
     const options = await createRegistrationOptions({
@@ -25,6 +25,9 @@ export async function POST(request: NextRequest) {
     console.error('WebAuthn registration options failed:', error);
     const message =
       error instanceof Error ? error.message : 'Failed to generate registration options';
-    return NextResponse.json({ message }, { status: 500 });
+    return NextResponse.json(
+      { code: 'WEBAUTHN_REGISTER_OPTIONS_FAILED', message },
+      { status: 500 },
+    );
   }
 }

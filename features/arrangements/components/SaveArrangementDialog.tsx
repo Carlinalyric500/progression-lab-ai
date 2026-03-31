@@ -16,6 +16,7 @@ import {
   InputAdornment,
 } from '@mui/material';
 import RefreshIcon from '@mui/icons-material/Refresh';
+import { useTranslation } from 'react-i18next';
 
 import AppTextField from '../../../components/ui/TextField';
 import { useAppSnackbar } from '../../../components/providers/AppSnackbarProvider';
@@ -56,6 +57,7 @@ export default function SaveArrangementDialog({
   playbackSnapshot,
   sourceChords,
 }: SaveArrangementDialogProps) {
+  const { t } = useTranslation('common');
   const { showError, showSuccess } = useAppSnackbar();
   const { user } = useAuth();
   const isAdmin = user?.role === 'ADMIN';
@@ -97,17 +99,17 @@ export default function SaveArrangementDialog({
 
     try {
       await createArrangement(payload);
-      showSuccess('Arrangement saved!');
+      showSuccess(t('arrangements.saveDialog.messages.saved'));
       onSuccess?.();
       onClose();
     } catch (error) {
-      showError((error as Error).message || 'Failed to save arrangement');
+      showError((error as Error).message || t('arrangements.saveDialog.messages.saveFailed'));
     }
   };
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-      <DialogTitle>Save Arrangement</DialogTitle>
+      <DialogTitle>{t('arrangements.saveDialog.title')}</DialogTitle>
       <DialogContent>
         <Stack spacing={2} sx={{ mt: 2 }} component="form">
           <Controller
@@ -116,14 +118,14 @@ export default function SaveArrangementDialog({
             rules={{
               maxLength: {
                 value: 100,
-                message: 'Title must be less than 100 characters',
+                message: t('arrangements.saveDialog.form.titleMaxLength'),
               },
             }}
             render={({ field, fieldState: { error } }) => (
               <AppTextField
-                label="Title (optional)"
+                label={t('arrangements.saveDialog.form.titleLabel')}
                 {...field}
-                placeholder="Pad Groove Draft"
+                placeholder={t('arrangements.saveDialog.form.titlePlaceholder')}
                 disabled={isSubmitting}
                 error={!!error}
                 helperText={error?.message}
@@ -136,7 +138,7 @@ export default function SaveArrangementDialog({
                           disabled={isSubmitting}
                           edge="end"
                           size="small"
-                          aria-label="regenerate title"
+                          aria-label={t('arrangements.saveDialog.form.regenerateTitleAriaLabel')}
                         >
                           <RefreshIcon fontSize="small" />
                         </IconButton>
@@ -149,8 +151,11 @@ export default function SaveArrangementDialog({
           />
 
           <Typography variant="caption" color="text.secondary">
-            {timeline.events.length} events across {timeline.loopLengthBars} bar
-            {timeline.loopLengthBars > 1 ? 's' : ''} ({timeline.totalSteps} steps)
+            {t('arrangements.saveDialog.form.timelineSummary', {
+              eventCount: timeline.events.length,
+              barCount: timeline.loopLengthBars,
+              stepCount: timeline.totalSteps,
+            })}
           </Typography>
 
           {isAdmin ? (
@@ -167,10 +172,10 @@ export default function SaveArrangementDialog({
                         disabled={isSubmitting}
                       />
                     }
-                    label="Add to Examples"
+                    label={t('arrangements.saveDialog.form.addToExamplesLabel')}
                   />
                   <Typography variant="caption" color="text.secondary">
-                    Makes this arrangement visible to all users under Examples.
+                    {t('arrangements.saveDialog.form.addToExamplesHelperText')}
                   </Typography>
                 </Stack>
               )}
@@ -180,14 +185,16 @@ export default function SaveArrangementDialog({
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose} disabled={isSubmitting}>
-          Cancel
+          {t('arrangements.saveDialog.actions.cancel')}
         </Button>
         <Button
           onClick={handleSubmit(onSubmit)}
           variant="contained"
           disabled={isSubmitting || Object.keys(errors).length > 0}
         >
-          {isSubmitting ? 'Saving...' : 'Save arrangement'}
+          {isSubmitting
+            ? t('arrangements.saveDialog.actions.saving')
+            : t('arrangements.saveDialog.actions.save')}
         </Button>
       </DialogActions>
     </Dialog>

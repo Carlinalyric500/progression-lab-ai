@@ -4,7 +4,9 @@ import ProgressionsPageContent from '../../features/progressions/components/Prog
 
 export default function ProgressionsPage() {
   return (
-    <Suspense fallback={<PageSuspenseFallback message="Loading progressions..." maxWidth="lg" />}>
+    <Suspense
+      fallback={<PageSuspenseFallback messageKey="settings.loadingProgressions" maxWidth="lg" />}
+    >
       <ProgressionsPageContent />
     </Suspense>
   );

@@ -9,6 +9,7 @@ import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import AudioFileIcon from '@mui/icons-material/AudioFile';
 import { Box, IconButton, Skeleton, Stack, Tooltip, Typography } from '@mui/material';
 import { alpha, useTheme } from '@mui/material/styles';
+import { useTranslation } from 'react-i18next';
 
 import { useAppSnackbar } from '../../../components/providers/AppSnackbarProvider';
 import type { Arrangement } from '../../../lib/types';
@@ -31,18 +32,19 @@ function isAbortError(error: unknown): boolean {
     : (error as { name?: string })?.name === 'AbortError';
 }
 
-function timeAgo(dateStr: string | Date): string {
+function timeAgo(dateStr: string | Date, t: (key: string, options?: Record<string, unknown>) => string): string {
   const ms = Date.now() - new Date(dateStr).getTime();
   const minutes = Math.floor(ms / 60_000);
-  if (minutes < 1) return 'just now';
-  if (minutes < 60) return `${minutes}m ago`;
+  if (minutes < 1) return t('arrangements.list.meta.relative.justNow');
+  if (minutes < 60) return t('arrangements.list.meta.relative.minutesAgo', { count: minutes });
   const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours}h ago`;
+  if (hours < 24) return t('arrangements.list.meta.relative.hoursAgo', { count: hours });
   const days = Math.floor(hours / 24);
-  return `${days}d ago`;
+  return t('arrangements.list.meta.relative.daysAgo', { count: days });
 }
 
 export default function ArrangementsList({ onLoad, refreshSignal, onAvailabilityChange }: Props) {
+  const { t } = useTranslation('common');
   const theme = useTheme();
   const { showError, showSuccess } = useAppSnackbar();
   const isDarkMode = theme.palette.mode === 'dark';
@@ -66,7 +68,7 @@ export default function ArrangementsList({ onLoad, refreshSignal, onAvailability
           return;
         }
 
-        setFetchError((err as Error).message || 'Failed to load arrangements');
+        setFetchError((err as Error).message || t('arrangements.list.errors.load'));
       } finally {
         if (!signal?.aborted) {
           setIsLoading(false);
@@ -95,14 +97,14 @@ export default function ArrangementsList({ onLoad, refreshSignal, onAvailability
           onAvailabilityChange?.(next.length > 0);
           return next;
         });
-        showSuccess(`Deleted "${title}"`);
+        showSuccess(t('arrangements.list.messages.deleted', { title }));
       } catch (err) {
-        showError((err as Error).message || 'Failed to delete arrangement');
+        showError((err as Error).message || t('arrangements.list.errors.delete'));
       } finally {
         setDeletingId(null);
       }
     },
-    [onAvailabilityChange, showError, showSuccess],
+    [onAvailabilityChange, showError, showSuccess, t],
   );
 
   const handleDownloadPdf = useCallback(
@@ -112,12 +114,12 @@ export default function ArrangementsList({ onLoad, refreshSignal, onAvailability
         const pdfOptions = arrangementToPdfOptions(arrangement);
         await downloadSessionPdf(pdfOptions);
       } catch (err) {
-        showError((err as Error).message || 'Failed to download PDF');
+        showError((err as Error).message || t('arrangements.list.errors.downloadPdf'));
       } finally {
         setDownloadingPdfId(null);
       }
     },
-    [showError],
+    [showError, t],
   );
 
   const handleDownloadMidi = useCallback(
@@ -126,12 +128,12 @@ export default function ArrangementsList({ onLoad, refreshSignal, onAvailability
       try {
         downloadArrangementMidi(arrangement);
       } catch (err) {
-        showError((err as Error).message || 'Failed to download MIDI');
+        showError((err as Error).message || t('arrangements.list.errors.downloadMidi'));
       } finally {
         setDownloadingMidiId(null);
       }
     },
-    [showError],
+    [showError, t],
   );
 
   if (isLoading) {
@@ -150,7 +152,7 @@ export default function ArrangementsList({ onLoad, refreshSignal, onAvailability
         <Typography variant="caption" color="error.main">
           {fetchError}
         </Typography>
-        <Tooltip title="Retry">
+        <Tooltip title={t('arrangements.list.actions.retry')}>
           <IconButton size="small" onClick={() => void load()}>
             <RefreshIcon fontSize="small" />
           </IconButton>
@@ -162,7 +164,7 @@ export default function ArrangementsList({ onLoad, refreshSignal, onAvailability
   if (arrangements.length === 0) {
     return (
       <Typography variant="body2" color="text.secondary" sx={{ py: 1 }}>
-        No saved arrangements yet. Record a loop in the Chord Playground and save it.
+        {t('arrangements.list.empty')}
       </Typography>
     );
   }
@@ -182,10 +184,10 @@ export default function ArrangementsList({ onLoad, refreshSignal, onAvailability
       {arrangements.map((arr) => {
         const isDeleting = deletingId === arr.id;
         const meta = [
-          `${arr.playbackSnapshot.tempoBpm} BPM`,
+          t('arrangements.list.meta.tempoBpm', { value: arr.playbackSnapshot.tempoBpm }),
           arr.playbackSnapshot.timeSignature,
-          `${arr.timeline.loopLengthBars} bar${arr.timeline.loopLengthBars === 1 ? '' : 's'}`,
-          `${arr.timeline.events.length} event${arr.timeline.events.length === 1 ? '' : 's'}`,
+          t('arrangements.list.meta.bars', { count: arr.timeline.loopLengthBars }),
+          t('arrangements.list.meta.events', { count: arr.timeline.events.length }),
         ].join(' · ');
 
         return (
@@ -226,16 +228,16 @@ export default function ArrangementsList({ onLoad, refreshSignal, onAvailability
                 {arr.title}
               </Typography>
               <Typography variant="caption" sx={{ color: 'text.secondary', lineHeight: 1.3 }}>
-                {meta} · {timeAgo(arr.updatedAt)}
+                {meta} · {timeAgo(arr.updatedAt, t)}
               </Typography>
             </Box>
-            <Tooltip title="Download as PDF chart">
+            <Tooltip title={t('arrangements.list.actions.downloadPdfTitle')}>
               <span>
                 <IconButton
                   size="small"
                   onClick={() => void handleDownloadPdf(arr)}
                   disabled={deletingId === arr.id || downloadingPdfId === arr.id}
-                  aria-label={`Download ${arr.title} as PDF`}
+                  aria-label={t('arrangements.list.actions.downloadPdfAriaLabel', { title: arr.title })}
                   sx={{
                     color: theme.palette.info.main,
                     '&:hover': { backgroundColor: alpha(theme.palette.info.main, 0.1) },
@@ -259,13 +261,13 @@ export default function ArrangementsList({ onLoad, refreshSignal, onAvailability
                 </IconButton>
               </span>
             </Tooltip>
-            <Tooltip title="Download as MIDI">
+            <Tooltip title={t('arrangements.list.actions.downloadMidiTitle')}>
               <span>
                 <IconButton
                   size="small"
                   onClick={() => handleDownloadMidi(arr)}
                   disabled={deletingId === arr.id || downloadingMidiId === arr.id}
-                  aria-label={`Download ${arr.title} as MIDI`}
+                  aria-label={t('arrangements.list.actions.downloadMidiAriaLabel', { title: arr.title })}
                   sx={{
                     color: theme.palette.success.main,
                     '&:hover': { backgroundColor: alpha(theme.palette.success.main, 0.1) },
@@ -289,13 +291,13 @@ export default function ArrangementsList({ onLoad, refreshSignal, onAvailability
                 </IconButton>
               </span>
             </Tooltip>
-            <Tooltip title="Load in Chord Playground">
+            <Tooltip title={t('arrangements.list.actions.loadTitle')}>
               <span>
                 <IconButton
                   size="small"
                   onClick={() => onLoad(arr)}
                   disabled={isDeleting}
-                  aria-label={`Load arrangement ${arr.title}`}
+                  aria-label={t('arrangements.list.actions.loadAriaLabel', { title: arr.title })}
                   sx={{
                     color: theme.palette.primary.main,
                     '&:hover': { backgroundColor: alpha(theme.palette.primary.main, 0.1) },
@@ -305,13 +307,13 @@ export default function ArrangementsList({ onLoad, refreshSignal, onAvailability
                 </IconButton>
               </span>
             </Tooltip>
-            <Tooltip title="Delete">
+            <Tooltip title={t('arrangements.list.actions.deleteTitle')}>
               <span>
                 <IconButton
                   size="small"
                   onClick={() => void handleDelete(arr.id, arr.title)}
                   disabled={isDeleting}
-                  aria-label={`Delete arrangement ${arr.title}`}
+                  aria-label={t('arrangements.list.actions.deleteAriaLabel', { title: arr.title })}
                   sx={{
                     color: theme.palette.error.main,
                     '&:hover': { backgroundColor: alpha(theme.palette.error.main, 0.1) },

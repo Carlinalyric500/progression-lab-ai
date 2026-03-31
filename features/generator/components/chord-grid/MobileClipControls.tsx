@@ -48,48 +48,46 @@ export default function MobileClipControls({
     >
       <Box sx={{ flex: 1, minWidth: 160 }}>
         <Typography variant="subtitle2" sx={{ lineHeight: 1.2 }}>
-          {t('ui.chordGrid.selectedClipTitle', { defaultValue: 'Selected clip' })}
+          {t('ui.chordGrid.selectedClipTitle')}
         </Typography>
         <Typography variant="caption" color="text.secondary">
           {t('ui.chordGrid.selectedClipMeta', {
-            defaultValue:
-              '{{count}} event at step {{step}}. Drag the clip or use the controls to move it.',
             count: selectedStepEventCount,
             step: selectedStepIndex + 1,
           })}
         </Typography>
       </Box>
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, ml: 'auto' }}>
-        <Tooltip title={t('ui.chordGrid.moveClipLeft', { defaultValue: 'Move clip left' })}>
+        <Tooltip title={t('ui.chordGrid.moveClipLeft')}>
           <span>
             <IconButton
               size="small"
               onClick={onNudgeLeft}
               disabled={selectedStepIndex === 0}
-              aria-label={t('ui.chordGrid.moveClipLeft', { defaultValue: 'Move clip left' })}
+              aria-label={t('ui.chordGrid.moveClipLeft')}
             >
               <KeyboardArrowLeftIcon fontSize="small" />
             </IconButton>
           </span>
         </Tooltip>
-        <Tooltip title={t('ui.chordGrid.moveClipRight', { defaultValue: 'Move clip right' })}>
+        <Tooltip title={t('ui.chordGrid.moveClipRight')}>
           <span>
             <IconButton
               size="small"
               onClick={onNudgeRight}
               disabled={selectedStepIndex >= totalSteps - 1}
-              aria-label={t('ui.chordGrid.moveClipRight', { defaultValue: 'Move clip right' })}
+              aria-label={t('ui.chordGrid.moveClipRight')}
             >
               <KeyboardArrowRightIcon fontSize="small" />
             </IconButton>
           </span>
         </Tooltip>
-        <Tooltip title={t('ui.chordGrid.deleteSelectedClip', { defaultValue: 'Delete clip' })}>
+        <Tooltip title={t('ui.chordGrid.deleteSelectedClip')}>
           <span>
             <IconButton
               size="small"
               onClick={onDeleteClip}
-              aria-label={t('ui.chordGrid.deleteSelectedClip', { defaultValue: 'Delete clip' })}
+              aria-label={t('ui.chordGrid.deleteSelectedClip')}
               sx={{ color: theme.palette.error.main }}
             >
               <DeleteOutlineIcon fontSize="small" />
@@ -98,9 +96,7 @@ export default function MobileClipControls({
         </Tooltip>
       </Box>
       <Typography variant="caption" color="text.secondary" sx={{ width: '100%' }}>
-        {t('ui.chordGrid.touchEditHint', {
-          defaultValue: 'Tap a clip to select it. Drag it horizontally to move it.',
-        })}
+        {t('ui.chordGrid.touchEditHint')}
       </Typography>
     </Box>
   );

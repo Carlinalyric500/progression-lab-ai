@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { Box, Button, Container, Stack, Typography } from '@mui/material';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import Link from 'next/link';
+import { useTranslation } from 'react-i18next';
 
 import ProgressionCard from '../../../features/progressions/components/ProgressionCard';
 import { getSharedProgression } from '../../../features/progressions/api/progressionsApi';
@@ -64,6 +65,7 @@ function getSharedProgressionResource(shareId: string): SharedProgressionResourc
 }
 
 function SharedProgressionContent({ shareId }: { shareId: string }) {
+  const { t } = useTranslation('common');
   const progression = getSharedProgressionResource(shareId).read();
   const router = useRouter();
   const instrument: AudioInstrument = 'piano';
@@ -103,8 +105,8 @@ function SharedProgressionContent({ shareId }: { shareId: string }) {
       {progression.pianoVoicings && progression.pianoVoicings.length > 0 ? (
         <Box sx={{ width: '100%' }}>
           <PlaybackToggleButton
-            playTitle="Play progression"
-            stopTitle="Stop progression"
+            playTitle={t('sharedProgression.actions.play')}
+            stopTitle={t('sharedProgression.actions.stop')}
             isPlaying={playingId === `shared-page-${progression.id}`}
             isInitializing={initializingId === `shared-page-${progression.id}`}
             onClick={() => {
@@ -122,13 +124,14 @@ function SharedProgressionContent({ shareId }: { shareId: string }) {
         fullWidth
         sx={{ py: 2 }}
       >
-        Load into Lab
+        {t('sharedProgression.actions.loadIntoLab')}
       </Button>
     </Stack>
   );
 }
 
 export default function SharedProgressionPage() {
+  const { t } = useTranslation('common');
   const params = useParams();
   const shareId = params?.shareId as string;
 
@@ -137,16 +140,16 @@ export default function SharedProgressionPage() {
       <Stack spacing={4}>
         <Box>
           <Link href="/" passHref>
-            <Button variant="text">← Back to Lab</Button>
+            <Button variant="text">{t('sharedProgression.actions.backToLab')}</Button>
           </Link>
           <Typography variant="h3" component="h1" sx={{ mt: 2 }}>
-            Shared Progression
+            {t('sharedProgression.title')}
           </Typography>
         </Box>
         <Suspense
           fallback={
             <PageSuspenseFallback
-              message="Loading shared progression..."
+              messageKey="sharedProgression.loading"
               maxWidth="lg"
               padded={false}
             />

@@ -8,6 +8,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import AudioFileIcon from '@mui/icons-material/AudioFile';
+import { useTranslation } from 'react-i18next';
 
 import type { Progression } from '../../../lib/types';
 import { playProgression } from '../../../domain/audio/audio';
@@ -45,6 +46,7 @@ export default function ProgressionCard({
   isDeleting = false,
   instrument,
 }: ProgressionCardProps) {
+  const { t } = useTranslation('common');
   const [copied, setCopied] = useState(false);
   const [isDownloadingPdf, setIsDownloadingPdf] = useState(false);
   const [isDownloadingMidi, setIsDownloadingMidi] = useState(false);
@@ -124,7 +126,7 @@ export default function ProgressionCard({
         >
           {progression.chords?.length > 0
             ? (progression.chords as Array<{ name: string }>).map((c) => c.name).join(' → ')
-            : 'No chords'}
+            : t('progressions.card.noChords')}
         </Typography>
       </Box>
 
@@ -132,12 +134,12 @@ export default function ProgressionCard({
       <Stack spacing={1}>
         {progression.scale && (
           <Typography variant="body2">
-            <strong>Scale:</strong> {progression.scale}
+            <strong>{t('progressions.card.scaleLabel')}:</strong> {progression.scale}
           </Typography>
         )}
         {progression.feel && (
           <Typography variant="body2">
-            <strong>Feel:</strong> {progression.feel}
+            <strong>{t('progressions.card.feelLabel')}:</strong> {progression.feel}
           </Typography>
         )}
         {progression.notes && (
@@ -160,7 +162,9 @@ export default function ProgressionCard({
 
   const statusSection = (
     <CardStatus
-      primary={progression.isPublic ? '🌍 Public' : '🔒 Private'}
+      primary={
+        progression.isPublic ? t('progressions.card.visibilityPublic') : t('progressions.card.visibilityPrivate')
+      }
       secondary={new Date(progression.createdAt).toLocaleDateString()}
     />
   );
@@ -168,8 +172,8 @@ export default function ProgressionCard({
   const actionsSection = (
     <Stack direction="row" spacing={1} sx={{ justifyContent: 'flex-end', flexWrap: 'wrap' }}>
       <PlaybackToggleButton
-        playTitle="Play"
-        stopTitle="Stop"
+        playTitle={t('progressions.card.actions.play')}
+        stopTitle={t('progressions.card.actions.stop')}
         isPlaying={isPlaying}
         isInitializing={isInitializingAudio}
         onClick={() => {
@@ -184,9 +188,11 @@ export default function ProgressionCard({
         startIcon={<FileDownloadIcon />}
         onClick={handleDownloadPdf}
         disabled={isDownloadingPdf}
-        title="Download as PDF chart"
+        title={t('progressions.card.actions.downloadPdfTitle')}
       >
-        {isDownloadingPdf ? 'Downloading PDF...' : 'Download PDF'}
+        {isDownloadingPdf
+          ? t('progressions.card.actions.downloadingPdf')
+          : t('progressions.card.actions.downloadPdf')}
       </Button>
 
       <Button
@@ -195,9 +201,11 @@ export default function ProgressionCard({
         startIcon={<AudioFileIcon />}
         onClick={handleDownloadMidi}
         disabled={isDownloadingMidi || !canPlay}
-        title="Download as MIDI file"
+        title={t('progressions.card.actions.downloadMidiTitle')}
       >
-        {isDownloadingMidi ? 'Downloading MIDI...' : 'Download MIDI'}
+        {isDownloadingMidi
+          ? t('progressions.card.actions.downloadingMidi')
+          : t('progressions.card.actions.downloadMidi')}
       </Button>
 
       {onOpen && (
@@ -207,7 +215,7 @@ export default function ProgressionCard({
           startIcon={<OpenInNewIcon />}
           onClick={() => onOpen(progression)}
         >
-          Open
+          {t('progressions.card.actions.open')}
         </Button>
       )}
 
@@ -218,7 +226,7 @@ export default function ProgressionCard({
           startIcon={<FileCopyIcon />}
           onClick={handleCopyShareLink}
         >
-          {copied ? 'Copied!' : 'Share'}
+          {copied ? t('progressions.card.actions.copied') : t('progressions.card.actions.share')}
         </Button>
       )}
 
@@ -229,7 +237,7 @@ export default function ProgressionCard({
           startIcon={<EditIcon />}
           onClick={() => onEdit(progression)}
         >
-          Edit
+          {t('progressions.card.actions.edit')}
         </Button>
       )}
 
@@ -242,7 +250,7 @@ export default function ProgressionCard({
           onClick={() => onDelete(progression.id)}
           disabled={isDeleting}
         >
-          {isDeleting ? 'Deleting...' : 'Delete'}
+          {isDeleting ? t('progressions.card.actions.deleting') : t('progressions.card.actions.delete')}
         </Button>
       )}
     </Stack>

@@ -26,6 +26,7 @@ import type {
   PublicKeyCredentialCreationOptionsJSON,
   RegistrationResponseJSON,
 } from '@simplewebauthn/browser';
+import { useTranslation } from 'react-i18next';
 
 import { createCsrfHeaders, ensureCsrfCookie } from '../../../lib/csrfClient';
 
@@ -40,17 +41,64 @@ type Credential = {
   lastUsedAt: string | null;
 };
 
-async function getResponseMessage(response: Response, fallback: string): Promise<string> {
-  try {
-    const data = (await response.json()) as { message?: string };
-    if (data.message) {
-      return data.message;
-    }
-  } catch {
-    // Ignore parse errors and return fallback.
+type ApiError = Error & {
+  code?: string;
+};
+
+function toApiError(message: string, code?: string): ApiError {
+  const error = new Error(message) as ApiError;
+  error.code = code;
+  return error;
+}
+
+function resolveSecurityErrorKey(error: ApiError, fallbackKey: string): string {
+  if (error.code === 'UNAUTHORIZED') {
+    return 'auth.security.errors.unauthorized';
   }
 
-  return fallback;
+  if (error.code === 'WEBAUTHN_CREDENTIAL_ID_REQUIRED') {
+    return 'auth.security.errors.credentialIdRequired';
+  }
+
+  if (error.code === 'WEBAUTHN_CREDENTIAL_NOT_FOUND') {
+    return 'auth.security.errors.credentialNotFound';
+  }
+
+  if (error.code === 'WEBAUTHN_CREDENTIAL_REVOKE_FAILED') {
+    return 'auth.security.errors.removeFailed';
+  }
+
+  if (error.code === 'WEBAUTHN_REGISTER_OPTIONS_FAILED') {
+    return 'auth.security.errors.startRegistrationFailed';
+  }
+
+  if (error.code === 'WEBAUTHN_REGISTER_VERIFY_FAILED') {
+    return 'auth.security.errors.enrollmentFailed';
+  }
+
+  if (error.message === 'Unauthorized') {
+    return 'auth.security.errors.unauthorized';
+  }
+
+  if (error.message === 'credentialId is required') {
+    return 'auth.security.errors.credentialIdRequired';
+  }
+
+  if (error.message === 'Credential not found') {
+    return 'auth.security.errors.credentialNotFound';
+  }
+
+  return fallbackKey;
+}
+
+async function getResponseMessage(response: Response, fallback: string): Promise<ApiError> {
+  try {
+    const data = (await response.json()) as { message?: string; code?: string };
+    return toApiError(data.message || fallback, data.code);
+  } catch {
+    // Ignore parse errors and return fallback.
+    return toApiError(fallback);
+  }
 }
 
 async function fetchCredentials(): Promise<Credential[]> {
@@ -60,7 +108,7 @@ async function fetchCredentials(): Promise<Credential[]> {
   });
 
   if (!response.ok) {
-    throw new Error('Failed to load security keys');
+    throw await getResponseMessage(response, 'Failed to load security keys');
   }
 
   const data = (await response.json()) as { credentials: Credential[] };
@@ -78,9 +126,7 @@ async function getRegistrationOptions(): Promise<PublicKeyCredentialCreationOpti
   });
 
   if (!response.ok) {
-    throw new Error(
-      await getResponseMessage(response, 'Failed to start security key registration'),
-    );
+    throw await getResponseMessage(response, 'Failed to start security key registration');
   }
 
   const data = (await response.json()) as { options: PublicKeyCredentialCreationOptionsJSON };
@@ -98,7 +144,7 @@ async function saveRegistration(response: RegistrationResponseJSON, label?: stri
   });
 
   if (!res.ok) {
-    throw new Error(await getResponseMessage(res, 'Security key enrollment failed'));
+    throw await getResponseMessage(res, 'Security key enrollment failed');
   }
 }
 
@@ -113,11 +159,12 @@ async function revokeCredential(credentialId: string): Promise<void> {
   });
 
   if (!response.ok) {
-    throw new Error(await getResponseMessage(response, 'Failed to remove security key'));
+    throw await getResponseMessage(response, 'Failed to remove security key');
   }
 }
 
 export default function SecuritySettingsContent() {
+  const { t } = useTranslation('common');
   const [credentials, setCredentials] = useState<Credential[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -133,11 +180,12 @@ export default function SecuritySettingsContent() {
       const result = await fetchCredentials();
       setCredentials(result);
     } catch (error) {
-      setLoadError((error as Error).message);
+      const securityError = error as ApiError;
+      setLoadError(t(resolveSecurityErrorKey(securityError, 'auth.security.errors.loadFailed')));
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     void loadCredentials();
@@ -151,15 +199,17 @@ export default function SecuritySettingsContent() {
     try {
       const options = await getRegistrationOptions();
       const regResponse = await startRegistration({ optionsJSON: options });
-      await saveRegistration(regResponse, 'My security key');
+      await saveRegistration(regResponse, t('auth.security.defaultLabel'));
       setEnrollSuccess(true);
       await loadCredentials();
     } catch (error) {
-      const message = (error as Error).message ?? 'Security key enrollment failed';
+      const securityError = error as ApiError;
+      const message =
+        securityError.message ?? t('auth.security.errors.enrollmentFailed');
       setEnrollError(
         message.includes('NotAllowedError') || message.includes('The operation')
-          ? 'Security key interaction was cancelled or timed out.'
-          : message,
+          ? t('auth.security.errors.cancelledOrTimedOut')
+          : t(resolveSecurityErrorKey(securityError, 'auth.security.errors.enrollmentFailed')),
       );
     } finally {
       setIsEnrolling(false);
@@ -167,7 +217,7 @@ export default function SecuritySettingsContent() {
   };
 
   const handleRemove = async (credentialId: string) => {
-    if (!window.confirm('Remove this security key?')) {
+    if (!window.confirm(t('auth.security.confirmRemove'))) {
       return;
     }
 
@@ -177,7 +227,8 @@ export default function SecuritySettingsContent() {
       await revokeCredential(credentialId);
       await loadCredentials();
     } catch (error) {
-      setEnrollError((error as Error).message);
+      const securityError = error as ApiError;
+      setEnrollError(t(resolveSecurityErrorKey(securityError, 'auth.security.errors.removeFailed')));
     } finally {
       setRemovingId(null);
     }
@@ -188,17 +239,17 @@ export default function SecuritySettingsContent() {
       <Stack spacing={3}>
         <Box>
           <Typography variant="h5" component="h1" gutterBottom>
-            Security Keys
+            {t('auth.security.title')}
           </Typography>
           <Typography color="text.secondary">
-            Add hardware security keys (FIDO2 / WebAuthn) for stronger account protection.
+            {t('auth.security.description')}
           </Typography>
         </Box>
 
         {loadError ? <Alert severity="error">{loadError}</Alert> : null}
         {enrollError ? <Alert severity="error">{enrollError}</Alert> : null}
         {enrollSuccess ? (
-          <Alert severity="success">Security key enrolled successfully.</Alert>
+          <Alert severity="success">{t('auth.security.messages.enrolled')}</Alert>
         ) : null}
 
         <Card variant="outlined">
@@ -209,14 +260,16 @@ export default function SecuritySettingsContent() {
               alignItems="center"
               sx={{ mb: 2 }}
             >
-              <Typography variant="h6">Enrolled keys</Typography>
+              <Typography variant="h6">{t('auth.security.enrolledKeysTitle')}</Typography>
               <Button
                 variant="contained"
                 startIcon={<SecurityIcon />}
                 onClick={() => void handleAddKey()}
                 disabled={isEnrolling}
               >
-                {isEnrolling ? 'Follow browser prompt…' : 'Add security key'}
+                {isEnrolling
+                  ? t('auth.security.actions.followBrowserPrompt')
+                  : t('auth.security.actions.addSecurityKey')}
               </Button>
             </Stack>
 
@@ -226,7 +279,7 @@ export default function SecuritySettingsContent() {
               </Box>
             ) : credentials.length === 0 ? (
               <Typography color="text.secondary" sx={{ py: 2 }}>
-                No security keys enrolled.
+                {t('auth.security.empty')}
               </Typography>
             ) : (
               <List disablePadding>
@@ -235,10 +288,10 @@ export default function SecuritySettingsContent() {
                     {index > 0 ? <Divider /> : null}
                     <ListItem
                       secondaryAction={
-                        <Tooltip title="Remove key">
+                        <Tooltip title={t('auth.security.actions.removeKey')}>
                           <IconButton
                             edge="end"
-                            aria-label="remove security key"
+                            aria-label={t('auth.security.actions.removeKeyAriaLabel')}
                             onClick={() => void handleRemove(credential.id)}
                             disabled={removingId === credential.id}
                           >
@@ -248,21 +301,25 @@ export default function SecuritySettingsContent() {
                       }
                     >
                       <ListItemText
-                        primary={credential.label ?? 'Security key'}
+                        primary={credential.label ?? t('auth.security.defaultLabel')}
                         secondary={
                           <Stack direction="row" spacing={1} sx={{ mt: 0.5 }} alignItems="center">
                             {credential.backedUp ? (
                               <Chip
-                                label="Backed up"
+                                label={t('auth.security.backedUp')}
                                 size="small"
                                 color="success"
                                 variant="outlined"
                               />
                             ) : (
-                              <Chip label="Single device" size="small" variant="outlined" />
+                              <Chip
+                                label={t('auth.security.singleDevice')}
+                                size="small"
+                                variant="outlined"
+                              />
                             )}
                             <Typography variant="caption" color="text.secondary">
-                              Added{' '}
+                              {t('auth.security.meta.added')}{' '}
                               {new Date(credential.createdAt).toLocaleDateString(undefined, {
                                 year: 'numeric',
                                 month: 'short',
@@ -271,7 +328,7 @@ export default function SecuritySettingsContent() {
                             </Typography>
                             {credential.lastUsedAt ? (
                               <Typography variant="caption" color="text.secondary">
-                                · Last used{' '}
+                                · {t('auth.security.meta.lastUsed')}{' '}
                                 {new Date(credential.lastUsedAt).toLocaleDateString(undefined, {
                                   year: 'numeric',
                                   month: 'short',

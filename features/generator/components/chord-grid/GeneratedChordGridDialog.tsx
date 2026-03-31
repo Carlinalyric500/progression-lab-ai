@@ -420,9 +420,7 @@ export default function GeneratedChordGridDialog({
             insertManualEventAtStep(entry, stepIndex, { durationSteps: 1 });
             interaction$.setMobileTimelineInsertPadKey(null);
           }}
-          emptyTimelineHint={t('ui.chordGrid.dragOrRecordHint', {
-            defaultValue: 'Drag pads or record chords to place regions on the timeline',
-          })}
+          emptyTimelineHint={t('ui.chordGrid.dragOrRecordHint')}
         />
 
         {isMobile && interaction$.mobileTimelineInsertPadKey ? (
@@ -441,7 +439,6 @@ export default function GeneratedChordGridDialog({
           >
             <Typography variant="caption" color="text.secondary" sx={{ flex: 1 }}>
               {t('ui.chordGrid.mobileDragInsertHint', {
-                defaultValue: 'Tap the timeline to place {{chord}}.',
                 chord:
                   edit$.editableChords.find(
                     (c) => c.key === interaction$.mobileTimelineInsertPadKey,
@@ -454,17 +451,14 @@ export default function GeneratedChordGridDialog({
               onClick={() => interaction$.setMobileTimelineInsertPadKey(null)}
               sx={{ textTransform: 'none' }}
             >
-              {t('ui.buttons.cancel', { defaultValue: 'Cancel' })}
+              {t('ui.buttons.cancel')}
             </Button>
           </Box>
         ) : null}
 
         {recordingMode === 'single-shot' ? (
           <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 1.25 }}>
-            {t('ui.chordGrid.singleShotHint', {
-              defaultValue:
-                'Single-shot mode: place the timeline cursor, then tap pads to insert. Insertion is paused while playback runs.',
-            })}
+            {t('ui.chordGrid.singleShotHint')}
           </Typography>
         ) : null}
 

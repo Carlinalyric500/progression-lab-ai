@@ -52,9 +52,7 @@ export default function CircleOfFifthsAccordion({
     >
       <AccordionSummary
         expandIcon={<ExpandMoreIcon />}
-        aria-label={t('ui.chordGrid.suggestionModeAccordionLabel', {
-          defaultValue: 'Suggestion modes',
-        })}
+        aria-label={t('ui.chordGrid.suggestionModeAccordionLabel')}
         sx={{
           px: 1.25,
           minHeight: 0,
@@ -62,7 +60,7 @@ export default function CircleOfFifthsAccordion({
         }}
       >
         <Typography variant="subtitle2">
-          {t('ui.chordGrid.suggestionModeAccordionLabel', { defaultValue: 'Suggestion modes' })}
+          {t('ui.chordGrid.suggestionModeAccordionLabel')}
         </Typography>
       </AccordionSummary>
       <AccordionDetails sx={{ px: 1.25, pb: 1.25, pt: 0.25 }}>
@@ -77,9 +75,7 @@ export default function CircleOfFifthsAccordion({
               onSuggestionModeChange(mode);
             }
           }}
-          aria-label={t('ui.chordGrid.suggestionModeLabel', {
-            defaultValue: 'Circle of 5ths suggestions',
-          })}
+          aria-label={t('ui.chordGrid.suggestionModeLabel')}
           sx={{
             '& .MuiToggleButton-root': {
               textTransform: 'none',
@@ -93,35 +89,27 @@ export default function CircleOfFifthsAccordion({
         >
           <ToggleButton
             value="none"
-            aria-label={t('ui.chordGrid.suggestionModeOff', { defaultValue: 'Off' })}
+            aria-label={t('ui.chordGrid.suggestionModeOff')}
           >
-            {t('ui.chordGrid.suggestionModeOff', { defaultValue: 'Off' })}
+            {t('ui.chordGrid.suggestionModeOff')}
           </ToggleButton>
           <ToggleButton
             value="neighbors"
-            aria-label={t('ui.chordGrid.suggestionModeCurrent', {
-              defaultValue: 'Both directions',
-            })}
+            aria-label={t('ui.chordGrid.suggestionModeCurrent')}
           >
-            {t('ui.chordGrid.suggestionModeCurrent', { defaultValue: 'Both directions' })}
+            {t('ui.chordGrid.suggestionModeCurrent')}
           </ToggleButton>
           <ToggleButton
             value="clockwise"
-            aria-label={t('ui.chordGrid.suggestionModeClockwise', {
-              defaultValue: 'Dominant flow',
-            })}
+            aria-label={t('ui.chordGrid.suggestionModeClockwise')}
           >
-            {t('ui.chordGrid.suggestionModeClockwise', { defaultValue: 'Dominant flow' })}
+            {t('ui.chordGrid.suggestionModeClockwise')}
           </ToggleButton>
           <ToggleButton
             value="counterclockwise"
-            aria-label={t('ui.chordGrid.suggestionModeCounterclockwise', {
-              defaultValue: 'Subdominant flow',
-            })}
+            aria-label={t('ui.chordGrid.suggestionModeCounterclockwise')}
           >
-            {t('ui.chordGrid.suggestionModeCounterclockwise', {
-              defaultValue: 'Subdominant flow',
-            })}
+            {t('ui.chordGrid.suggestionModeCounterclockwise')}
           </ToggleButton>
         </ToggleButtonGroup>
       </AccordionDetails>
