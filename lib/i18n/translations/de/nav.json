@@ -5,5 +5,8 @@
   "structure": "Struktur",
   "myProgressions": "Meine Progressionen",
   "login": "Anmelden",
-  "logout": "Abmelden"
+  "logout": "Abmelden",
+  "pricing": "Pricing",
+  "billing": "Billing",
+  "security": "Security"
 }

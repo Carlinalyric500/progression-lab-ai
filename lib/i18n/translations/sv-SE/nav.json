@@ -5,5 +5,8 @@
   "structure": "Struktur",
   "myProgressions": "Mina progressioner",
   "login": "Logga in",
-  "logout": "Logga ut"
+  "logout": "Logga ut",
+  "pricing": "Pricing",
+  "billing": "Billing",
+  "security": "Security"
 }

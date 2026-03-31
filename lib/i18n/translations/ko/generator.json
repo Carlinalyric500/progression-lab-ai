@@ -170,7 +170,8 @@
       "playArrangement": "편곡 재생",
       "stopArrangement": "편곡 정지",
       "saveArrangement": "편곡 저장",
-      "edit": "편집"
+      "edit": "편집",
+      "pdf": "PDF"
     },
     "sectionTitles": {
       "nextChordSuggestions": "다음 코드 제안",
@@ -179,7 +180,17 @@
     },
     "labels": {
       "commonChordExamples": "일반적인 코드 예시",
-      "harmonicSource": "화성 출처: {{label}}"
+      "harmonicSource": "화성 출처: {{label}}",
+      "arrangementName": "Arrangement",
+      "romanNumeralLabel": "Roman numeral:",
+      "tensionLabel": "Tension:",
+      "confidenceLabel": "Confidence:",
+      "voicingHintLabel": "Voicing hint:",
+      "leftHandLabel": "Left hand:",
+      "rightHandLabel": "Right hand:",
+      "leftHandShort": "LH:",
+      "rightHandShort": "RH:",
+      "tempoBpmLabel": "Tempo: {{tempo}} BPM"
     },
     "messages": {
       "noGuitarDiagram": "사용 가능한 기타 다이어그램이 없습니다.",
@@ -219,7 +230,47 @@
       "countInActive": "카운트인 활성",
       "stepSummary": "스텝 {{current}}/{{total}}",
       "eventSingular": "{{count}} 이벤트",
-      "eventPlural": "{{count}} 이벤트"
+      "eventPlural": "{{count}} 이벤트",
+      "keyboardShortcutsButtonLabel": "Tips",
+      "recordingModeLabel": "Recording mode",
+      "recordingModeContinuous": "Continuous",
+      "recordingModeSingleShot": "Single-shot",
+      "recordDisabledInSingleShot": "Switch to Continuous mode to use live recording.",
+      "dragOrRecordHint": "Drag pads or record chords to place regions on the timeline",
+      "mobileDragInsertHint": "Tap the timeline to place {{chord}}.",
+      "singleShotHint": "Single-shot mode: place the timeline cursor, then tap pads to insert. Insertion is paused while playback runs.",
+      "singleShotCursorUnset": "Single-shot: click timeline to place cursor",
+      "singleShotCursorSet": "Single-shot cursor: step {{step}}",
+      "selectedClipTitle": "Selected clip",
+      "selectedClipMeta": "{{count}} event at step {{step}}. Drag the clip or use the controls to move it.",
+      "moveClipLeft": "Move clip left",
+      "moveClipRight": "Move clip right",
+      "deleteSelectedClip": "Delete clip",
+      "touchEditHint": "Tap a clip to select it. Drag it horizontally to move it.",
+      "suggestionModeAccordionLabel": "Suggestion modes",
+      "suggestionModeLabel": "Suggestion mode",
+      "suggestionModeOff": "Off",
+      "suggestionModeCurrent": "Both directions",
+      "suggestionModeClockwise": "Dominant flow",
+      "suggestionModeCounterclockwise": "Subdominant flow"
+    },
+    "playback": {
+      "initializingAudio": "Initializing audio",
+      "initializingAudioEllipsis": "Initializing audio...",
+      "playPlaybackAriaLabel": "Play playback",
+      "stopPlaybackAriaLabel": "Stop playback"
+    },
+    "playbackSettings": {
+      "attackLabel": "Attack",
+      "decayLabel": "Decay",
+      "attackAriaLabel": "Attack time",
+      "decayAriaLabel": "Decay time",
+      "attackValue": "Attack: {{value}}s",
+      "decayValue": "Decay: {{value}}s",
+      "octaveShiftAriaLabel": "Octave shift",
+      "inversionRegisterAriaLabel": "Inversion register",
+      "playbackStyleAriaLabel": "Playback style",
+      "timeSignatureAriaLabel": "Time signature"
     }
   }
 }

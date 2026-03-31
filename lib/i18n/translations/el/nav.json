@@ -5,5 +5,8 @@
   "structure": "Δομή",
   "myProgressions": "Οι πρόοδοί μου",
   "login": "Σύνδεση",
-  "logout": "Αποσύνδεση"
+  "logout": "Αποσύνδεση",
+  "pricing": "Pricing",
+  "billing": "Billing",
+  "security": "Security"
 }

@@ -22,7 +22,7 @@ function serializeCredential(c: PrismaWebAuthnCredential) {
 export async function GET(request: NextRequest) {
   const session = getSessionFromRequest(request);
   if (!session) {
-    return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
+    return NextResponse.json({ code: 'UNAUTHORIZED', message: 'Unauthorized' }, { status: 401 });
   }
 
   const credentials = await listActiveCredentials(session.userId);
@@ -38,12 +38,15 @@ export async function DELETE(request: NextRequest) {
 
     const session = getSessionFromRequest(request);
     if (!session) {
-      return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ code: 'UNAUTHORIZED', message: 'Unauthorized' }, { status: 401 });
     }
 
     const payload = (await request.json()) as { credentialId?: string };
     if (!payload.credentialId) {
-      return NextResponse.json({ message: 'credentialId is required' }, { status: 400 });
+      return NextResponse.json(
+        { code: 'WEBAUTHN_CREDENTIAL_ID_REQUIRED', message: 'credentialId is required' },
+        { status: 400 },
+      );
     }
 
     const credential = await prisma.webAuthnCredential.findFirst({
@@ -55,7 +58,10 @@ export async function DELETE(request: NextRequest) {
     });
 
     if (!credential) {
-      return NextResponse.json({ message: 'Credential not found' }, { status: 404 });
+      return NextResponse.json(
+        { code: 'WEBAUTHN_CREDENTIAL_NOT_FOUND', message: 'Credential not found' },
+        { status: 404 },
+      );
     }
 
     await prisma.webAuthnCredential.update({
@@ -66,6 +72,9 @@ export async function DELETE(request: NextRequest) {
     return NextResponse.json({ ok: true });
   } catch (error) {
     console.error('WebAuthn credential revoke failed:', error);
-    return NextResponse.json({ message: 'Failed to revoke credential' }, { status: 500 });
+    return NextResponse.json(
+      { code: 'WEBAUTHN_CREDENTIAL_REVOKE_FAILED', message: 'Failed to revoke credential' },
+      { status: 500 },
+    );
   }
 }

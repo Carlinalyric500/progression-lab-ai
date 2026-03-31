@@ -17,6 +17,7 @@ import type {
   PublicKeyCredentialCreationOptionsJSON,
   RegistrationResponseJSON,
 } from '@simplewebauthn/browser';
+import { useTranslation } from 'react-i18next';
 
 import { createCsrfHeaders, ensureCsrfCookie } from '../../../lib/csrfClient';
 
@@ -49,9 +50,7 @@ async function getRegistrationOptions(): Promise<PublicKeyCredentialCreationOpti
   });
 
   if (!response.ok) {
-    throw new Error(
-      await getResponseMessage(response, 'Failed to start security key registration'),
-    );
+    throw new Error(await getResponseMessage(response, 'auth.webauthn.errors.startFailed'));
   }
 
   const data = (await response.json()) as { options: PublicKeyCredentialCreationOptionsJSON };
@@ -72,11 +71,12 @@ async function saveRegistration(regResponse: RegistrationResponseJSON): Promise<
   });
 
   if (!response.ok) {
-    throw new Error(await getResponseMessage(response, 'Security key enrollment failed'));
+    throw new Error(await getResponseMessage(response, 'auth.webauthn.errors.enrollmentFailed'));
   }
 }
 
 export default function WebAuthnEnrollmentModal({ open, onClose }: WebAuthnEnrollmentModalProps) {
+  const { t } = useTranslation('common');
   const [isEnrolling, setIsEnrolling] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
@@ -96,39 +96,35 @@ export default function WebAuthnEnrollmentModal({ open, onClose }: WebAuthnEnrol
         onClose();
       }, 1500);
     } catch (err) {
-      const message = (err as Error).message ?? 'Security key enrollment failed';
+      const message = (err as Error).message ?? 'auth.webauthn.errors.enrollmentFailed';
       setError(
         message.includes('NotAllowedError') || message.includes('The operation')
-          ? 'Security key interaction was cancelled or timed out.'
-          : message,
+          ? t('auth.webauthn.errors.cancelledOrTimedOut')
+          : message.startsWith('auth.')
+            ? t(message)
+            : message,
       );
     } finally {
       setIsEnrolling(false);
     }
-  }, [onClose]);
+  }, [onClose, t]);
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
       <DialogTitle>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           <SecurityIcon />
-          <span>Add a Security Key</span>
+          <span>{t('auth.webauthn.title')}</span>
         </Box>
       </DialogTitle>
 
       <DialogContent>
         <Stack spacing={2} sx={{ pt: 1 }}>
           {success ? (
-            <Alert severity="success">
-              Security key enrolled successfully! You can add more keys from your security settings
-              later.
-            </Alert>
+            <Alert severity="success">{t('auth.webauthn.successMessage')}</Alert>
           ) : (
             <>
-              <Typography>
-                Protect your account with a hardware security key (like a YubiKey). This is optional
-                but highly recommended.
-              </Typography>
+              <Typography>{t('auth.webauthn.description')}</Typography>
 
               {error && <Alert severity="error">{error}</Alert>}
 
@@ -140,10 +136,12 @@ export default function WebAuthnEnrollmentModal({ open, onClose }: WebAuthnEnrol
                   disabled={isEnrolling}
                   fullWidth
                 >
-                  {isEnrolling ? 'Follow browser prompt…' : 'Add Security Key'}
+                  {isEnrolling
+                    ? t('auth.webauthn.actions.followBrowserPrompt')
+                    : t('auth.webauthn.actions.addSecurityKey')}
                 </Button>
                 <Button onClick={onClose} disabled={isEnrolling} variant="outlined">
-                  Skip
+                  {t('auth.webauthn.actions.skip')}
                 </Button>
               </Stack>
             </>

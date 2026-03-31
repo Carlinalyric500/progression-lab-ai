@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 import * as Sentry from '@sentry/nextjs';
 import { Box, Button, Container, Typography } from '@mui/material';
+import { useTranslation } from 'react-i18next';
 
 export default function Error({
   error,
@@ -11,6 +12,8 @@ export default function Error({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  const { t } = useTranslation('common');
+
   useEffect(() => {
     // Log the error to Sentry
     Sentry.captureException(error);
@@ -29,10 +32,10 @@ export default function Error({
         }}
       >
         <Typography variant="h1" component="h1">
-          Oops!
+          {t('errors.boundary.title')}
         </Typography>
         <Typography variant="body1" color="textSecondary">
-          Something went wrong. Our team has been notified and is working on a fix.
+          {t('errors.boundary.description')}
         </Typography>
         {process.env.NODE_ENV === 'development' && (
           <Box sx={{ mt: 2, p: 2, bgcolor: 'error.light', borderRadius: 1, width: '100%' }}>
@@ -42,7 +45,7 @@ export default function Error({
           </Box>
         )}
         <Button variant="contained" onClick={() => reset()}>
-          Try again
+          {t('errors.boundary.tryAgain')}
         </Button>
       </Box>
     </Container>

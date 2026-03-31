@@ -16,6 +16,7 @@ import {
 } from '@mui/material';
 import { startAuthentication } from '@simplewebauthn/browser';
 import type { PublicKeyCredentialRequestOptionsJSON } from '@simplewebauthn/browser';
+import { useTranslation } from 'react-i18next';
 
 import { useAuth } from '../../../components/providers/AuthProvider';
 import { useAppSnackbar } from '../../../components/providers/AppSnackbarProvider';
@@ -45,13 +46,16 @@ type AuthModalDialogProps = {
   reason?: AuthDialogReason;
 };
 
-const getReasonMessage = (reason: AuthDialogReason | undefined): string | null => {
+const getReasonMessage = (
+  reason: AuthDialogReason | undefined,
+  t: (key: string) => string,
+): string | null => {
   if (reason === 'my-progressions') {
-    return 'Create an account to access your personal saved progressions.';
+    return t('auth.reason.myProgressions');
   }
 
   if (reason === 'save-arrangement') {
-    return 'Sign in or create an account to save this arrangement.';
+    return t('auth.reason.saveArrangement');
   }
 
   return null;
@@ -64,12 +68,13 @@ export default function AuthModalDialog({
   initialMode = 'login',
   reason,
 }: AuthModalDialogProps) {
+  const { t } = useTranslation('common');
   const { refresh } = useAuth();
   const { showError, showSuccess } = useAppSnackbar();
   const [mode, setMode] = useState<AuthMode>(initialMode);
   const [apiError, setApiError] = useState('');
   const [showEnrollmentModal, setShowEnrollmentModal] = useState(false);
-  const reasonMessage = getReasonMessage(reason);
+  const reasonMessage = getReasonMessage(reason, t);
 
   const {
     control,
@@ -112,7 +117,7 @@ export default function AuthModalDialog({
 
       if (!response.ok) {
         const body = (await response.json()) as { message?: string };
-        throw new Error(body.message ?? 'Authentication failed');
+        throw new Error(body.message ?? t('auth.errors.authenticationFailed'));
       }
 
       if (mode === 'login') {
@@ -120,7 +125,7 @@ export default function AuthModalDialog({
 
         if (body.status === 'MFA_REQUIRED') {
           if (!body.options) {
-            throw new Error('Security key authentication options are missing');
+            throw new Error(t('auth.errors.mfaOptionsMissing'));
           }
 
           const assertionResponse = await startAuthentication({ optionsJSON: body.options });
@@ -133,13 +138,15 @@ export default function AuthModalDialog({
 
           if (!verifyResponse.ok) {
             const verifyBody = (await verifyResponse.json()) as { message?: string };
-            throw new Error(verifyBody.message ?? 'Security key verification failed');
+            throw new Error(verifyBody.message ?? t('auth.errors.mfaVerificationFailed'));
           }
         }
       }
 
       await refresh();
-      showSuccess(mode === 'login' ? 'Signed in successfully.' : 'Account created successfully.');
+      showSuccess(
+        mode === 'login' ? t('auth.messages.signedInSuccessfully') : t('auth.messages.accountCreatedSuccessfully'),
+      );
 
       // If registering, show optional enrollment modal; otherwise close immediately
       if (mode === 'register') {
@@ -149,7 +156,7 @@ export default function AuthModalDialog({
         onSuccess?.();
       }
     } catch (err) {
-      const message = (err as Error).message || 'Authentication failed';
+      const message = (err as Error).message || t('auth.errors.authenticationFailed');
       setApiError(message);
       showError(message);
     }
@@ -169,13 +176,11 @@ export default function AuthModalDialog({
         maxWidth="sm"
         fullWidth
       >
-        <DialogTitle>Account</DialogTitle>
+        <DialogTitle>{t('auth.dialog.title')}</DialogTitle>
         <DialogContent>
           <Stack spacing={2.5} component="form" sx={{ mt: 1 }} onSubmit={handleSubmit(onSubmit)}>
             <Box>
-              <Typography color="text.secondary">
-                Register or sign in without leaving your current work.
-              </Typography>
+              <Typography color="text.secondary">{t('auth.dialog.description')}</Typography>
             </Box>
 
             {reasonMessage ? <Alert severity="info">{reasonMessage}</Alert> : null}
@@ -192,8 +197,8 @@ export default function AuthModalDialog({
               }}
               size="small"
             >
-              <ToggleButton value="login">Login</ToggleButton>
-              <ToggleButton value="register">Register</ToggleButton>
+              <ToggleButton value="login">{t('auth.actions.login')}</ToggleButton>
+              <ToggleButton value="register">{t('auth.actions.register')}</ToggleButton>
             </ToggleButtonGroup>
 
             {mode === 'register' ? (
@@ -201,15 +206,15 @@ export default function AuthModalDialog({
                 name="name"
                 control={control}
                 rules={{
-                  required: 'Name is required',
+                  required: t('auth.form.nameRequired'),
                   minLength: {
                     value: 2,
-                    message: 'Name must be at least 2 characters',
+                    message: t('auth.form.nameMinLength'),
                   },
                 }}
                 render={({ field, fieldState: { error } }) => (
                   <TextField
-                    label="Name"
+                    label={t('auth.form.nameLabel')}
                     {...field}
                     disabled={isSubmitting}
                     error={!!error}
@@ -223,15 +228,15 @@ export default function AuthModalDialog({
               name="email"
               control={control}
               rules={{
-                required: 'Email is required',
+                required: t('auth.form.emailRequired'),
                 pattern: {
                   value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                  message: 'Please enter a valid email address',
+                  message: t('auth.form.emailInvalid'),
                 },
               }}
               render={({ field, fieldState: { error } }) => (
                 <TextField
-                  label="Email"
+                  label={t('auth.form.emailLabel')}
                   type="email"
                   {...field}
                   disabled={isSubmitting}
@@ -245,23 +250,24 @@ export default function AuthModalDialog({
               name="password"
               control={control}
               rules={{
-                required: 'Password is required',
+                required: t('auth.form.passwordRequired'),
                 ...(mode === 'register' && {
                   minLength: {
                     value: 8,
-                    message: 'Password must be at least 8 characters',
+                    message: t('auth.form.passwordMinLength'),
                   },
                 }),
               }}
               render={({ field, fieldState: { error } }) => (
                 <TextField
-                  label="Password"
+                  label={t('auth.form.passwordLabel')}
                   type="password"
                   {...field}
                   disabled={isSubmitting}
                   error={!!error}
                   helperText={
-                    error?.message || (mode === 'register' ? 'Minimum 8 characters' : undefined)
+                    error?.message ||
+                    (mode === 'register' ? t('auth.form.passwordMinLengthHint') : undefined)
                   }
                 />
               )}
@@ -271,7 +277,7 @@ export default function AuthModalDialog({
 
             <Stack direction="row" spacing={1.5} justifyContent="flex-end">
               <Button onClick={onClose} disabled={isSubmitting}>
-                Cancel
+                {t('auth.actions.cancel')}
               </Button>
               <Button
                 variant="contained"
@@ -280,11 +286,11 @@ export default function AuthModalDialog({
               >
                 {isSubmitting
                   ? mode === 'login'
-                    ? 'Signing in...'
-                    : 'Creating account...'
+                    ? t('auth.actions.signingIn')
+                    : t('auth.actions.creatingAccount')
                   : mode === 'login'
-                    ? 'Sign in'
-                    : 'Create account'}
+                    ? t('auth.actions.signIn')
+                    : t('auth.actions.createAccount')}
               </Button>
             </Stack>
           </Stack>

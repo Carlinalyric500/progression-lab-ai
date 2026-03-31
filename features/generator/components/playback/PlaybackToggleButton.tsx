@@ -4,6 +4,7 @@ import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import StopIcon from '@mui/icons-material/Stop';
 import { Box, Button, IconButton } from '@mui/material';
 import { alpha, type Theme } from '@mui/material/styles';
+import { useTranslation } from 'react-i18next';
 
 type PlaybackToggleButtonProps = {
   isPlaying: boolean;
@@ -40,6 +41,7 @@ export default function PlaybackToggleButton({
   playTitle,
   stopTitle,
 }: PlaybackToggleButtonProps) {
+  const { t } = useTranslation('generator');
   const icon = isInitializing ? (
     <Box
       component="span"
@@ -56,9 +58,15 @@ export default function PlaybackToggleButton({
   ) : (
     <PlayArrowIcon />
   );
-  const stateTitle = isInitializing ? 'Initializing audio' : isPlaying ? stopTitle : playTitle;
+  const stateTitle = isInitializing
+    ? t('ui.playback.initializingAudio')
+    : isPlaying
+      ? stopTitle
+      : playTitle;
   const shouldRenderTextButton = Boolean(label || stateTitle);
-  const resolvedLabel = isInitializing ? 'Initializing audio...' : (stateTitle ?? label);
+  const resolvedLabel = isInitializing
+    ? t('ui.playback.initializingAudioEllipsis')
+    : (stateTitle ?? label);
 
   if (shouldRenderTextButton) {
     return (
@@ -82,7 +90,10 @@ export default function PlaybackToggleButton({
 
   return (
     <IconButton
-      aria-label={stateTitle ?? (isPlaying ? 'Stop playback' : 'Play playback')}
+      aria-label={
+        stateTitle ??
+        (isPlaying ? t('ui.playback.stopPlaybackAriaLabel') : t('ui.playback.playPlaybackAriaLabel'))
+      }
       size="small"
       title={stateTitle}
       onClick={onClick}

@@ -177,7 +177,7 @@ export default function AppWrapper({ children }: Props) {
             >
               <Image
                 src="/brand-icon.png"
-                alt="ProgressionLab.AI logo"
+                alt={t('app.brandLogoAlt', { ns: 'common' })}
                 width={24}
                 height={24}
                 style={{ marginRight: 8, marginBottom: 2, verticalAlign: 'middle' }}
@@ -192,19 +192,19 @@ export default function AppWrapper({ children }: Props) {
                 </Button>
               ))}
               <Button component={Link} href="/pricing" color="inherit">
-                Pricing
+                {t('pricing', { ns: 'nav' })}
               </Button>
               <Button component={Link} href="/progressions?view=public" color="inherit">
                 {t('myProgressions', { ns: 'nav' })}
               </Button>
               {isAuthenticated ? (
                 <Button component={Link} href="/settings/billing" color="inherit">
-                  Billing
+                  {t('billing', { ns: 'nav' })}
                 </Button>
               ) : null}
               {isAuthenticated ? (
                 <Button component={Link} href="/settings/security" color="inherit">
-                  Security
+                  {t('security', { ns: 'nav' })}
                 </Button>
               ) : null}
               {isLoading ? (
@@ -260,7 +260,7 @@ export default function AppWrapper({ children }: Props) {
               </ListItemButton>
             ))}
             <ListItemButton component={Link} href="/pricing" onClick={() => setMobileOpen(false)}>
-              <ListItemText primary="Pricing" />
+              <ListItemText primary={t('pricing', { ns: 'nav' })} />
             </ListItemButton>
             <ListItemButton
               component={Link}
@@ -275,7 +275,7 @@ export default function AppWrapper({ children }: Props) {
                 href="/settings/billing"
                 onClick={() => setMobileOpen(false)}
               >
-                <ListItemText primary="Billing" />
+                <ListItemText primary={t('billing', { ns: 'nav' })} />
               </ListItemButton>
             ) : null}
             {isAuthenticated ? (
@@ -284,7 +284,7 @@ export default function AppWrapper({ children }: Props) {
                 href="/settings/security"
                 onClick={() => setMobileOpen(false)}
               >
-                <ListItemText primary="Security" />
+                <ListItemText primary={t('security', { ns: 'nav' })} />
               </ListItemButton>
             ) : null}
             {isLoading ? (
@@ -340,7 +340,7 @@ export default function AppWrapper({ children }: Props) {
               href="https://github.com/carlwelchdesign/progression-lab-ai"
               target="_blank"
               rel="noreferrer noopener"
-              aria-label="Open Progression Lab AI GitHub repository"
+              aria-label={t('app.openGithubAriaLabel', { ns: 'common' })}
               color="inherit"
             >
               <GitHubIcon />
@@ -351,7 +351,7 @@ export default function AppWrapper({ children }: Props) {
               href="https://www.linkedin.com/in/carlwelch/"
               target="_blank"
               rel="noreferrer noopener"
-              aria-label="Open Carl Welch LinkedIn profile"
+              aria-label={t('app.openLinkedInAriaLabel', { ns: 'common' })}
               color="inherit"
             >
               <LinkedInIcon />
@@ -362,7 +362,7 @@ export default function AppWrapper({ children }: Props) {
               href="https://storybook-progression-lab-ai.vercel.app/"
               target="_blank"
               rel="noreferrer noopener"
-              aria-label="Open Progression Lab AI Storybook"
+              aria-label={t('app.openStorybookAriaLabel', { ns: 'common' })}
               color="inherit"
             >
               <StorybookIcon />

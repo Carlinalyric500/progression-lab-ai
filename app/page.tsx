@@ -4,7 +4,7 @@ import PageSuspenseFallback from '../components/ui/PageSuspenseFallback';
 
 export default function HomePage() {
   return (
-    <Suspense fallback={<PageSuspenseFallback message="Loading studio..." maxWidth="xl" />}>
+    <Suspense fallback={<PageSuspenseFallback messageKey="settings.loadingStudio" maxWidth="xl" />}>
       <GeneratorPageContent />
     </Suspense>
   );

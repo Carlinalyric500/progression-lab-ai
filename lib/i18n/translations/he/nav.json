@@ -5,5 +5,8 @@
   "structure": "מבנה",
   "myProgressions": "המהלכים שלי",
   "login": "התחברות",
-  "logout": "התנתקות"
+  "logout": "התנתקות",
+  "pricing": "Pricing",
+  "billing": "Billing",
+  "security": "Security"
 }

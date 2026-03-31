@@ -5,5 +5,8 @@
   "structure": "البنية",
   "myProgressions": "تتابعاتي",
   "login": "تسجيل الدخول",
-  "logout": "تسجيل الخروج"
+  "logout": "تسجيل الخروج",
+  "pricing": "Pricing",
+  "billing": "Billing",
+  "security": "Security"
 }

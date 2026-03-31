@@ -1,6 +1,7 @@
 'use client';
 
 import { Box, Slider, Typography } from '@mui/material';
+import { useTranslation } from 'react-i18next';
 
 /**
  * Props for attack/decay envelope controls.
@@ -23,6 +24,8 @@ export default function EnvelopeControls({
   onDecayChange,
   direction = 'row',
 }: EnvelopeControlsProps) {
+  const { t } = useTranslation('generator');
+
   return (
     <Box
       sx={{
@@ -34,7 +37,7 @@ export default function EnvelopeControls({
     >
       <Box sx={{ minWidth: 120, width: direction === 'column' ? '100%' : 'auto' }}>
         <Typography variant="caption" color="text.secondary" display="block" mb={0.5}>
-          Attack: {attack.toFixed(2)}s
+          {t('ui.playbackSettings.attackValue', { value: attack.toFixed(2) })}
         </Typography>
         <Slider
           size="small"
@@ -43,12 +46,12 @@ export default function EnvelopeControls({
           min={0}
           max={0.5}
           step={0.01}
-          aria-label="Attack time"
+          aria-label={t('ui.playbackSettings.attackAriaLabel')}
         />
       </Box>
       <Box sx={{ minWidth: 120, width: direction === 'column' ? '100%' : 'auto' }}>
         <Typography variant="caption" color="text.secondary" display="block" mb={0.5}>
-          Decay: {decay.toFixed(2)}s
+          {t('ui.playbackSettings.decayValue', { value: decay.toFixed(2) })}
         </Typography>
         <Slider
           size="small"
@@ -57,7 +60,7 @@ export default function EnvelopeControls({
           min={0.1}
           max={3}
           step={0.1}
-          aria-label="Decay time"
+          aria-label={t('ui.playbackSettings.decayAriaLabel')}
         />
       </Box>
     </Box>

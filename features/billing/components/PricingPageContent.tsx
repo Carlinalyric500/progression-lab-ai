@@ -5,6 +5,7 @@ import BoltIcon from '@mui/icons-material/Bolt';
 import WorkspacePremiumIcon from '@mui/icons-material/WorkspacePremium';
 import Link from 'next/link';
 import { useMemo, useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Alert,
   Box,
@@ -149,9 +150,9 @@ function getAiAccessFeature(config: PricingTierConfig): string {
   return isPremiumModel ? 'Premium AI model access' : 'Standard AI model access';
 }
 
-function buildFeatures(baseFeatures: string[], config?: PricingTierConfig): string[] {
+function buildFeatures(baseFeatures: readonly string[], config?: PricingTierConfig): string[] {
   if (!config) {
-    return baseFeatures;
+    return [...baseFeatures];
   }
 
   const features = [
@@ -168,7 +169,61 @@ function buildFeatures(baseFeatures: string[], config?: PricingTierConfig): stri
   return features;
 }
 
+function getDefaultTierContent(t: (key: string) => string) {
+  return {
+    SESSION: {
+      name: t('billing.pricing.tiers.session.name'),
+      priceMonthly: t('billing.pricing.tiers.session.priceMonthly'),
+      priceYearly: t('billing.pricing.tiers.session.priceYearly'),
+      summary: t('billing.pricing.tiers.session.summary'),
+      description: t('billing.pricing.tiers.session.description'),
+      features: [
+        t('billing.pricing.tiers.session.features.generations'),
+        t('billing.pricing.tiers.session.features.savedProgressions'),
+        t('billing.pricing.tiers.session.features.savedArrangements'),
+        t('billing.pricing.tiers.session.features.publicShares'),
+        t('billing.pricing.tiers.session.features.playbackTools'),
+      ],
+      cta: t('billing.pricing.tiers.session.cta'),
+      badge: '',
+    },
+    COMPOSER: {
+      name: t('billing.pricing.tiers.composer.name'),
+      priceMonthly: t('billing.pricing.tiers.composer.priceMonthly'),
+      priceYearly: t('billing.pricing.tiers.composer.priceYearly'),
+      summary: t('billing.pricing.tiers.composer.summary'),
+      description: t('billing.pricing.tiers.composer.description'),
+      features: [
+        t('billing.pricing.tiers.composer.features.generations'),
+        t('billing.pricing.tiers.composer.features.savedProgressions'),
+        t('billing.pricing.tiers.composer.features.savedArrangements'),
+        t('billing.pricing.tiers.composer.features.publicShares'),
+        t('billing.pricing.tiers.composer.features.exports'),
+      ],
+      cta: t('billing.pricing.tiers.composer.cta'),
+      badge: t('billing.pricing.tiers.composer.badge'),
+    },
+    STUDIO: {
+      name: t('billing.pricing.tiers.studio.name'),
+      priceMonthly: t('billing.pricing.tiers.studio.priceMonthly'),
+      priceYearly: t('billing.pricing.tiers.studio.priceYearly'),
+      summary: t('billing.pricing.tiers.studio.summary'),
+      description: t('billing.pricing.tiers.studio.description'),
+      features: [
+        t('billing.pricing.tiers.studio.features.generations'),
+        t('billing.pricing.tiers.studio.features.savedProgressions'),
+        t('billing.pricing.tiers.studio.features.savedArrangements'),
+        t('billing.pricing.tiers.studio.features.publicShares'),
+        t('billing.pricing.tiers.studio.features.premiumAi'),
+      ],
+      cta: t('billing.pricing.tiers.studio.cta'),
+      badge: '',
+    },
+  } as const;
+}
+
 export default function PricingPageContent() {
+  const { t } = useTranslation('common');
   const { isAuthenticated, isLoading } = useAuth();
   const { openAuthModal } = useAuthModal();
   const { showError } = useAppSnackbar();
@@ -209,22 +264,38 @@ export default function PricingPageContent() {
   }, []);
 
   const displayedTiers = useMemo(
-    () =>
-      TIERS.map((tier) => {
+    () => {
+      const defaultsByPlan = getDefaultTierContent(t);
+      return TIERS.map((tier) => {
+        const defaults = defaultsByPlan[tier.plan];
         const config = tierConfigs?.[tier.plan];
-        if (!config) return tier;
-        const priceMonthly = config.monthlyPrice === 0 ? '$0' : `$${config.monthlyPrice}`;
-        const priceYearly = config.yearlyPrice === 0 ? '$0' : `$${config.yearlyPrice}`;
+        const priceMonthly =
+          config?.monthlyPrice !== undefined
+            ? config.monthlyPrice === 0
+              ? '$0'
+              : `$${config.monthlyPrice}`
+            : defaults.priceMonthly;
+        const priceYearly =
+          config?.yearlyPrice !== undefined
+            ? config.yearlyPrice === 0
+              ? '$0'
+              : `$${config.yearlyPrice}`
+            : defaults.priceYearly;
+
         return {
           ...tier,
-          name: config.displayName || tier.name,
+          name: config?.displayName || defaults.name,
           priceMonthly,
           priceYearly,
-          summary: config.description || tier.summary,
-          features: buildFeatures(tier.features, config),
+          summary: config?.description || defaults.summary,
+          description: defaults.description,
+          features: buildFeatures(defaults.features, config),
+          cta: defaults.cta,
+          badge: defaults.badge,
         };
-      }),
-    [tierConfigs],
+      });
+    },
+    [t, tierConfigs],
   );
 
   const handleCheckout = async (plan: CheckoutPlan) => {
@@ -250,17 +321,17 @@ export default function PricingPageContent() {
 
       if (!response.ok) {
         const body = (await response.json()) as { message?: string };
-        throw new Error(body.message ?? 'Failed to start checkout');
+        throw new Error(body.message ?? t('billing.errors.startCheckout'));
       }
 
       const body = (await response.json()) as { url?: string };
       if (!body.url) {
-        throw new Error('Checkout URL was not returned');
+        throw new Error(t('billing.errors.checkoutUrlMissing'));
       }
 
       window.location.assign(body.url);
     } catch (error) {
-      showError((error as Error).message || 'Failed to start checkout');
+      showError((error as Error).message || t('billing.errors.startCheckout'));
     } finally {
       setPendingPlan(null);
     }
@@ -277,7 +348,7 @@ export default function PricingPageContent() {
           >
             <Chip
               icon={<BoltIcon />}
-              label="Subscription plans"
+              label={t('billing.pricing.subscriptionPlansLabel')}
               color="primary"
               variant="outlined"
               sx={{ alignSelf: 'center' }}
@@ -288,15 +359,14 @@ export default function PricingPageContent() {
               align="center"
               sx={{ width: '100%', textAlign: 'center' }}
             >
-              Pick the plan that matches your writing pace
+              {t('billing.pricing.pageTitle')}
             </Typography>
             <Typography
               color="text.secondary"
               align="center"
               sx={{ fontSize: '1.05rem', maxWidth: 700, width: '100%', textAlign: 'center' }}
             >
-              Session keeps the door open. Composer is the default paid tier. Studio is for users
-              who want the highest AI headroom and no storage friction.
+              {t('billing.pricing.pageDescription')}
             </Typography>
           </Stack>
         </Box>
@@ -306,20 +376,19 @@ export default function PricingPageContent() {
             variant={selectedInterval === 'monthly' ? 'contained' : 'outlined'}
             onClick={() => setSelectedInterval('monthly')}
           >
-            Monthly
+            {t('billing.pricing.monthly')}
           </Button>
           <Button
             variant={selectedInterval === 'yearly' ? 'contained' : 'outlined'}
             onClick={() => setSelectedInterval('yearly')}
           >
-            Yearly
+            {t('billing.pricing.yearly')}
           </Button>
         </Stack>
 
         {!isLoading && !isAuthenticated ? (
           <Alert severity="info">
-            You can browse plans without signing in. Checkout begins after you create or sign into
-            an account.
+            {t('billing.pricing.signInHint')}
           </Alert>
         ) : null}
 
@@ -360,7 +429,9 @@ export default function PricingPageContent() {
                   <Box>
                     <Typography variant="h3">{price}</Typography>
                     <Typography color="text.secondary">
-                      {selectedInterval === 'monthly' ? 'per month' : 'per year'}
+                      {selectedInterval === 'monthly'
+                        ? t('billing.pricing.perMonth')
+                        : t('billing.pricing.perYear')}
                     </Typography>
                   </Box>
 
@@ -391,11 +462,13 @@ export default function PricingPageContent() {
                       onClick={() => void handleCheckout(tier.checkoutPlan!)}
                       disabled={pendingPlan === tier.checkoutPlan}
                     >
-                      {pendingPlan === tier.checkoutPlan ? 'Starting checkout...' : tier.cta}
+                      {pendingPlan === tier.checkoutPlan
+                        ? t('billing.pricing.startingCheckout')
+                        : tier.cta}
                     </Button>
                   ) : isAuthenticated ? (
                     <Button fullWidth component={Link} href="/" variant="outlined">
-                      Keep using Session
+                      {t('billing.pricing.keepUsingSession')}
                     </Button>
                   ) : (
                     <Button

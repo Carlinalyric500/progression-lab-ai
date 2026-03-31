@@ -170,7 +170,8 @@
       "playArrangement": "Jouer l arrangement",
       "stopArrangement": "Arreter l arrangement",
       "saveArrangement": "Enregistrer l arrangement",
-      "edit": "Modifier"
+      "edit": "Modifier",
+      "pdf": "PDF"
     },
     "sectionTitles": {
       "nextChordSuggestions": "Suggestions d accord suivant",
@@ -179,7 +180,17 @@
     },
     "labels": {
       "commonChordExamples": "Exemples d accords courants",
-      "harmonicSource": "Source harmonique : {{label}}"
+      "harmonicSource": "Source harmonique : {{label}}",
+      "arrangementName": "Arrangement",
+      "romanNumeralLabel": "Roman numeral:",
+      "tensionLabel": "Tension:",
+      "confidenceLabel": "Confidence:",
+      "voicingHintLabel": "Voicing hint:",
+      "leftHandLabel": "Left hand:",
+      "rightHandLabel": "Right hand:",
+      "leftHandShort": "LH:",
+      "rightHandShort": "RH:",
+      "tempoBpmLabel": "Tempo: {{tempo}} BPM"
     },
     "messages": {
       "noGuitarDiagram": "Aucun diagramme de guitare disponible.",
@@ -219,7 +230,47 @@
       "countInActive": "Decompte actif",
       "stepSummary": "Etape {{current}}/{{total}}",
       "eventSingular": "{{count}} evenement",
-      "eventPlural": "{{count}} evenements"
+      "eventPlural": "{{count}} evenements",
+      "keyboardShortcutsButtonLabel": "Tips",
+      "recordingModeLabel": "Recording mode",
+      "recordingModeContinuous": "Continuous",
+      "recordingModeSingleShot": "Single-shot",
+      "recordDisabledInSingleShot": "Switch to Continuous mode to use live recording.",
+      "dragOrRecordHint": "Drag pads or record chords to place regions on the timeline",
+      "mobileDragInsertHint": "Tap the timeline to place {{chord}}.",
+      "singleShotHint": "Single-shot mode: place the timeline cursor, then tap pads to insert. Insertion is paused while playback runs.",
+      "singleShotCursorUnset": "Single-shot: click timeline to place cursor",
+      "singleShotCursorSet": "Single-shot cursor: step {{step}}",
+      "selectedClipTitle": "Selected clip",
+      "selectedClipMeta": "{{count}} event at step {{step}}. Drag the clip or use the controls to move it.",
+      "moveClipLeft": "Move clip left",
+      "moveClipRight": "Move clip right",
+      "deleteSelectedClip": "Delete clip",
+      "touchEditHint": "Tap a clip to select it. Drag it horizontally to move it.",
+      "suggestionModeAccordionLabel": "Suggestion modes",
+      "suggestionModeLabel": "Suggestion mode",
+      "suggestionModeOff": "Off",
+      "suggestionModeCurrent": "Both directions",
+      "suggestionModeClockwise": "Dominant flow",
+      "suggestionModeCounterclockwise": "Subdominant flow"
+    },
+    "playback": {
+      "initializingAudio": "Initializing audio",
+      "initializingAudioEllipsis": "Initializing audio...",
+      "playPlaybackAriaLabel": "Play playback",
+      "stopPlaybackAriaLabel": "Stop playback"
+    },
+    "playbackSettings": {
+      "attackLabel": "Attack",
+      "decayLabel": "Decay",
+      "attackAriaLabel": "Attack time",
+      "decayAriaLabel": "Decay time",
+      "attackValue": "Attack: {{value}}s",
+      "decayValue": "Decay: {{value}}s",
+      "octaveShiftAriaLabel": "Octave shift",
+      "inversionRegisterAriaLabel": "Inversion register",
+      "playbackStyleAriaLabel": "Playback style",
+      "timeSignatureAriaLabel": "Time signature"
     }
   }
 }

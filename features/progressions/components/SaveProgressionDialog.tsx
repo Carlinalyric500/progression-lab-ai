@@ -16,6 +16,7 @@ import {
   InputAdornment,
 } from '@mui/material';
 import RefreshIcon from '@mui/icons-material/Refresh';
+import { useTranslation } from 'react-i18next';
 
 import AppTextField from '../../../components/ui/TextField';
 import { useAppSnackbar } from '../../../components/providers/AppSnackbarProvider';
@@ -53,6 +54,7 @@ export default function SaveProgressionDialog({
   scale,
   genre,
 }: SaveProgressionDialogProps) {
+  const { t } = useTranslation('common');
   const { showError, showSuccess } = useAppSnackbar();
   const { user } = useAuth();
   const isAdmin = user?.role === 'ADMIN';
@@ -94,17 +96,17 @@ export default function SaveProgressionDialog({
           : { chords, pianoVoicings, feel, scale, genre }),
       });
 
-      showSuccess('Progression saved!');
+      showSuccess(t('progressions.saveDialog.messages.saved'));
       onSuccess?.();
       onClose();
     } catch (err) {
-      showError((err as Error).message || 'Failed to save progression');
+      showError((err as Error).message || t('progressions.saveDialog.messages.saveFailed'));
     }
   };
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-      <DialogTitle>Save Progression</DialogTitle>
+      <DialogTitle>{t('progressions.saveDialog.title')}</DialogTitle>
       <DialogContent>
         <Stack spacing={2} sx={{ mt: 2 }} component="form">
           <Controller
@@ -113,14 +115,14 @@ export default function SaveProgressionDialog({
             rules={{
               maxLength: {
                 value: 100,
-                message: 'Title must be less than 100 characters',
+                message: t('progressions.saveDialog.form.titleMaxLength'),
               },
             }}
             render={({ field, fieldState: { error } }) => (
               <AppTextField
-                label="Title (optional)"
+                label={t('progressions.saveDialog.form.titleLabel')}
                 {...field}
-                placeholder="Late Night Groove"
+                placeholder={t('progressions.saveDialog.form.titlePlaceholder')}
                 disabled={isSubmitting}
                 error={!!error}
                 helperText={error?.message}
@@ -133,7 +135,7 @@ export default function SaveProgressionDialog({
                           disabled={isSubmitting}
                           edge="end"
                           size="small"
-                          aria-label="regenerate title"
+                          aria-label={t('progressions.saveDialog.form.regenerateTitleAriaLabel')}
                         >
                           <RefreshIcon fontSize="small" />
                         </IconButton>
@@ -159,10 +161,10 @@ export default function SaveProgressionDialog({
                         disabled={isSubmitting}
                       />
                     }
-                    label="Add to Examples"
+                    label={t('progressions.saveDialog.form.addToExamplesLabel')}
                   />
                   <Typography variant="caption" color="text.secondary">
-                    Makes this progression visible to all users under Examples.
+                    {t('progressions.saveDialog.form.addToExamplesHelperText')}
                   </Typography>
                 </Stack>
               )}
@@ -172,14 +174,16 @@ export default function SaveProgressionDialog({
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose} disabled={isSubmitting}>
-          Cancel
+          {t('progressions.saveDialog.actions.cancel')}
         </Button>
         <Button
           onClick={handleSubmit(onSubmit)}
           variant="contained"
           disabled={isSubmitting || Object.keys(errors).length > 0}
         >
-          {isSubmitting ? 'Saving...' : 'Save'}
+          {isSubmitting
+            ? t('progressions.saveDialog.actions.saving')
+            : t('progressions.saveDialog.actions.save')}
         </Button>
       </DialogActions>
     </Dialog>

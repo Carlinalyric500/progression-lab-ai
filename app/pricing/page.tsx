@@ -5,7 +5,9 @@ import PricingPageContent from '../../features/billing/components/PricingPageCon
 
 export default function PricingPage() {
   return (
-    <Suspense fallback={<PageSuspenseFallback message="Loading pricing..." maxWidth="lg" />}>
+    <Suspense
+      fallback={<PageSuspenseFallback messageKey="settings.loadingPricing" maxWidth="lg" />}
+    >
       <PricingPageContent />
     </Suspense>
   );

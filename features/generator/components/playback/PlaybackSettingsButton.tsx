@@ -243,25 +243,25 @@ export default function PlaybackSettingsButton({
   const envelopeSliderConfigs: SliderRowConfig[] = [
     {
       key: 'attack',
-      label: 'Attack',
+      label: t('ui.playbackSettings.attackLabel'),
       valueText: `${attack.toFixed(2)}s`,
       value: attack,
       onChange: onAttackChange,
       min: 0,
       max: 0.5,
       step: 0.01,
-      ariaLabel: 'Attack time',
+      ariaLabel: t('ui.playbackSettings.attackAriaLabel'),
     },
     {
       key: 'decay',
-      label: 'Decay',
+      label: t('ui.playbackSettings.decayLabel'),
       valueText: `${decay.toFixed(2)}s`,
       value: decay,
       onChange: onDecayChange,
       min: 0.1,
       max: 3,
       step: 0.1,
-      ariaLabel: 'Decay time',
+      ariaLabel: t('ui.playbackSettings.decayAriaLabel'),
     },
     {
       key: 'gate',
@@ -357,7 +357,7 @@ export default function PlaybackSettingsButton({
                   step={OCTAVE_SHIFT_RANGE.step}
                   marks={OCTAVE_SHIFT_MARKS}
                   valueLabelDisplay="auto"
-                  aria-label="Octave shift"
+                  aria-label={t('ui.playbackSettings.octaveShiftAriaLabel')}
                   sx={{ flex: 1 }}
                 />
               </Box>
@@ -384,7 +384,7 @@ export default function PlaybackSettingsButton({
                     onInversionRegisterChange(nextValue);
                   }
                 }}
-                aria-label="Inversion register"
+                aria-label={t('ui.playbackSettings.inversionRegisterAriaLabel')}
                 fullWidth
               >
                 {INVERSION_OPTIONS.map((option) => (
@@ -420,7 +420,7 @@ export default function PlaybackSettingsButton({
                     onPlaybackStyleChange(nextValue);
                   }
                 }}
-                aria-label="Playback style"
+                aria-label={t('ui.playbackSettings.playbackStyleAriaLabel')}
                 fullWidth
               >
                 {PLAYBACK_STYLE_OPTIONS.map((option) => (
@@ -473,7 +473,7 @@ export default function PlaybackSettingsButton({
                 onChange={(_, next: TimeSignature | null) => {
                   if (next) onTimeSignatureChange(next);
                 }}
-                aria-label="Time signature"
+                aria-label={t('ui.playbackSettings.timeSignatureAriaLabel')}
                 fullWidth
               >
                 {TIME_SIGNATURE_OPTIONS.map((option) => (

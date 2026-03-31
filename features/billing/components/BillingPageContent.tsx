@@ -7,6 +7,7 @@ import CreditCardIcon from '@mui/icons-material/CreditCard';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Alert,
   Box,
@@ -68,7 +69,7 @@ const PLAN_LABELS: Record<SubscriptionPlan, string> = {
 
 function formatDate(value: string | null): string {
   if (!value) {
-    return 'Not set';
+    return 'common.billing.format.notSet';
   }
 
   return new Intl.DateTimeFormat(undefined, {
@@ -79,6 +80,7 @@ function formatDate(value: string | null): string {
 }
 
 export default function BillingPageContent() {
+  const { t } = useTranslation('common');
   const { isAuthenticated, isLoading } = useAuth();
   const { openAuthModal } = useAuthModal();
   const { showError } = useAppSnackbar();
@@ -108,7 +110,7 @@ export default function BillingPageContent() {
 
         if (!response.ok) {
           const body = (await response.json()) as { message?: string };
-          throw new Error(body.message ?? 'Failed to load billing status');
+          throw new Error(body.message ?? t('billing.errors.loadStatus'));
         }
 
         const body = (await response.json()) as BillingStatusResponse;
@@ -118,7 +120,7 @@ export default function BillingPageContent() {
           return;
         }
 
-        showError((error as Error).message || 'Failed to load billing status');
+        showError((error as Error).message || t('billing.errors.loadStatus'));
       } finally {
         setIsPageLoading(false);
       }
@@ -127,7 +129,7 @@ export default function BillingPageContent() {
     void loadBillingStatus();
 
     return () => controller.abort();
-  }, [isAuthenticated, isLoading, showError]);
+  }, [isAuthenticated, isLoading, showError, t]);
 
   const handleOpenPortal = async () => {
     setIsPortalLoading(true);
@@ -143,17 +145,17 @@ export default function BillingPageContent() {
 
       if (!response.ok) {
         const body = (await response.json()) as { message?: string };
-        throw new Error(body.message ?? 'Failed to open billing portal');
+        throw new Error(body.message ?? t('billing.errors.openPortal'));
       }
 
       const body = (await response.json()) as { url?: string };
       if (!body.url) {
-        throw new Error('Billing portal URL was not returned');
+        throw new Error(t('billing.errors.portalUrlMissing'));
       }
 
       window.location.assign(body.url);
     } catch (error) {
-      showError((error as Error).message || 'Failed to open billing portal');
+      showError((error as Error).message || t('billing.errors.openPortal'));
     } finally {
       setIsPortalLoading(false);
     }
@@ -164,7 +166,7 @@ export default function BillingPageContent() {
       <Container maxWidth="md" sx={{ py: { xs: 4, md: 8 } }}>
         <Stack spacing={3} alignItems="center">
           <CircularProgress />
-          <Typography color="text.secondary">Loading billing status...</Typography>
+          <Typography color="text.secondary">{t('billing.loadingStatus')}</Typography>
         </Stack>
       </Container>
     );
@@ -176,17 +178,19 @@ export default function BillingPageContent() {
         <Card variant="outlined">
           <CardContent>
             <Stack spacing={2.5} alignItems="flex-start">
-              <Chip icon={<LockOutlinedIcon />} label="Sign in required" variant="outlined" />
-              <Typography variant="h4">Billing is tied to your account</Typography>
-              <Typography color="text.secondary">
-                Sign in to view your current plan, monthly usage, and manage your subscription.
-              </Typography>
+              <Chip
+                icon={<LockOutlinedIcon />}
+                label={t('billing.signInRequiredChip')}
+                variant="outlined"
+              />
+              <Typography variant="h4">{t('billing.signInRequiredTitle')}</Typography>
+              <Typography color="text.secondary">{t('billing.signInRequiredDescription')}</Typography>
               <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5}>
                 <Button variant="contained" onClick={() => openAuthModal({ mode: 'login' })}>
-                  Sign in
+                  {t('billing.signInAction')}
                 </Button>
                 <Button component={Link} href="/pricing" variant="outlined">
-                  View pricing
+                  {t('billing.viewPricingAction')}
                 </Button>
               </Stack>
             </Stack>
@@ -199,7 +203,7 @@ export default function BillingPageContent() {
   if (!billingStatus) {
     return (
       <Container maxWidth="md" sx={{ py: { xs: 4, md: 8 } }}>
-        <Alert severity="error">Billing status is unavailable right now.</Alert>
+        <Alert severity="error">{t('billing.unavailable')}</Alert>
       </Container>
     );
   }
@@ -214,16 +218,14 @@ export default function BillingPageContent() {
       <Stack spacing={3.5}>
         <Stack spacing={1}>
           <Typography variant="h3" component="h1">
-            Billing and usage
+            {t('billing.pageTitle')}
           </Typography>
-          <Typography color="text.secondary">
-            See your current plan, monthly AI usage, and manage billing through Stripe.
-          </Typography>
+          <Typography color="text.secondary">{t('billing.pageDescription')}</Typography>
         </Stack>
 
         {billingStatus.planOverride ? (
           <Alert severity="info">
-            This account has a manual plan override: {PLAN_LABELS[billingStatus.planOverride]}.
+            {t('billing.planOverride', { plan: PLAN_LABELS[billingStatus.planOverride] })}
           </Alert>
         ) : null}
 
@@ -239,28 +241,28 @@ export default function BillingPageContent() {
               <Stack spacing={3}>
                 <Stack direction="row" justifyContent="space-between" alignItems="center">
                   <Box>
-                    <Typography variant="h5">Current plan</Typography>
+                    <Typography variant="h5">{t('billing.currentPlan')}</Typography>
                     <Typography color="text.secondary">{planLabel}</Typography>
                   </Box>
                   <Chip
                     icon={<CreditCardIcon />}
-                    label={billingStatus.subscriptionStatus ?? 'No paid subscription'}
+                    label={billingStatus.subscriptionStatus ?? t('billing.noPaidSubscription')}
                     color={billingStatus.subscriptionStatus ? 'primary' : 'default'}
                     variant="outlined"
                   />
                 </Stack>
 
                 <Stack spacing={1}>
-                  <Typography fontWeight={700}>Billing cycle</Typography>
+                  <Typography fontWeight={700}>{t('billing.billingCycle')}</Typography>
                   <Typography color="text.secondary">
-                    {billingStatus.billing.subscription?.billingInterval ?? 'No paid billing cycle'}
+                    {billingStatus.billing.subscription?.billingInterval ?? t('billing.noPaidBillingCycle')}
                   </Typography>
                 </Stack>
 
                 <Stack spacing={1}>
-                  <Typography fontWeight={700}>Current period end</Typography>
+                  <Typography fontWeight={700}>{t('billing.currentPeriodEnd')}</Typography>
                   <Typography color="text.secondary">
-                    {formatDate(billingStatus.billing.subscription?.currentPeriodEnd ?? null)}
+                    {t(formatDate(billingStatus.billing.subscription?.currentPeriodEnd ?? null))}
                   </Typography>
                 </Stack>
 
@@ -271,15 +273,15 @@ export default function BillingPageContent() {
                       onClick={() => void handleOpenPortal()}
                       disabled={isPortalLoading}
                     >
-                      {isPortalLoading ? 'Opening portal...' : 'Manage billing'}
+                      {isPortalLoading ? t('billing.openingPortal') : t('billing.manageBilling')}
                     </Button>
                   ) : (
                     <Button component={Link} href="/pricing" variant="contained">
-                      Upgrade plan
+                      {t('billing.upgradePlan')}
                     </Button>
                   )}
                   <Button component={Link} href="/pricing" variant="outlined">
-                    Compare plans
+                    {t('billing.comparePlans')}
                   </Button>
                 </Stack>
               </Stack>
@@ -291,25 +293,23 @@ export default function BillingPageContent() {
               <Stack spacing={2.5}>
                 <Stack direction="row" spacing={1} alignItems="center">
                   <AutoAwesomeIcon color="primary" />
-                  <Typography variant="h5">AI usage</Typography>
+                  <Typography variant="h5">{t('billing.aiUsage')}</Typography>
                 </Stack>
 
                 <Box>
                   <Typography variant="h4">
                     {aiLimit === null ? `${aiUsed}` : `${aiUsed} / ${aiLimit}`}
                   </Typography>
-                  <Typography color="text.secondary">generations used this month</Typography>
+                  <Typography color="text.secondary">{t('billing.generationsUsedThisMonth')}</Typography>
                 </Box>
 
                 {aiLimit === null ? (
-                  <Alert severity="success">
-                    Your current plan does not enforce an AI hard cap.
-                  </Alert>
+                  <Alert severity="success">{t('billing.noAiHardCap')}</Alert>
                 ) : (
                   <Stack spacing={1}>
                     <LinearProgress variant="determinate" value={aiProgress} />
                     <Typography color="text.secondary">
-                      {aiProgress}% of monthly quota used
+                      {t('billing.monthlyQuotaUsed', { percent: aiProgress })}
                     </Typography>
                   </Stack>
                 )}
@@ -317,17 +317,28 @@ export default function BillingPageContent() {
                 <Stack spacing={1}>
                   <Stack direction="row" spacing={1} alignItems="center">
                     <BoltIcon fontSize="small" color="primary" />
-                    <Typography fontWeight={700}>Feature access</Typography>
+                    <Typography fontWeight={700}>{t('billing.featureAccess')}</Typography>
                   </Stack>
                   <Typography color="text.secondary">
-                    MIDI export: {billingStatus.entitlements.canExportMidi ? 'enabled' : 'locked'}
+                    {t('billing.midiExportStatus', {
+                      status: billingStatus.entitlements.canExportMidi
+                        ? t('billing.enabled')
+                        : t('billing.locked'),
+                    })}
                   </Typography>
                   <Typography color="text.secondary">
-                    PDF export: {billingStatus.entitlements.canExportPdf ? 'enabled' : 'locked'}
+                    {t('billing.pdfExportStatus', {
+                      status: billingStatus.entitlements.canExportPdf
+                        ? t('billing.enabled')
+                        : t('billing.locked'),
+                    })}
                   </Typography>
                   <Typography color="text.secondary">
-                    Public sharing:{' '}
-                    {billingStatus.entitlements.canSharePublicly ? 'enabled' : 'locked'}
+                    {t('billing.publicSharingStatus', {
+                      status: billingStatus.entitlements.canSharePublicly
+                        ? t('billing.enabled')
+                        : t('billing.locked'),
+                    })}
                   </Typography>
                 </Stack>
               </Stack>

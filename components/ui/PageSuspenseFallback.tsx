@@ -1,16 +1,23 @@
+'use client';
+
 import { Box, Card, CardContent, Stack, Typography } from '@mui/material';
+import { useTranslation } from 'react-i18next';
 
 type PageSuspenseFallbackProps = {
   message?: string;
+  messageKey?: string;
   maxWidth?: 'sm' | 'md' | 'lg' | 'xl';
   padded?: boolean;
 };
 
 export default function PageSuspenseFallback({
-  message = 'Loading...',
+  message,
+  messageKey,
   maxWidth = 'lg',
   padded = true,
 }: PageSuspenseFallbackProps) {
+  const { t } = useTranslation('common');
+  const resolvedMessage = messageKey ? t(messageKey) : (message ?? t('settings.loadingDefault'));
   const maxWidthPxBySize = {
     sm: 600,
     md: 900,
@@ -35,7 +42,7 @@ export default function PageSuspenseFallback({
       <Card variant="outlined">
         <CardContent>
           <Stack spacing={2.5} sx={{ py: 4 }}>
-            <Typography color="text.secondary">{message}</Typography>
+            <Typography color="text.secondary">{resolvedMessage}</Typography>
             <Box
               sx={{
                 height: 10,

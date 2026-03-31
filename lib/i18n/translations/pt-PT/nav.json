@@ -5,5 +5,8 @@
   "structure": "Estrutura",
   "myProgressions": "As minhas progressoes",
   "login": "Entrar",
-  "logout": "Sair"
+  "logout": "Sair",
+  "pricing": "Pricing",
+  "billing": "Billing",
+  "security": "Security"
 }

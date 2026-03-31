@@ -5,5 +5,8 @@
   "structure": "Struktur",
   "myProgressions": "Mine progresjoner",
   "login": "Logg inn",
-  "logout": "Logg ut"
+  "logout": "Logg ut",
+  "pricing": "Pricing",
+  "billing": "Billing",
+  "security": "Security"
 }

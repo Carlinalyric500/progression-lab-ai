@@ -4,6 +4,7 @@ import DarkModeOutlinedIcon from '@mui/icons-material/DarkModeOutlined';
 import LightModeOutlinedIcon from '@mui/icons-material/LightModeOutlined';
 // import LayersOutlinedIcon from '@mui/icons-material/LayersOutlined';
 import { IconButton, Stack, Tooltip } from '@mui/material';
+import { useTranslation } from 'react-i18next';
 
 import { useThemeMode } from '../../lib/themeMode';
 
@@ -11,16 +12,15 @@ import { useThemeMode } from '../../lib/themeMode';
  * Header action button that toggles between light and dark mode.
  */
 export default function ThemeModeToggle() {
+  const { t } = useTranslation('common');
   const { mode, toggleMode } = useThemeMode();
   const isDark = mode === 'dark';
+  const toggleTitle = isDark ? t('theme.switchToLightMode') : t('theme.switchToDarkMode');
 
   return (
     <Stack direction="row" spacing={0.5}>
-      <Tooltip title={isDark ? 'Switch to light mode' : 'Switch to dark mode'}>
-        <IconButton
-          aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
-          onClick={toggleMode}
-        >
+      <Tooltip title={toggleTitle}>
+        <IconButton aria-label={toggleTitle} onClick={toggleMode}>
           {isDark ? <LightModeOutlinedIcon /> : <DarkModeOutlinedIcon />}
         </IconButton>
       </Tooltip>

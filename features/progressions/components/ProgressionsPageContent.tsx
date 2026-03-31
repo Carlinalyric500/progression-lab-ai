@@ -16,6 +16,7 @@ import {
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import Link from 'next/link';
+import { useTranslation } from 'react-i18next';
 
 import ProgressionCard from './ProgressionCard';
 import TextField from '../../../components/ui/TextField';
@@ -65,6 +66,7 @@ function getFirstChordName(progression: Progression): string {
 }
 
 export default function ProgressionsPageContent() {
+  const { t } = useTranslation('common');
   const router = useRouter();
   const searchParams = useSearchParams();
   const { isAuthenticated, user } = useAuth();
@@ -125,7 +127,7 @@ export default function ProgressionsPageContent() {
           return;
         }
 
-        const message = (err as Error).message || 'Failed to load progressions';
+        const message = (err as Error).message || t('progressions.errors.loadMine');
         setError(message);
         showError(message);
       } finally {
@@ -140,7 +142,7 @@ export default function ProgressionsPageContent() {
     return () => {
       controller.abort();
     };
-  }, [isAuthenticated, showError]);
+  }, [isAuthenticated, showError, t]);
 
   useEffect(() => {
     if (viewMode !== 'public') {
@@ -163,7 +165,7 @@ export default function ProgressionsPageContent() {
           return;
         }
 
-        const message = (err as Error).message || 'Failed to load public progressions';
+        const message = (err as Error).message || t('progressions.errors.loadPublic');
         setError(message);
         showError(message);
       } finally {
@@ -178,7 +180,7 @@ export default function ProgressionsPageContent() {
     return () => {
       controller.abort();
     };
-  }, [viewMode, tagQuery, keyQuery, showError]);
+  }, [viewMode, tagQuery, keyQuery, showError, t]);
 
   const filteredMyProgressions = useMemo(() => {
     const normalizedTagQueries = sanitizeTags(tagQuery)
@@ -211,7 +213,7 @@ export default function ProgressionsPageContent() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!window.confirm('Are you sure you want to delete this progression?')) {
+    if (!window.confirm(t('progressions.confirm.delete'))) {
       return;
     }
 
@@ -232,9 +234,9 @@ export default function ProgressionsPageContent() {
         setMyProgressions(refreshedMine);
       }
 
-      showSuccess('Progression deleted.');
+      showSuccess(t('progressions.messages.deleted'));
     } catch (err) {
-      const message = (err as Error).message || 'Failed to delete progression';
+      const message = (err as Error).message || t('progressions.errors.delete');
       setError(message);
       showError(message);
     } finally {
@@ -253,17 +255,19 @@ export default function ProgressionsPageContent() {
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <Box>
             <Typography variant="h3" component="h1" gutterBottom>
-              {viewMode === 'mine' ? 'My Progressions' : 'Examples'}
+              {viewMode === 'mine'
+                ? t('progressions.page.myProgressionsTitle')
+                : t('progressions.page.examplesTitle')}
             </Typography>
             <Typography variant="body1" color="text.secondary">
               {viewMode === 'mine'
-                ? 'View, edit, and share your saved chord progressions'
-                : 'Example chord progressions curated by admins'}
+                ? t('progressions.page.myProgressionsDescription')
+                : t('progressions.page.examplesDescription')}
             </Typography>
           </Box>
           <Link href="/" passHref>
             <Button variant="contained" startIcon={<AddIcon />}>
-              Create New
+              {t('progressions.actions.createNew')}
             </Button>
           </Link>
         </Box>
@@ -285,16 +289,16 @@ export default function ProgressionsPageContent() {
                 setViewMode('mine');
               }}
             >
-              My Progressions
+              {t('progressions.page.myProgressionsTitle')}
             </Button>
             <Button
               variant={viewMode === 'public' ? 'contained' : 'outlined'}
               onClick={() => setViewMode('public')}
             >
-              Examples
+              {t('progressions.page.examplesTitle')}
             </Button>
             <Button variant="text" onClick={handleClearFilters} disabled={!hasActiveFilters}>
-              Clear Filters
+              {t('progressions.actions.clearFilters')}
             </Button>
           </Stack>
 
@@ -339,9 +343,11 @@ export default function ProgressionsPageContent() {
                     renderInput={(params) => (
                       <TextField
                         {...params}
-                        label="Search tags"
+                        label={t('progressions.filters.searchTagsLabel')}
                         InputLabelProps={{ shrink: true }}
-                        placeholder={value.length === 0 ? 'house, cinematic, jazz...' : ''}
+                        placeholder={
+                          value.length === 0 ? t('progressions.filters.searchTagsPlaceholder') : ''
+                        }
                       />
                     )}
                   />
@@ -383,9 +389,11 @@ export default function ProgressionsPageContent() {
                   renderInput={(params) => (
                     <TextField
                       {...params}
-                      label="Search key/Chord(s)"
+                      label={t('progressions.filters.searchKeyLabel')}
                       InputLabelProps={{ shrink: true }}
-                      placeholder={value.length === 0 ? 'C, F#m, Bb...' : ''}
+                      placeholder={
+                        value.length === 0 ? t('progressions.filters.searchKeyPlaceholder') : ''
+                      }
                     />
                   )}
                 />
@@ -412,11 +420,11 @@ export default function ProgressionsPageContent() {
           <Box sx={{ textAlign: 'center', py: 8 }}>
             <Typography variant="body1" color="text.secondary" sx={{ mb: 2 }}>
               {viewMode === 'mine'
-                ? "You haven't saved any progressions yet."
-                : 'No example progressions match your filters yet.'}
+                ? t('progressions.empty.mine')
+                : t('progressions.empty.public')}
             </Typography>
             <Link href="/" passHref>
-              <Button variant="contained">Create a progression</Button>
+              <Button variant="contained">{t('progressions.actions.createProgression')}</Button>
             </Link>
           </Box>
         )}

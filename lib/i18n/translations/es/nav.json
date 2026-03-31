@@ -5,5 +5,8 @@
   "structure": "Estructura",
   "myProgressions": "Mis progresiones",
   "login": "Iniciar sesion",
-  "logout": "Cerrar sesion"
+  "logout": "Cerrar sesion",
+  "pricing": "Pricing",
+  "billing": "Billing",
+  "security": "Security"
 }
