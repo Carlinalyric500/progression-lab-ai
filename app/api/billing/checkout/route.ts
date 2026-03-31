@@ -76,6 +76,21 @@ export async function POST(request: NextRequest) {
     });
     const stripe = getStripeClient();
     const appUrl = getAppUrl(request.nextUrl.origin);
+    const checkoutMetadata: Record<string, string> = {
+      userId: user.id,
+      plan,
+      billingInterval: getBillingInterval(interval),
+    };
+    const subscriptionMetadata: Record<string, string> = {
+      userId: user.id,
+      plan,
+    };
+
+    if (promoValidation?.isValid) {
+      checkoutMetadata.promoCode = promoValidation.code;
+      subscriptionMetadata.promoCode = promoValidation.code;
+    }
+
     const checkoutSession = await stripe.checkout.sessions.create({
       mode: 'subscription',
       customer: stripeCustomerId,
@@ -92,18 +107,9 @@ export async function POST(request: NextRequest) {
         : undefined,
       success_url: `${appUrl}/settings/billing?checkout=success`,
       cancel_url: `${appUrl}/pricing?checkout=cancelled`,
-      metadata: {
-        userId: user.id,
-        plan,
-        billingInterval: getBillingInterval(interval),
-        promoCode: promoValidation?.isValid ? promoValidation.code : undefined,
-      },
+      metadata: checkoutMetadata,
       subscription_data: {
-        metadata: {
-          userId: user.id,
-          plan,
-          promoCode: promoValidation?.isValid ? promoValidation.code : undefined,
-        },
+        metadata: subscriptionMetadata,
       },
     });
 
