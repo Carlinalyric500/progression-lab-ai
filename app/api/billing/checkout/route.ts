@@ -8,6 +8,7 @@ import {
   getCheckoutPriceId,
   isBillablePlan,
   isCheckoutInterval,
+  validatePromoCodeForCheckout,
 } from '../../../../lib/billing';
 import { checkCsrfToken } from '../../../../lib/csrf';
 import { prisma } from '../../../../lib/prisma';
@@ -16,6 +17,7 @@ import { getStripeClient } from '../../../../lib/stripe';
 type CheckoutRequestBody = {
   plan?: unknown;
   interval?: unknown;
+  promoCode?: unknown;
 };
 
 export async function POST(request: NextRequest) {
@@ -33,9 +35,23 @@ export async function POST(request: NextRequest) {
     const body = (await request.json()) as CheckoutRequestBody;
     const plan = typeof body.plan === 'string' ? body.plan : '';
     const interval = typeof body.interval === 'string' ? body.interval : '';
+    const promoCode = typeof body.promoCode === 'string' ? body.promoCode : '';
 
     if (!isBillablePlan(plan) || !isCheckoutInterval(interval)) {
       return NextResponse.json({ message: 'Invalid billing selection' }, { status: 400 });
+    }
+
+    const promoValidation = promoCode
+      ? await validatePromoCodeForCheckout({
+          rawCode: promoCode,
+          plan,
+          interval,
+          userId: session.userId,
+        })
+      : null;
+
+    if (promoValidation && !promoValidation.isValid) {
+      return NextResponse.json({ message: 'Invalid or ineligible promo code' }, { status: 400 });
     }
 
     const user = await prisma.user.findUnique({
@@ -60,6 +76,21 @@ export async function POST(request: NextRequest) {
     });
     const stripe = getStripeClient();
     const appUrl = getAppUrl(request.nextUrl.origin);
+    const checkoutMetadata: Record<string, string> = {
+      userId: user.id,
+      plan,
+      billingInterval: getBillingInterval(interval),
+    };
+    const subscriptionMetadata: Record<string, string> = {
+      userId: user.id,
+      plan,
+    };
+
+    if (promoValidation?.isValid) {
+      checkoutMetadata.promoCode = promoValidation.code;
+      subscriptionMetadata.promoCode = promoValidation.code;
+    }
+
     const checkoutSession = await stripe.checkout.sessions.create({
       mode: 'subscription',
       customer: stripeCustomerId,
@@ -71,18 +102,14 @@ export async function POST(request: NextRequest) {
         },
       ],
       allow_promotion_codes: true,
+      discounts: promoValidation?.isValid
+        ? [{ promotion_code: promoValidation.stripePromotionCodeId }]
+        : undefined,
       success_url: `${appUrl}/settings/billing?checkout=success`,
       cancel_url: `${appUrl}/pricing?checkout=cancelled`,
-      metadata: {
-        userId: user.id,
-        plan,
-        billingInterval: getBillingInterval(interval),
-      },
+      metadata: checkoutMetadata,
       subscription_data: {
-        metadata: {
-          userId: user.id,
-          plan,
-        },
+        metadata: subscriptionMetadata,
       },
     });
 

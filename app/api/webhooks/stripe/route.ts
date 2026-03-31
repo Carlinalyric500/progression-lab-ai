@@ -1,7 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 
-import { syncStripeSubscription, updateUserStripeCustomerId } from '../../../../lib/billing';
+import {
+  recordPromoCodeRedemptionFromCheckout,
+  syncStripeSubscription,
+  updateUserStripeCustomerId,
+} from '../../../../lib/billing';
 import { getStripeClient, getStripeWebhookSecrets } from '../../../../lib/stripe';
 
 export const runtime = 'nodejs';
@@ -79,6 +83,20 @@ export async function POST(request: NextRequest) {
         if (typeof session.subscription === 'string') {
           const subscription = await stripe.subscriptions.retrieve(session.subscription);
           await syncStripeSubscription(subscription);
+        }
+
+        if (
+          session.client_reference_id &&
+          typeof session.id === 'string' &&
+          typeof session.metadata?.promoCode === 'string'
+        ) {
+          await recordPromoCodeRedemptionFromCheckout({
+            rawCode: session.metadata.promoCode,
+            userId: session.client_reference_id,
+            checkoutSessionId: session.id,
+            stripeSubscriptionId:
+              typeof session.subscription === 'string' ? session.subscription : null,
+          });
         }
 
         break;

@@ -1,5 +1,6 @@
 import type {
   BillingInterval,
+  PromoCodeType,
   SubscriptionPlan,
   SubscriptionStatus,
   UsageEventType,
@@ -12,6 +13,51 @@ import { getCurrentMonthUsageCount } from './usage';
 
 export type CheckoutInterval = 'monthly' | 'yearly';
 export type BillablePlan = Extract<SubscriptionPlan, 'COMPOSER' | 'STUDIO'>;
+type PromoCodeValidationFailureReason =
+  | 'not_found'
+  | 'inactive'
+  | 'not_started'
+  | 'expired'
+  | 'max_redemptions_reached'
+  | 'single_use_already_redeemed'
+  | 'plan_not_allowed'
+  | 'interval_not_allowed'
+  | 'invalid_type'
+  | 'missing_stripe_promotion_code_id';
+
+type InviteCodeRedeemFailureReason =
+  | 'not_found'
+  | 'inactive'
+  | 'not_started'
+  | 'expired'
+  | 'max_redemptions_reached'
+  | 'already_redeemed'
+  | 'invalid_type'
+  | 'already_paid_plan';
+
+type PromoCodeValidationResult =
+  | {
+      isValid: true;
+      code: string;
+      stripePromotionCodeId: string;
+      promoCodeId: string;
+    }
+  | {
+      isValid: false;
+      reason: PromoCodeValidationFailureReason;
+    };
+
+export type InviteCodeRedeemResult =
+  | {
+      applied: true;
+      code: string;
+      grantedPlan: SubscriptionPlan;
+      expiresAt: Date;
+    }
+  | {
+      applied: false;
+      reason: InviteCodeRedeemFailureReason;
+    };
 
 type StripePriceEnvMap = Record<BillablePlan, Record<CheckoutInterval, string>>;
 
@@ -53,6 +99,123 @@ export function isCheckoutInterval(value: string): value is CheckoutInterval {
 
 export function getBillingInterval(interval: CheckoutInterval): BillingInterval {
   return BILLING_INTERVAL_BY_CHECKOUT_INTERVAL[interval];
+}
+
+export function normalizePromoCode(rawCode: string): string {
+  return rawCode.trim().toUpperCase();
+}
+
+function includesPlanRestriction(allowedPlans: SubscriptionPlan[], plan: BillablePlan): boolean {
+  return allowedPlans.length === 0 || allowedPlans.includes(plan);
+}
+
+function includesIntervalRestriction(
+  allowedIntervals: BillingInterval[],
+  interval: BillingInterval,
+): boolean {
+  return allowedIntervals.length === 0 || allowedIntervals.includes(interval);
+}
+
+function isDiscountPromoCode(type: PromoCodeType): boolean {
+  return type === 'DISCOUNT';
+}
+
+function isInvitePromoCode(type: PromoCodeType): boolean {
+  return type === 'INVITE';
+}
+
+function isEntitledSubscriptionStatus(status: SubscriptionStatus | null | undefined): boolean {
+  return status === 'ACTIVE' || status === 'TRIALING' || status === 'PAST_DUE';
+}
+
+export async function validatePromoCodeForCheckout(options: {
+  rawCode: string;
+  plan: BillablePlan;
+  interval: CheckoutInterval;
+  userId: string;
+}): Promise<PromoCodeValidationResult> {
+  const normalizedCode = normalizePromoCode(options.rawCode);
+  if (!normalizedCode) {
+    return { isValid: false, reason: 'not_found' };
+  }
+
+  const billingInterval = getBillingInterval(options.interval);
+  const code = await prisma.promoCode.findUnique({
+    where: { code: normalizedCode },
+    select: {
+      id: true,
+      type: true,
+      isActive: true,
+      startsAt: true,
+      expiresAt: true,
+      maxRedemptions: true,
+      currentRedemptions: true,
+      isSingleUse: true,
+      allowedPlans: true,
+      allowedBillingIntervals: true,
+      stripePromotionCodeId: true,
+    },
+  });
+
+  if (!code) {
+    return { isValid: false, reason: 'not_found' };
+  }
+
+  if (!isDiscountPromoCode(code.type)) {
+    return { isValid: false, reason: 'invalid_type' };
+  }
+
+  if (!code.isActive) {
+    return { isValid: false, reason: 'inactive' };
+  }
+
+  const now = new Date();
+  if (code.startsAt && code.startsAt > now) {
+    return { isValid: false, reason: 'not_started' };
+  }
+
+  if (code.expiresAt && code.expiresAt <= now) {
+    return { isValid: false, reason: 'expired' };
+  }
+
+  if (code.maxRedemptions !== null && code.currentRedemptions >= code.maxRedemptions) {
+    return { isValid: false, reason: 'max_redemptions_reached' };
+  }
+
+  if (!includesPlanRestriction(code.allowedPlans, options.plan)) {
+    return { isValid: false, reason: 'plan_not_allowed' };
+  }
+
+  if (!includesIntervalRestriction(code.allowedBillingIntervals, billingInterval)) {
+    return { isValid: false, reason: 'interval_not_allowed' };
+  }
+
+  if (code.isSingleUse) {
+    const existingRedemption = await prisma.promoCodeRedemption.findUnique({
+      where: {
+        promoCodeId_userId: {
+          promoCodeId: code.id,
+          userId: options.userId,
+        },
+      },
+      select: { id: true },
+    });
+
+    if (existingRedemption) {
+      return { isValid: false, reason: 'single_use_already_redeemed' };
+    }
+  }
+
+  if (!code.stripePromotionCodeId) {
+    return { isValid: false, reason: 'missing_stripe_promotion_code_id' };
+  }
+
+  return {
+    isValid: true,
+    code: normalizedCode,
+    stripePromotionCodeId: code.stripePromotionCodeId,
+    promoCodeId: code.id,
+  };
 }
 
 export function getPrimaryPriceId(subscription: Stripe.Subscription): string | null {
@@ -204,6 +367,201 @@ export async function syncStripeSubscription(subscription: Stripe.Subscription) 
       cancelAtPeriodEnd: subscriptionPeriod.cancel_at_period_end ?? false,
     },
   });
+}
+
+export async function recordPromoCodeRedemptionFromCheckout(options: {
+  rawCode: string;
+  userId: string;
+  checkoutSessionId: string;
+  stripeSubscriptionId?: string | null;
+}) {
+  const normalizedCode = normalizePromoCode(options.rawCode);
+  if (!normalizedCode) {
+    return null;
+  }
+
+  const code = await prisma.promoCode.findUnique({
+    where: { code: normalizedCode },
+    select: {
+      id: true,
+      stripePromotionCodeId: true,
+    },
+  });
+
+  if (!code) {
+    return null;
+  }
+
+  return prisma.$transaction(async (tx) => {
+    const existingRedemption = await tx.promoCodeRedemption.findUnique({
+      where: {
+        promoCodeId_userId: {
+          promoCodeId: code.id,
+          userId: options.userId,
+        },
+      },
+      select: { id: true },
+    });
+
+    if (!existingRedemption) {
+      await tx.promoCodeRedemption.create({
+        data: {
+          promoCodeId: code.id,
+          userId: options.userId,
+          status: 'REDEEMED',
+          checkoutSessionId: options.checkoutSessionId,
+          stripeSubscriptionId: options.stripeSubscriptionId ?? null,
+        },
+      });
+
+      await tx.promoCode.update({
+        where: { id: code.id },
+        data: {
+          currentRedemptions: {
+            increment: 1,
+          },
+        },
+      });
+    }
+
+    if (options.stripeSubscriptionId) {
+      await tx.subscription.updateMany({
+        where: {
+          userId: options.userId,
+          stripeSubscriptionId: options.stripeSubscriptionId,
+        },
+        data: {
+          appliedPromoCode: normalizedCode,
+          stripePromotionCodeId: code.stripePromotionCodeId ?? undefined,
+        },
+      });
+    }
+
+    return {
+      code: normalizedCode,
+      promoCodeId: code.id,
+    };
+  });
+}
+
+export async function redeemInviteCodeForUser(options: {
+  rawCode: string;
+  userId: string;
+}): Promise<InviteCodeRedeemResult> {
+  const normalizedCode = normalizePromoCode(options.rawCode);
+  if (!normalizedCode) {
+    return { applied: false, reason: 'not_found' };
+  }
+
+  const [user, code] = await Promise.all([
+    prisma.user.findUnique({
+      where: { id: options.userId },
+      select: {
+        id: true,
+        subscription: {
+          select: {
+            status: true,
+          },
+        },
+      },
+    }),
+    prisma.promoCode.findUnique({
+      where: { code: normalizedCode },
+      select: {
+        id: true,
+        type: true,
+        isActive: true,
+        startsAt: true,
+        expiresAt: true,
+        maxRedemptions: true,
+        currentRedemptions: true,
+        isSingleUse: true,
+        grantedPlan: true,
+        inviteDurationDays: true,
+      },
+    }),
+  ]);
+
+  if (!user || !code) {
+    return { applied: false, reason: 'not_found' };
+  }
+
+  if (!isInvitePromoCode(code.type)) {
+    return { applied: false, reason: 'invalid_type' };
+  }
+
+  if (isEntitledSubscriptionStatus(user.subscription?.status)) {
+    return { applied: false, reason: 'already_paid_plan' };
+  }
+
+  if (!code.isActive) {
+    return { applied: false, reason: 'inactive' };
+  }
+
+  const now = new Date();
+  if (code.startsAt && code.startsAt > now) {
+    return { applied: false, reason: 'not_started' };
+  }
+
+  if (code.expiresAt && code.expiresAt <= now) {
+    return { applied: false, reason: 'expired' };
+  }
+
+  if (code.maxRedemptions !== null && code.currentRedemptions >= code.maxRedemptions) {
+    return { applied: false, reason: 'max_redemptions_reached' };
+  }
+
+  const existingRedemption = await prisma.promoCodeRedemption.findUnique({
+    where: {
+      promoCodeId_userId: {
+        promoCodeId: code.id,
+        userId: user.id,
+      },
+    },
+    select: { id: true },
+  });
+
+  if (existingRedemption) {
+    return { applied: false, reason: 'already_redeemed' };
+  }
+
+  const grantedPlan = code.grantedPlan ?? 'INVITE';
+  const inviteDurationDays = code.inviteDurationDays ?? 14;
+  const expiresAt = new Date(now.getTime() + inviteDurationDays * 24 * 60 * 60 * 1000);
+
+  await prisma.$transaction(async (tx) => {
+    await tx.user.update({
+      where: { id: user.id },
+      data: {
+        planOverride: grantedPlan,
+        planOverrideExpiresAt: expiresAt,
+      },
+    });
+
+    await tx.promoCodeRedemption.create({
+      data: {
+        promoCodeId: code.id,
+        userId: user.id,
+        status: 'REDEEMED',
+      },
+    });
+
+    await tx.promoCode.update({
+      where: { id: code.id },
+      data: {
+        currentRedemptions: {
+          increment: 1,
+        },
+      },
+    });
+  });
+
+  return {
+    applied: true,
+    code: normalizedCode,
+    grantedPlan,
+    expiresAt,
+  };
 }
 
 export async function getBillingStatusForUser(userId: string) {

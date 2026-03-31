@@ -16,6 +16,7 @@ import {
   Chip,
   Container,
   Stack,
+  TextField,
   Typography,
 } from '@mui/material';
 
@@ -229,6 +230,8 @@ export default function PricingPageContent() {
   const { showError } = useAppSnackbar();
   const [selectedInterval, setSelectedInterval] = useState<BillingInterval>('monthly');
   const [pendingPlan, setPendingPlan] = useState<CheckoutPlan | null>(null);
+  const [promoCode, setPromoCode] = useState('');
+  const [promoError, setPromoError] = useState('');
   const [tierConfigs, setTierConfigs] = useState<Record<PublicPlan, PricingTierConfig> | null>(
     null,
   );
@@ -263,40 +266,37 @@ export default function PricingPageContent() {
     void loadTierConfigs();
   }, []);
 
-  const displayedTiers = useMemo(
-    () => {
-      const defaultsByPlan = getDefaultTierContent(t);
-      return TIERS.map((tier) => {
-        const defaults = defaultsByPlan[tier.plan];
-        const config = tierConfigs?.[tier.plan];
-        const priceMonthly =
-          config?.monthlyPrice !== undefined
-            ? config.monthlyPrice === 0
-              ? '$0'
-              : `$${config.monthlyPrice}`
-            : defaults.priceMonthly;
-        const priceYearly =
-          config?.yearlyPrice !== undefined
-            ? config.yearlyPrice === 0
-              ? '$0'
-              : `$${config.yearlyPrice}`
-            : defaults.priceYearly;
+  const displayedTiers = useMemo(() => {
+    const defaultsByPlan = getDefaultTierContent(t);
+    return TIERS.map((tier) => {
+      const defaults = defaultsByPlan[tier.plan];
+      const config = tierConfigs?.[tier.plan];
+      const priceMonthly =
+        config?.monthlyPrice !== undefined
+          ? config.monthlyPrice === 0
+            ? '$0'
+            : `$${config.monthlyPrice}`
+          : defaults.priceMonthly;
+      const priceYearly =
+        config?.yearlyPrice !== undefined
+          ? config.yearlyPrice === 0
+            ? '$0'
+            : `$${config.yearlyPrice}`
+          : defaults.priceYearly;
 
-        return {
-          ...tier,
-          name: config?.displayName || defaults.name,
-          priceMonthly,
-          priceYearly,
-          summary: config?.description || defaults.summary,
-          description: defaults.description,
-          features: buildFeatures(defaults.features, config),
-          cta: defaults.cta,
-          badge: defaults.badge,
-        };
-      });
-    },
-    [t, tierConfigs],
-  );
+      return {
+        ...tier,
+        name: config?.displayName || defaults.name,
+        priceMonthly,
+        priceYearly,
+        summary: config?.description || defaults.summary,
+        description: defaults.description,
+        features: buildFeatures(defaults.features, config),
+        cta: defaults.cta,
+        badge: defaults.badge,
+      };
+    });
+  }, [t, tierConfigs]);
 
   const handleCheckout = async (plan: CheckoutPlan) => {
     if (!isAuthenticated) {
@@ -316,12 +316,18 @@ export default function PricingPageContent() {
         body: JSON.stringify({
           plan,
           interval: selectedInterval,
+          promoCode: promoCode.trim() || undefined,
         }),
       });
 
       if (!response.ok) {
         const body = (await response.json()) as { message?: string };
-        throw new Error(body.message ?? t('billing.errors.startCheckout'));
+        const msg = body.message ?? t('billing.errors.startCheckout');
+        if (/promo/i.test(msg)) {
+          setPromoError(msg);
+          return;
+        }
+        throw new Error(msg);
       }
 
       const body = (await response.json()) as { url?: string };
@@ -386,10 +392,25 @@ export default function PricingPageContent() {
           </Button>
         </Stack>
 
+        <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+          <TextField
+            label="Promo code"
+            value={promoCode}
+            onChange={(event) => {
+              setPromoCode(event.target.value.toUpperCase());
+              setPromoError('');
+            }}
+            placeholder="PRODUCER-XXXX"
+            size="small"
+            sx={{ width: { xs: '100%', sm: 340 } }}
+            error={!!promoError}
+            helperText={promoError || 'Applies to paid plans when valid'}
+            inputProps={{ maxLength: 64 }}
+          />
+        </Box>
+
         {!isLoading && !isAuthenticated ? (
-          <Alert severity="info">
-            {t('billing.pricing.signInHint')}
-          </Alert>
+          <Alert severity="info">{t('billing.pricing.signInHint')}</Alert>
         ) : null}
 
         <Box

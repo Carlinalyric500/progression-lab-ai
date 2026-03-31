@@ -105,6 +105,24 @@ const FALLBACK_PRICING: Record<
     canSharePublicly: true,
     canUsePremiumAiModel: true,
   },
+  [SubscriptionPlan.INVITE]: {
+    planId: 'INVITE',
+    displayName: 'Invite',
+    description: 'Time-limited invite access plan',
+    monthlyPrice: 0,
+    yearlyPrice: 0,
+    monthlyStripePriceId: null,
+    yearlyStripePriceId: null,
+    gptModel: 'gpt-3.5-turbo',
+    aiGenerationsPerMonth: 25,
+    maxSavedProgressions: 50,
+    maxSavedArrangements: 50,
+    maxPublicShares: 10,
+    canExportMidi: true,
+    canExportPdf: true,
+    canSharePublicly: false,
+    canUsePremiumAiModel: false,
+  },
 };
 
 export async function getActivePricingPlan(planId: string): Promise<ActivePricingPlan> {

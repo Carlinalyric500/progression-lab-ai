@@ -9,6 +9,7 @@ var mockEnsureStripeCustomerForUser = jest.fn();
 var mockGetAppUrl = jest.fn();
 var mockGetBillingInterval = jest.fn();
 var mockGetCheckoutPriceId = jest.fn();
+var mockValidatePromoCodeForCheckout = jest.fn();
 var mockCheckoutSessionsCreate = jest.fn();
 
 jest.mock('../../../../../lib/csrf', () => ({
@@ -32,6 +33,7 @@ jest.mock('../../../../../lib/billing', () => ({
   getAppUrl: (...args: unknown[]) => mockGetAppUrl(...args),
   getBillingInterval: (...args: unknown[]) => mockGetBillingInterval(...args),
   getCheckoutPriceId: (...args: unknown[]) => mockGetCheckoutPriceId(...args),
+  validatePromoCodeForCheckout: (...args: unknown[]) => mockValidatePromoCodeForCheckout(...args),
   isBillablePlan: (value: string) => value === 'COMPOSER' || value === 'STUDIO',
   isCheckoutInterval: (value: string) => value === 'monthly' || value === 'yearly',
 }));
@@ -65,6 +67,12 @@ describe('POST /api/billing/checkout', () => {
     mockGetAppUrl.mockReturnValue('http://localhost:3000');
     mockGetBillingInterval.mockReturnValue('MONTHLY');
     mockGetCheckoutPriceId.mockReturnValue('price_123');
+    mockValidatePromoCodeForCheckout.mockResolvedValue({
+      isValid: true,
+      code: 'PRODUCER10',
+      stripePromotionCodeId: 'promo_123',
+      promoCodeId: 'promo_db_123',
+    });
     mockCheckoutSessionsCreate.mockResolvedValue({
       url: 'https://checkout.stripe.com/test-session',
     });
@@ -141,5 +149,45 @@ describe('POST /api/billing/checkout', () => {
       }),
     );
     expect(body).toEqual({ url: 'https://checkout.stripe.com/test-session' });
+  });
+
+  it('returns 400 when promo code validation fails', async () => {
+    mockValidatePromoCodeForCheckout.mockResolvedValue({
+      isValid: false,
+      reason: 'expired',
+    });
+
+    const response = await POST({
+      json: async () => ({ plan: 'COMPOSER', interval: 'monthly', promoCode: 'OLDPROMO' }),
+    } as never);
+    const body = await response.json();
+
+    expect(response.status).toBe(400);
+    expect(body).toEqual({ message: 'Invalid or ineligible promo code' });
+    expect(mockCheckoutSessionsCreate).not.toHaveBeenCalled();
+  });
+
+  it('adds Stripe discount and metadata when promo code is valid', async () => {
+    const response = await POST({
+      json: async () => ({ plan: 'COMPOSER', interval: 'monthly', promoCode: 'producer10' }),
+      nextUrl: { origin: 'http://localhost:3000' },
+    } as never);
+
+    expect(response.status).toBe(200);
+    expect(mockValidatePromoCodeForCheckout).toHaveBeenCalledWith({
+      rawCode: 'producer10',
+      plan: 'COMPOSER',
+      interval: 'monthly',
+      userId: 'user-1',
+    });
+    expect(mockCheckoutSessionsCreate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        discounts: [{ promotion_code: 'promo_123' }],
+        metadata: expect.objectContaining({ promoCode: 'PRODUCER10' }),
+        subscription_data: {
+          metadata: expect.objectContaining({ promoCode: 'PRODUCER10' }),
+        },
+      }),
+    );
   });
 });

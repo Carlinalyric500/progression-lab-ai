@@ -22,6 +22,7 @@ export type AccessContext = {
   plan: SubscriptionPlan;
   entitlements: PlanEntitlements;
   planOverride: SubscriptionPlan | null;
+  planOverrideExpiresAt: Date | null;
   subscriptionStatus: SubscriptionStatus | null;
 };
 
@@ -75,6 +76,17 @@ export const PLAN_ENTITLEMENTS: Record<SubscriptionPlan, PlanEntitlements> = {
     canUsePremiumAiModel: true,
     gptModel: 'gpt-4o',
   },
+  [SubscriptionPlan.INVITE]: {
+    aiGenerationsPerMonth: 25,
+    maxSavedProgressions: 50,
+    maxSavedArrangements: 50,
+    maxPublicShares: 10,
+    canExportMidi: true,
+    canExportPdf: true,
+    canSharePublicly: false,
+    canUsePremiumAiModel: false,
+    gptModel: 'gpt-3.5-turbo',
+  },
 };
 
 function isSubscriptionEntitled(status: SubscriptionStatus | null | undefined): boolean {
@@ -91,11 +103,18 @@ export function hasReachedLimit(limit: number | null, used: number): boolean {
 
 export function resolvePlan(options: {
   planOverride?: SubscriptionPlan | null;
+  planOverrideExpiresAt?: Date | null;
   subscriptionPlan?: SubscriptionPlan | null;
   subscriptionStatus?: SubscriptionStatus | null;
 }): SubscriptionPlan {
-  if (options.planOverride) {
-    return options.planOverride;
+  const now = new Date();
+  const overridePlan = options.planOverride;
+  const hasActiveOverride =
+    overridePlan &&
+    (!options.planOverrideExpiresAt || options.planOverrideExpiresAt.getTime() > now.getTime());
+
+  if (hasActiveOverride) {
+    return overridePlan;
   }
 
   if (options.subscriptionPlan && isSubscriptionEntitled(options.subscriptionStatus)) {
@@ -114,6 +133,7 @@ export async function getAccessContextForSession(session: {
     select: {
       id: true,
       planOverride: true,
+      planOverrideExpiresAt: true,
       subscription: {
         select: {
           plan: true,
@@ -129,6 +149,7 @@ export async function getAccessContextForSession(session: {
 
   const plan = resolvePlan({
     planOverride: user.planOverride,
+    planOverrideExpiresAt: user.planOverrideExpiresAt,
     subscriptionPlan: user.subscription?.plan,
     subscriptionStatus: user.subscription?.status,
   });
@@ -153,6 +174,7 @@ export async function getAccessContextForSession(session: {
     plan,
     entitlements,
     planOverride: user.planOverride,
+    planOverrideExpiresAt: user.planOverrideExpiresAt,
     subscriptionStatus: user.subscription?.status ?? null,
   };
 }
