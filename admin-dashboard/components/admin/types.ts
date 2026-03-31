@@ -181,6 +181,51 @@ export type PlanVersionsState = {
   versions: PlanVersion[];
 };
 
+export type PromoCodeType = 'DISCOUNT' | 'INVITE';
+export type PromoRedemptionStatus = 'REDEEMED' | 'REJECTED';
+
+export type PromoCodeRow = {
+  id: string;
+  code: string;
+  type: PromoCodeType;
+  isActive: boolean;
+  startsAt: string | null;
+  expiresAt: string | null;
+  maxRedemptions: number | null;
+  currentRedemptions: number;
+  isSingleUse: boolean;
+  allowedPlans: SubscriptionPlan[];
+  grantedPlan: SubscriptionPlan | null;
+  inviteDurationDays: number | null;
+  createdByEmail: string | null;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type CreatePromoCodeInput = {
+  code: string;
+  type: PromoCodeType;
+  isActive: boolean;
+  startsAt: string | null;
+  expiresAt: string | null;
+  maxRedemptions: number | null;
+  isSingleUse: boolean;
+  allowedPlans: SubscriptionPlan[];
+  grantedPlan: SubscriptionPlan | null;
+  inviteDurationDays: number | null;
+  stripePromotionCodeId: string | null;
+};
+
+export type UpdatePromoCodeInput = Partial<Omit<CreatePromoCodeInput, 'code' | 'type'>>;
+
+export type PromoCodeRedemptionRow = {
+  id: string;
+  userId: string;
+  userEmail: string;
+  status: PromoRedemptionStatus;
+  redeemedAt: string;
+};
+
 export type SavePlanDraftInput = {
   planId: string;
   displayName: string;

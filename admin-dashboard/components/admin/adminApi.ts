@@ -6,8 +6,11 @@ import type {
   AdminUserRow,
   AdminUserSummary,
   AdminAuditLogItem,
+  CreatePromoCodeInput,
   PlanVersion,
   PlanVersionsState,
+  PromoCodeRedemptionRow,
+  PromoCodeRow,
   PromptBuilderState,
   PromptVersion,
   ProgressionDetail,
@@ -15,6 +18,7 @@ import type {
   SavePlanDraftInput,
   SubscriptionPlan,
   SubscriptionTierConfig,
+  UpdatePromoCodeInput,
 } from './types';
 
 import type { AuthenticationResponseJSON, RegistrationResponseJSON } from '@simplewebauthn/server';
@@ -399,4 +403,79 @@ export async function rollbackPlanVersion(params: {
 
   const data = (await response.json()) as { item: PlanVersion };
   return data.item;
+}
+
+export async function fetchPromoCodes(): Promise<PromoCodeRow[]> {
+  const response = await fetch('/api/promo-codes', {
+    credentials: 'include',
+    cache: 'no-store',
+  });
+
+  if (!response.ok) {
+    throw new Error(await readErrorMessage(response, 'Failed to fetch promo codes'));
+  }
+
+  const data = (await response.json()) as { items: PromoCodeRow[] };
+  return data.items;
+}
+
+export async function createPromoCode(input: CreatePromoCodeInput): Promise<PromoCodeRow> {
+  const response = await fetch('/api/promo-codes', {
+    method: 'POST',
+    credentials: 'include',
+    headers: createCsrfHeaders({ 'Content-Type': 'application/json' }),
+    body: JSON.stringify(input),
+  });
+
+  if (!response.ok) {
+    throw new Error(await readErrorMessage(response, 'Failed to create promo code'));
+  }
+
+  const data2 = (await response.json()) as { item: PromoCodeRow };
+  return data2.item;
+}
+
+export async function updatePromoCode(
+  id: string,
+  updates: UpdatePromoCodeInput,
+): Promise<PromoCodeRow> {
+  const response = await fetch(`/api/promo-codes/${id}`, {
+    method: 'PATCH',
+    credentials: 'include',
+    headers: createCsrfHeaders({ 'Content-Type': 'application/json' }),
+    body: JSON.stringify(updates),
+  });
+
+  if (!response.ok) {
+    throw new Error(await readErrorMessage(response, 'Failed to update promo code'));
+  }
+
+  const data3 = (await response.json()) as { item: PromoCodeRow };
+  return data3.item;
+}
+
+export async function revokePromoCode(id: string): Promise<void> {
+  const response = await fetch(`/api/promo-codes/${id}`, {
+    method: 'DELETE',
+    credentials: 'include',
+    headers: createCsrfHeaders(),
+  });
+
+  if (!response.ok) {
+    throw new Error(await readErrorMessage(response, 'Failed to revoke promo code'));
+  }
+}
+
+export async function fetchPromoCodeRedemptions(id: string): Promise<PromoCodeRedemptionRow[]> {
+  const response = await fetch(`/api/promo-codes/${id}/redemptions`, {
+    credentials: 'include',
+    cache: 'no-store',
+  });
+
+  if (!response.ok) {
+    throw new Error(await readErrorMessage(response, 'Failed to fetch redemptions'));
+  }
+
+  const data4 = (await response.json()) as { items: PromoCodeRedemptionRow[] };
+  return data4.items;
 }

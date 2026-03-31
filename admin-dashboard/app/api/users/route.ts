@@ -28,6 +28,7 @@ const PLAN_LIMITS: Record<SubscriptionPlan, number | null> = {
   COMPOSER: 50,
   STUDIO: 200,
   COMP: 200,
+  INVITE: 25,
 };
 
 function normalizePositiveInt(rawValue: string | null, fallback: number): number {
