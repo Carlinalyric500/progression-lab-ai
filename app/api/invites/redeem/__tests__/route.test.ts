@@ -97,22 +97,25 @@ describe('POST /api/invites/redeem', () => {
     });
   });
 
-  it('returns 400 for invalid invite state', async () => {
-    mockRedeemInviteCodeForUser.mockResolvedValue({
-      applied: false,
-      reason: 'expired',
-    });
+  it.each(['not_found', 'inactive', 'not_started', 'expired', 'max_redemptions_reached'])(
+    'returns 400 for invalid invite state: %s',
+    async (reason) => {
+      mockRedeemInviteCodeForUser.mockResolvedValue({
+        applied: false,
+        reason,
+      });
 
-    const response = await POST({ json: async () => ({ code: 'producer14' }) } as never);
-    const body = await response.json();
+      const response = await POST({ json: async () => ({ code: 'producer14' }) } as never);
+      const body = await response.json();
 
-    expect(response.status).toBe(400);
-    expect(body).toEqual({
-      applied: false,
-      message: 'Invite code is invalid or unavailable',
-      reason: 'expired',
-    });
-  });
+      expect(response.status).toBe(400);
+      expect(body).toEqual({
+        applied: false,
+        message: 'Invite code is invalid or unavailable',
+        reason,
+      });
+    },
+  );
 
   it('returns 500 when invite redemption throws unexpectedly', async () => {
     mockRedeemInviteCodeForUser.mockRejectedValue(new Error('db down'));
