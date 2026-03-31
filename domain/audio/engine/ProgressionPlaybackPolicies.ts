@@ -61,7 +61,7 @@ export const createProgressionPlaybackPolicies = ({
     const shiftedLeftHand = shiftNotesByOctaves(leftHand, octaveShift);
     const shiftedRightHand = shiftNotesByOctaves(rightHand, octaveShift);
 
-    return applyInversionLock([...shiftedLeftHand, ...shiftedRightHand], inversionRegister);
+    return applyInversionLock([...shiftedLeftHand, ...shiftedRightHand], inversionRegister ?? 'off');
   };
 
   const getTimingOffset = ({ humanize, symmetric }: GetTimingOffsetParams): number => {

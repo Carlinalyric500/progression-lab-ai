@@ -1,8 +1,8 @@
 export type SchedulablePart = {
   start: (time: number) => void;
-  loop: boolean;
-  loopStart: number;
-  loopEnd: number;
+  loop: boolean | number;
+  loopStart: unknown;
+  loopEnd: unknown;
   dispose: () => void;
 };
 

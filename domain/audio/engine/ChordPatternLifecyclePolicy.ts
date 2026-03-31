@@ -1,7 +1,7 @@
 type LoopablePart = {
-  loop: boolean;
-  loopStart: number;
-  loopEnd: number;
+  loop: boolean | number;
+  loopStart: unknown;
+  loopEnd: unknown;
 };
 
 type ApplyChordPatternLifecyclePolicyParams = {

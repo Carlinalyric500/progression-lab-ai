@@ -17,7 +17,7 @@ type TransportLike = {
   bpm: {
     value: number;
   };
-  timeSignature: number;
+  timeSignature: number | number[];
 };
 
 export const buildTransportTiming = ({
