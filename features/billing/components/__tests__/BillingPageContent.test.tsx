@@ -138,4 +138,68 @@ describe('BillingPageContent invite redemption', () => {
       ).length,
     ).toBeGreaterThanOrEqual(2);
   });
+
+  it('shows inline error on the invite field when redeem returns 4xx', async () => {
+    (global.fetch as jest.Mock).mockImplementation(async (input: RequestInfo | URL) => {
+      const url = String(input);
+
+      if (url === '/api/billing/status') {
+        return { ok: true, json: async () => statusPayload } as Response;
+      }
+
+      if (url === '/api/invites/redeem') {
+        return {
+          ok: false,
+          json: async () => ({ message: 'Invite code not found or inactive' }),
+        } as Response;
+      }
+
+      throw new Error(`Unexpected fetch call to ${url}`);
+    });
+
+    render(<BillingPageContent />);
+
+    const inviteInput = await screen.findByLabelText('Invite code');
+    fireEvent.change(inviteInput, { target: { value: 'INVALID-CODE' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Redeem' }));
+
+    await waitFor(() => {
+      expect(screen.getByText('Invite code not found or inactive')).toBeInTheDocument();
+    });
+
+    expect(mockShowError).not.toHaveBeenCalled();
+  });
+
+  it('clears inline invite error when the user edits the invite code field', async () => {
+    (global.fetch as jest.Mock).mockImplementation(async (input: RequestInfo | URL) => {
+      const url = String(input);
+
+      if (url === '/api/billing/status') {
+        return { ok: true, json: async () => statusPayload } as Response;
+      }
+
+      if (url === '/api/invites/redeem') {
+        return {
+          ok: false,
+          json: async () => ({ message: 'Invite code not found or inactive' }),
+        } as Response;
+      }
+
+      throw new Error(`Unexpected fetch call to ${url}`);
+    });
+
+    render(<BillingPageContent />);
+
+    const inviteInput = await screen.findByLabelText('Invite code');
+    fireEvent.change(inviteInput, { target: { value: 'INVALID-CODE' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Redeem' }));
+
+    await waitFor(() => {
+      expect(screen.getByText('Invite code not found or inactive')).toBeInTheDocument();
+    });
+
+    fireEvent.change(inviteInput, { target: { value: 'NEW-CODE' } });
+
+    expect(screen.queryByText('Invite code not found or inactive')).not.toBeInTheDocument();
+  });
 });

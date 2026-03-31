@@ -97,4 +97,32 @@ describe('PricingPageContent promo checkout', () => {
     });
     expect(mockEnsureCsrfCookie).toHaveBeenCalledTimes(1);
   });
+
+  it('shows inline error on the promo field when promo code is rejected', async () => {
+    render(<PricingPageContent />);
+
+    fireEvent.change(screen.getByLabelText('Promo code'), { target: { value: 'BAD-CODE' } });
+    fireEvent.click(screen.getByRole('button', { name: 'billing.pricing.tiers.composer.cta' }));
+
+    await waitFor(() => {
+      expect(screen.getByText('Invalid or ineligible promo code')).toBeInTheDocument();
+    });
+
+    expect(mockShowError).not.toHaveBeenCalled();
+  });
+
+  it('clears inline promo error when the user edits the promo code field', async () => {
+    render(<PricingPageContent />);
+
+    fireEvent.change(screen.getByLabelText('Promo code'), { target: { value: 'BAD-CODE' } });
+    fireEvent.click(screen.getByRole('button', { name: 'billing.pricing.tiers.composer.cta' }));
+
+    await waitFor(() => {
+      expect(screen.getByText('Invalid or ineligible promo code')).toBeInTheDocument();
+    });
+
+    fireEvent.change(screen.getByLabelText('Promo code'), { target: { value: 'NEW-CODE' } });
+
+    expect(screen.queryByText('Invalid or ineligible promo code')).not.toBeInTheDocument();
+  });
 });

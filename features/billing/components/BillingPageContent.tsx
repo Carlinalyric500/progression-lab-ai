@@ -91,6 +91,7 @@ export default function BillingPageContent() {
   const [isPageLoading, setIsPageLoading] = useState(true);
   const [isPortalLoading, setIsPortalLoading] = useState(false);
   const [inviteCode, setInviteCode] = useState('');
+  const [inviteError, setInviteError] = useState('');
   const [isInviteRedeeming, setIsInviteRedeeming] = useState(false);
 
   const loadBillingStatus = useCallback(
@@ -168,7 +169,8 @@ export default function BillingPageContent() {
       };
 
       if (!response.ok) {
-        throw new Error(body.message ?? 'Unable to redeem invite code');
+        setInviteError(body.message ?? 'Unable to redeem invite code');
+        return;
       }
 
       if (body.applied) {
@@ -181,6 +183,7 @@ export default function BillingPageContent() {
           : '';
         showSuccess(`Invite applied successfully.${expiresSuffix}`.trim());
         setInviteCode('');
+        setInviteError('');
         await loadBillingStatus();
         return;
       }
@@ -313,8 +316,13 @@ export default function BillingPageContent() {
                   fullWidth
                   label="Invite code"
                   value={inviteCode}
-                  onChange={(event) => setInviteCode(event.target.value.toUpperCase())}
+                  onChange={(event) => {
+                    setInviteCode(event.target.value.toUpperCase());
+                    setInviteError('');
+                  }}
                   placeholder="PRODUCER-XXXX"
+                  error={!!inviteError}
+                  helperText={inviteError || undefined}
                   inputProps={{ maxLength: 64 }}
                 />
                 <Button

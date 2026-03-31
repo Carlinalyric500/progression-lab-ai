@@ -231,6 +231,7 @@ export default function PricingPageContent() {
   const [selectedInterval, setSelectedInterval] = useState<BillingInterval>('monthly');
   const [pendingPlan, setPendingPlan] = useState<CheckoutPlan | null>(null);
   const [promoCode, setPromoCode] = useState('');
+  const [promoError, setPromoError] = useState('');
   const [tierConfigs, setTierConfigs] = useState<Record<PublicPlan, PricingTierConfig> | null>(
     null,
   );
@@ -321,7 +322,12 @@ export default function PricingPageContent() {
 
       if (!response.ok) {
         const body = (await response.json()) as { message?: string };
-        throw new Error(body.message ?? t('billing.errors.startCheckout'));
+        const msg = body.message ?? t('billing.errors.startCheckout');
+        if (/promo/i.test(msg)) {
+          setPromoError(msg);
+          return;
+        }
+        throw new Error(msg);
       }
 
       const body = (await response.json()) as { url?: string };
@@ -390,11 +396,15 @@ export default function PricingPageContent() {
           <TextField
             label="Promo code"
             value={promoCode}
-            onChange={(event) => setPromoCode(event.target.value.toUpperCase())}
+            onChange={(event) => {
+              setPromoCode(event.target.value.toUpperCase());
+              setPromoError('');
+            }}
             placeholder="PRODUCER-XXXX"
             size="small"
             sx={{ width: { xs: '100%', sm: 340 } }}
-            helperText="Applies to paid plans when valid"
+            error={!!promoError}
+            helperText={promoError || 'Applies to paid plans when valid'}
             inputProps={{ maxLength: 64 }}
           />
         </Box>
