@@ -5,5 +5,8 @@
   "structure": "Rakenne",
   "myProgressions": "Omat progressiot",
   "login": "Kirjaudu sisaan",
-  "logout": "Kirjaudu ulos"
+  "logout": "Kirjaudu ulos",
+  "pricing": "Pricing",
+  "billing": "Billing",
+  "security": "Security"
 }

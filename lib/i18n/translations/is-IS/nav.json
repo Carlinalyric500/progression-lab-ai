@@ -5,5 +5,8 @@
   "structure": "Bygging",
   "myProgressions": "Minar progressionir",
   "login": "Skraning inn",
-  "logout": "Skraning ut"
+  "logout": "Skraning ut",
+  "pricing": "Pricing",
+  "billing": "Billing",
+  "security": "Security"
 }

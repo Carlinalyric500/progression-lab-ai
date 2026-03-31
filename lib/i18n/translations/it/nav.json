@@ -1,9 +1,12 @@
 {
-	"generator": "Generatore",
-	"suggestions": "Suggerimenti",
-	"progressions": "Progressioni",
-	"structure": "Struttura",
-	"myProgressions": "Le mie progressioni",
-	"login": "Accedi",
-	"logout": "Esci"
+  "generator": "Generatore",
+  "suggestions": "Suggerimenti",
+  "progressions": "Progressioni",
+  "structure": "Struttura",
+  "myProgressions": "Le mie progressioni",
+  "login": "Accedi",
+  "logout": "Esci",
+  "pricing": "Pricing",
+  "billing": "Billing",
+  "security": "Security"
 }

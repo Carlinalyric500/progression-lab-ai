@@ -219,7 +219,35 @@
       "countInActive": "Odliczanie aktywne",
       "stepSummary": "Krok {{current}}/{{total}}",
       "eventSingular": "{{count}} zdarzenie",
-      "eventPlural": "{{count}} zdarzenia"
+      "eventPlural": "{{count}} zdarzenia",
+      "keyboardShortcutsButtonLabel": "Tips",
+      "recordingModeLabel": "Recording mode",
+      "recordingModeContinuous": "Continuous",
+      "recordingModeSingleShot": "Single-shot",
+      "recordDisabledInSingleShot": "Switch to Continuous mode to use live recording.",
+      "dragOrRecordHint": "Drag pads or record chords to place regions on the timeline",
+      "mobileDragInsertHint": "Tap the timeline to place {{chord}}.",
+      "singleShotHint": "Single-shot mode: place the timeline cursor, then tap pads to insert. Insertion is paused while playback runs.",
+      "singleShotCursorUnset": "Single-shot: click timeline to place cursor",
+      "singleShotCursorSet": "Single-shot cursor: step {{step}}",
+      "selectedClipTitle": "Selected clip",
+      "selectedClipMeta": "{{count}} event at step {{step}}. Drag the clip or use the controls to move it.",
+      "moveClipLeft": "Move clip left",
+      "moveClipRight": "Move clip right",
+      "deleteSelectedClip": "Delete clip",
+      "touchEditHint": "Tap a clip to select it. Drag it horizontally to move it.",
+      "suggestionModeAccordionLabel": "Suggestion modes",
+      "suggestionModeLabel": "Suggestion mode",
+      "suggestionModeOff": "Off",
+      "suggestionModeCurrent": "Both directions",
+      "suggestionModeClockwise": "Dominant flow",
+      "suggestionModeCounterclockwise": "Subdominant flow"
+    },
+    "playback": {
+      "initializingAudio": "Initializing audio",
+      "initializingAudioEllipsis": "Initializing audio...",
+      "playPlaybackAriaLabel": "Play playback",
+      "stopPlaybackAriaLabel": "Stop playback"
     }
   }
 }

@@ -2,5 +2,365 @@
   "languageLabel": "Sprache",
   "languageSelectorAriaLabel": "App-Sprache auswahlen",
   "openNavigationMenu": "Navigationsmenu offnen",
-  "loadingEllipsis": "..."
+  "loadingEllipsis": "...",
+  "theme": {
+    "switchToLightMode": "Switch to light mode",
+    "switchToDarkMode": "Switch to dark mode"
+  },
+  "auth": {
+    "dialog": {
+      "title": "Account",
+      "description": "Register or sign in without leaving your current work."
+    },
+    "reason": {
+      "myProgressions": "Create an account to access your personal saved progressions.",
+      "saveArrangement": "Sign in or create an account to save this arrangement."
+    },
+    "form": {
+      "nameLabel": "Name",
+      "emailLabel": "Email",
+      "passwordLabel": "Password",
+      "nameRequired": "Name is required",
+      "nameMinLength": "Name must be at least 2 characters",
+      "emailRequired": "Email is required",
+      "emailInvalid": "Please enter a valid email address",
+      "passwordRequired": "Password is required",
+      "passwordMinLength": "Password must be at least 8 characters",
+      "passwordMinLengthHint": "Minimum 8 characters"
+    },
+    "actions": {
+      "login": "Login",
+      "register": "Register",
+      "cancel": "Cancel",
+      "signIn": "Sign in",
+      "createAccount": "Create account",
+      "signingIn": "Signing in...",
+      "creatingAccount": "Creating account..."
+    },
+    "messages": {
+      "signedInSuccessfully": "Signed in successfully.",
+      "accountCreatedSuccessfully": "Account created successfully."
+    },
+    "errors": {
+      "authenticationFailed": "Authentication failed",
+      "mfaOptionsMissing": "Security key authentication options are missing",
+      "mfaVerificationFailed": "Security key verification failed"
+    },
+    "webauthn": {
+      "title": "Add a Security Key",
+      "description": "Protect your account with a hardware security key (like a YubiKey). This is optional but highly recommended.",
+      "successMessage": "Security key enrolled successfully! You can add more keys from your security settings later.",
+      "actions": {
+        "followBrowserPrompt": "Follow browser prompt...",
+        "addSecurityKey": "Add Security Key",
+        "skip": "Skip"
+      },
+      "errors": {
+        "startFailed": "Failed to start security key registration",
+        "enrollmentFailed": "Security key enrollment failed",
+        "cancelledOrTimedOut": "Security key interaction was cancelled or timed out."
+      }
+    },
+    "security": {
+      "title": "Security Keys",
+      "description": "Add hardware security keys (FIDO2 / WebAuthn) for stronger account protection.",
+      "enrolledKeysTitle": "Enrolled keys",
+      "defaultLabel": "Security key",
+      "backedUp": "Backed up",
+      "singleDevice": "Single device",
+      "empty": "No security keys enrolled.",
+      "confirmRemove": "Remove this security key?",
+      "actions": {
+        "followBrowserPrompt": "Follow browser prompt...",
+        "addSecurityKey": "Add security key",
+        "removeKey": "Remove key",
+        "removeKeyAriaLabel": "remove security key"
+      },
+      "meta": {
+        "added": "Added",
+        "lastUsed": "Last used"
+      },
+      "messages": {
+        "enrolled": "Security key enrolled successfully."
+      },
+      "errors": {
+        "loadFailed": "Failed to load security keys",
+        "startRegistrationFailed": "Failed to start security key registration",
+        "enrollmentFailed": "Security key enrollment failed",
+        "removeFailed": "Failed to remove security key",
+        "unauthorized": "Please sign in to manage security keys.",
+        "credentialIdRequired": "Missing security key identifier.",
+        "credentialNotFound": "Security key not found.",
+        "cancelledOrTimedOut": "Security key interaction was cancelled or timed out."
+      }
+    }
+  },
+  "billing": {
+    "errors": {
+      "startCheckout": "Failed to start checkout",
+      "checkoutUrlMissing": "Checkout URL was not returned",
+      "loadStatus": "Failed to load billing status",
+      "openPortal": "Failed to open billing portal",
+      "portalUrlMissing": "Billing portal URL was not returned"
+    },
+    "pricing": {
+      "subscriptionPlansLabel": "Subscription plans",
+      "pageTitle": "Pick the plan that matches your writing pace",
+      "pageDescription": "Session keeps the door open. Composer is the default paid tier. Studio is for users who want the highest AI headroom and no storage friction.",
+      "monthly": "Monthly",
+      "yearly": "Yearly",
+      "signInHint": "You can browse plans without signing in. Checkout begins after you create or sign into an account.",
+      "perMonth": "per month",
+      "perYear": "per year",
+      "startingCheckout": "Starting checkout...",
+      "keepUsingSession": "Keep using Session",
+      "tiers": {
+        "session": {
+          "name": "Session",
+          "priceMonthly": "$0",
+          "priceYearly": "$0",
+          "summary": "Try the studio with meaningful limits",
+          "description": "Perfect for exploring the generator before you commit to a paid workflow.",
+          "cta": "Start free",
+          "features": {
+            "generations": "10 AI generations per month",
+            "savedProgressions": "10 saved progressions",
+            "savedArrangements": "5 saved arrangements",
+            "publicShares": "2 public shares",
+            "playbackTools": "Standard playback tools"
+          }
+        },
+        "composer": {
+          "name": "Composer",
+          "priceMonthly": "$9",
+          "priceYearly": "$90",
+          "summary": "For serious songwriting sessions",
+          "description": "Unlock exports, more storage, and enough AI headroom for regular use.",
+          "cta": "Choose Composer",
+          "badge": "Most practical",
+          "features": {
+            "generations": "50 AI generations per month",
+            "savedProgressions": "50 saved progressions",
+            "savedArrangements": "25 saved arrangements",
+            "publicShares": "10 public shares",
+            "exports": "MIDI and PDF export"
+          }
+        },
+        "studio": {
+          "name": "Studio",
+          "priceMonthly": "$19",
+          "priceYearly": "$190",
+          "summary": "Maximum headroom for power users",
+          "description": "Best fit when ProgressionLab is part of your daily creative stack.",
+          "cta": "Go Studio",
+          "features": {
+            "generations": "200 AI generations per month",
+            "savedProgressions": "Unlimited saved progressions",
+            "savedArrangements": "Unlimited saved arrangements",
+            "publicShares": "Unlimited public shares",
+            "premiumAi": "Premium AI model access"
+          }
+        }
+      }
+    },
+    "format": {
+      "notSet": "Not set"
+    },
+    "loadingStatus": "Loading billing status...",
+    "signInRequiredChip": "Sign in required",
+    "signInRequiredTitle": "Billing is tied to your account",
+    "signInRequiredDescription": "Sign in to view your current plan, monthly usage, and manage your subscription.",
+    "signInAction": "Sign in",
+    "viewPricingAction": "View pricing",
+    "unavailable": "Billing status is unavailable right now.",
+    "pageTitle": "Billing and usage",
+    "pageDescription": "See your current plan, monthly AI usage, and manage billing through Stripe.",
+    "planOverride": "This account has a manual plan override: {{plan}}.",
+    "currentPlan": "Current plan",
+    "noPaidSubscription": "No paid subscription",
+    "billingCycle": "Billing cycle",
+    "noPaidBillingCycle": "No paid billing cycle",
+    "currentPeriodEnd": "Current period end",
+    "openingPortal": "Opening portal...",
+    "manageBilling": "Manage billing",
+    "upgradePlan": "Upgrade plan",
+    "comparePlans": "Compare plans",
+    "aiUsage": "AI usage",
+    "generationsUsedThisMonth": "generations used this month",
+    "noAiHardCap": "Your current plan does not enforce an AI hard cap.",
+    "monthlyQuotaUsed": "{{percent}}% of monthly quota used",
+    "featureAccess": "Feature access",
+    "enabled": "enabled",
+    "locked": "locked",
+    "midiExportStatus": "MIDI export: {{status}}",
+    "pdfExportStatus": "PDF export: {{status}}",
+    "publicSharingStatus": "Public sharing: {{status}}"
+  },
+  "progressions": {
+    "errors": {
+      "loadMine": "Failed to load progressions",
+      "loadPublic": "Failed to load public progressions",
+      "delete": "Failed to delete progression"
+    },
+    "messages": {
+      "deleted": "Progression deleted."
+    },
+    "confirm": {
+      "delete": "Are you sure you want to delete this progression?"
+    },
+    "page": {
+      "myProgressionsTitle": "My Progressions",
+      "examplesTitle": "Examples",
+      "myProgressionsDescription": "View, edit, and share your saved chord progressions",
+      "examplesDescription": "Example chord progressions curated by admins"
+    },
+    "actions": {
+      "createNew": "Create New",
+      "clearFilters": "Clear Filters",
+      "createProgression": "Create a progression"
+    },
+    "filters": {
+      "searchTagsLabel": "Search tags",
+      "searchTagsPlaceholder": "house, cinematic, jazz...",
+      "searchKeyLabel": "Search key/Chord(s)",
+      "searchKeyPlaceholder": "C, F#m, Bb..."
+    },
+    "empty": {
+      "mine": "You haven't saved any progressions yet.",
+      "public": "No example progressions match your filters yet."
+    },
+    "card": {
+      "noChords": "No chords",
+      "scaleLabel": "Scale",
+      "feelLabel": "Feel",
+      "visibilityPublic": "🌍 Public",
+      "visibilityPrivate": "🔒 Private",
+      "actions": {
+        "play": "Play",
+        "stop": "Stop",
+        "downloadPdfTitle": "Download as PDF chart",
+        "downloadingPdf": "Downloading PDF...",
+        "downloadPdf": "Download PDF",
+        "downloadMidiTitle": "Download as MIDI file",
+        "downloadingMidi": "Downloading MIDI...",
+        "downloadMidi": "Download MIDI",
+        "open": "Open",
+        "copied": "Copied!",
+        "share": "Share",
+        "edit": "Edit",
+        "deleting": "Deleting...",
+        "delete": "Delete"
+      }
+    },
+    "saveDialog": {
+      "title": "Save Progression",
+      "form": {
+        "titleMaxLength": "Title must be less than 100 characters",
+        "titleLabel": "Title (optional)",
+        "titlePlaceholder": "Late Night Groove",
+        "regenerateTitleAriaLabel": "regenerate title",
+        "addToExamplesLabel": "Add to Examples",
+        "addToExamplesHelperText": "Makes this progression visible to all users under Examples."
+      },
+      "actions": {
+        "cancel": "Cancel",
+        "saving": "Saving...",
+        "save": "Save"
+      },
+      "messages": {
+        "saved": "Progression saved!",
+        "saveFailed": "Failed to save progression"
+      }
+    }
+  },
+  "arrangements": {
+    "saveDialog": {
+      "title": "Save Arrangement",
+      "form": {
+        "titleMaxLength": "Title must be less than 100 characters",
+        "titleLabel": "Title (optional)",
+        "titlePlaceholder": "Pad Groove Draft",
+        "regenerateTitleAriaLabel": "regenerate title",
+        "timelineSummary": "{{eventCount}} events across {{barCount}} bars ({{stepCount}} steps)",
+        "addToExamplesLabel": "Add to Examples",
+        "addToExamplesHelperText": "Makes this arrangement visible to all users under Examples."
+      },
+      "actions": {
+        "cancel": "Cancel",
+        "saving": "Saving...",
+        "save": "Save arrangement"
+      },
+      "messages": {
+        "saved": "Arrangement saved!",
+        "saveFailed": "Failed to save arrangement"
+      }
+    },
+    "list": {
+      "empty": "No saved arrangements yet. Record a loop in the Chord Playground and save it.",
+      "messages": {
+        "deleted": "Deleted \"{{title}}\""
+      },
+      "errors": {
+        "load": "Failed to load arrangements",
+        "delete": "Failed to delete arrangement",
+        "downloadPdf": "Failed to download PDF",
+        "downloadMidi": "Failed to download MIDI"
+      },
+      "actions": {
+        "retry": "Retry",
+        "downloadPdfTitle": "Download as PDF chart",
+        "downloadPdfAriaLabel": "Download {{title}} as PDF",
+        "downloadMidiTitle": "Download as MIDI",
+        "downloadMidiAriaLabel": "Download {{title}} as MIDI",
+        "loadTitle": "Load in Chord Playground",
+        "loadAriaLabel": "Load arrangement {{title}}",
+        "deleteTitle": "Delete",
+        "deleteAriaLabel": "Delete arrangement {{title}}"
+      },
+      "meta": {
+        "tempoBpm": "{{value}} BPM",
+        "bars_one": "{{count}} bar",
+        "bars_other": "{{count}} bars",
+        "events_one": "{{count}} event",
+        "events_other": "{{count}} events",
+        "relative": {
+          "justNow": "just now",
+          "minutesAgo": "{{count}}m ago",
+          "hoursAgo": "{{count}}h ago",
+          "daysAgo": "{{count}}d ago"
+        }
+      }
+    }
+  },
+  "settings": {
+    "loadingSecurity": "Loading security settings...",
+    "loadingBilling": "Loading billing...",
+    "loadingStudio": "Loading studio...",
+    "loadingPricing": "Loading pricing...",
+    "loadingProgressions": "Loading progressions...",
+    "loadingDefault": "Loading..."
+  },
+  "errors": {
+    "boundary": {
+      "title": "Oops!",
+      "description": "Something went wrong. Our team has been notified and is working on a fix.",
+      "tryAgain": "Try again"
+    }
+  },
+  "sharedProgression": {
+    "title": "Shared Progression",
+    "loading": "Loading shared progression...",
+    "actions": {
+      "play": "Play progression",
+      "stop": "Stop progression",
+      "loadIntoLab": "Load into Lab",
+      "backToLab": "← Back to Lab"
+    }
+  },
+  "app": {
+    "brandLogoAlt": "ProgressionLab.AI logo",
+    "openGithubAriaLabel": "Open Progression Lab AI GitHub repository",
+    "openLinkedInAriaLabel": "Open Carl Welch LinkedIn profile",
+    "openStorybookAriaLabel": "Open Progression Lab AI Storybook"
+  }
 }

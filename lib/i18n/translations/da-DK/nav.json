@@ -5,5 +5,8 @@
   "structure": "Struktur",
   "myProgressions": "Mine progressioner",
   "login": "Log ind",
-  "logout": "Log ud"
+  "logout": "Log ud",
+  "pricing": "Pricing",
+  "billing": "Billing",
+  "security": "Security"
 }

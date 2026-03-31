@@ -5,5 +5,8 @@
   "structure": "構成",
   "myProgressions": "マイ進行",
   "login": "ログイン",
-  "logout": "ログアウト"
+  "logout": "ログアウト",
+  "pricing": "Pricing",
+  "billing": "Billing",
+  "security": "Security"
 }

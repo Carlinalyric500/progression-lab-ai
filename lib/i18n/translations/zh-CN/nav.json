@@ -5,5 +5,8 @@
   "structure": "结构",
   "myProgressions": "我的进行",
   "login": "登录",
-  "logout": "退出登录"
+  "logout": "退出登录",
+  "pricing": "Pricing",
+  "billing": "Billing",
+  "security": "Security"
 }
