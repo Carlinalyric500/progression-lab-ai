@@ -59,6 +59,17 @@ const FALLBACK_TIER_CONFIGS: Record<SubscriptionPlan, SubscriptionTierConfig> = 
     canExportPdf: true,
     canSharePublicly: true,
   },
+  [SubscriptionPlan.INVITE]: {
+    plan: SubscriptionPlan.INVITE,
+    gptModel: 'gpt-3.5-turbo',
+    aiGenerationsPerMonth: 25,
+    maxSavedProgressions: 50,
+    maxSavedArrangements: 50,
+    maxPublicShares: 10,
+    canExportMidi: true,
+    canExportPdf: true,
+    canSharePublicly: false,
+  },
 };
 
 let cachedConfigs: Record<SubscriptionPlan, SubscriptionTierConfig> | null = null;

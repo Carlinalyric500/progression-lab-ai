@@ -1,5 +1,5 @@
 export type Role = 'ADMIN' | 'AUDITOR';
-export type SubscriptionPlan = 'SESSION' | 'COMPOSER' | 'STUDIO' | 'COMP';
+export type SubscriptionPlan = 'SESSION' | 'COMPOSER' | 'STUDIO' | 'COMP' | 'INVITE';
 export type UserRole = 'ADMIN' | 'AUDITOR' | 'USER';
 
 export type AdminUser = {

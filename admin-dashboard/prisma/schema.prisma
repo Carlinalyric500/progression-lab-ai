@@ -18,6 +18,7 @@ enum SubscriptionPlan {
   COMPOSER
   STUDIO
   COMP
+  INVITE
 }
 
 enum BillingInterval {
@@ -36,6 +37,16 @@ enum UsageEventType {
   AI_GENERATION
   MIDI_EXPORT
   PDF_EXPORT
+}
+
+enum PromoCodeType {
+  DISCOUNT
+  INVITE
+}
+
+enum PromoRedemptionStatus {
+  REDEEMED
+  REJECTED
 }
 
 enum MfaPolicy {
@@ -64,6 +75,7 @@ model User {
   role         UserRole      @default(USER)
   stripeCustomerId String?   @unique
   planOverride SubscriptionPlan?
+  planOverrideExpiresAt DateTime?
   mfaPolicy    MfaPolicy      @default(NONE)
   mfaEnrollmentState MfaEnrollmentState @default(NONE)
   mfaEnabledAt DateTime?
@@ -79,6 +91,8 @@ model User {
   promptVersions PromptVersion[]
   webauthnCredentials WebAuthnCredential[]
   webauthnChallenges WebAuthnChallenge[]
+  createdPromoCodes PromoCode[] @relation("PromoCodeCreatedBy")
+  promoCodeRedemptions PromoCodeRedemption[]
 }
 
 model WebAuthnCredential {
@@ -124,6 +138,8 @@ model Subscription {
   plan                 SubscriptionPlan
   billingInterval      BillingInterval?
   status               SubscriptionStatus @default(ACTIVE)
+  appliedPromoCode     String?
+  stripePromotionCodeId String?
   currentPeriodStart   DateTime?
   currentPeriodEnd     DateTime?
   cancelAtPeriodEnd    Boolean            @default(false)
@@ -133,6 +149,56 @@ model Subscription {
   user                 User               @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([plan, status])
+  @@index([appliedPromoCode])
+}
+
+model PromoCode {
+  id                     String             @id @default(cuid())
+  code                   String             @unique
+  type                   PromoCodeType
+  isActive               Boolean            @default(true)
+  startsAt               DateTime?
+  expiresAt              DateTime?
+  maxRedemptions         Int?
+  currentRedemptions     Int                @default(0)
+  isSingleUse            Boolean            @default(false)
+  allowedPlans           SubscriptionPlan[]
+  allowedBillingIntervals BillingInterval[]
+  grantedPlan            SubscriptionPlan?
+  inviteDurationDays     Int?
+  maxSavedProgressions   Int?
+  maxSavedArrangements   Int?
+  aiGenerationsPerMonth  Int?
+  stripePromotionCodeId  String?
+  metadata               Json?
+  createdByUserId        String?
+  createdAt              DateTime           @default(now())
+  updatedAt              DateTime           @updatedAt
+
+  createdByUser          User?              @relation("PromoCodeCreatedBy", fields: [createdByUserId], references: [id], onDelete: SetNull)
+  redemptions            PromoCodeRedemption[]
+
+  @@index([type, isActive, expiresAt])
+  @@index([createdAt])
+}
+
+model PromoCodeRedemption {
+  id                   String               @id @default(cuid())
+  promoCodeId          String
+  userId               String
+  status               PromoRedemptionStatus @default(REDEEMED)
+  failureReason        String?
+  checkoutSessionId    String?
+  stripeSubscriptionId String?
+  metadata             Json?
+  redeemedAt           DateTime             @default(now())
+
+  promoCode            PromoCode            @relation(fields: [promoCodeId], references: [id], onDelete: Cascade)
+  user                 User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([promoCodeId, userId])
+  @@index([userId, redeemedAt])
+  @@index([promoCodeId, redeemedAt])
 }
 
 model UsageEvent {

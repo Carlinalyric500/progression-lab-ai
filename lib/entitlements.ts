@@ -75,6 +75,17 @@ export const PLAN_ENTITLEMENTS: Record<SubscriptionPlan, PlanEntitlements> = {
     canUsePremiumAiModel: true,
     gptModel: 'gpt-4o',
   },
+  [SubscriptionPlan.INVITE]: {
+    aiGenerationsPerMonth: 25,
+    maxSavedProgressions: 50,
+    maxSavedArrangements: 50,
+    maxPublicShares: 10,
+    canExportMidi: true,
+    canExportPdf: true,
+    canSharePublicly: false,
+    canUsePremiumAiModel: false,
+    gptModel: 'gpt-3.5-turbo',
+  },
 };
 
 function isSubscriptionEntitled(status: SubscriptionStatus | null | undefined): boolean {
