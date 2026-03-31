@@ -102,10 +102,16 @@ export function hasReachedLimit(limit: number | null, used: number): boolean {
 
 export function resolvePlan(options: {
   planOverride?: SubscriptionPlan | null;
+  planOverrideExpiresAt?: Date | null;
   subscriptionPlan?: SubscriptionPlan | null;
   subscriptionStatus?: SubscriptionStatus | null;
 }): SubscriptionPlan {
-  if (options.planOverride) {
+  const now = new Date();
+  const hasActiveOverride =
+    options.planOverride &&
+    (!options.planOverrideExpiresAt || options.planOverrideExpiresAt.getTime() > now.getTime());
+
+  if (hasActiveOverride) {
     return options.planOverride;
   }
 
@@ -125,6 +131,7 @@ export async function getAccessContextForSession(session: {
     select: {
       id: true,
       planOverride: true,
+      planOverrideExpiresAt: true,
       subscription: {
         select: {
           plan: true,
@@ -140,6 +147,7 @@ export async function getAccessContextForSession(session: {
 
   const plan = resolvePlan({
     planOverride: user.planOverride,
+    planOverrideExpiresAt: user.planOverrideExpiresAt,
     subscriptionPlan: user.subscription?.plan,
     subscriptionStatus: user.subscription?.status,
   });

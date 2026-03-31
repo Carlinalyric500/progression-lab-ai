@@ -25,6 +25,16 @@ type PromoCodeValidationFailureReason =
   | 'invalid_type'
   | 'missing_stripe_promotion_code_id';
 
+type InviteCodeRedeemFailureReason =
+  | 'not_found'
+  | 'inactive'
+  | 'not_started'
+  | 'expired'
+  | 'max_redemptions_reached'
+  | 'already_redeemed'
+  | 'invalid_type'
+  | 'already_paid_plan';
+
 type PromoCodeValidationResult =
   | {
       isValid: true;
@@ -35,6 +45,18 @@ type PromoCodeValidationResult =
   | {
       isValid: false;
       reason: PromoCodeValidationFailureReason;
+    };
+
+export type InviteCodeRedeemResult =
+  | {
+      applied: true;
+      code: string;
+      grantedPlan: SubscriptionPlan;
+      expiresAt: Date;
+    }
+  | {
+      applied: false;
+      reason: InviteCodeRedeemFailureReason;
     };
 
 type StripePriceEnvMap = Record<BillablePlan, Record<CheckoutInterval, string>>;
@@ -96,6 +118,14 @@ function includesIntervalRestriction(
 
 function isDiscountPromoCode(type: PromoCodeType): boolean {
   return type === 'DISCOUNT';
+}
+
+function isInvitePromoCode(type: PromoCodeType): boolean {
+  return type === 'INVITE';
+}
+
+function isEntitledSubscriptionStatus(status: SubscriptionStatus | null | undefined): boolean {
+  return status === 'ACTIVE' || status === 'TRIALING' || status === 'PAST_DUE';
 }
 
 export async function validatePromoCodeForCheckout(options: {
@@ -412,6 +442,126 @@ export async function recordPromoCodeRedemptionFromCheckout(options: {
       promoCodeId: code.id,
     };
   });
+}
+
+export async function redeemInviteCodeForUser(options: {
+  rawCode: string;
+  userId: string;
+}): Promise<InviteCodeRedeemResult> {
+  const normalizedCode = normalizePromoCode(options.rawCode);
+  if (!normalizedCode) {
+    return { applied: false, reason: 'not_found' };
+  }
+
+  const [user, code] = await Promise.all([
+    prisma.user.findUnique({
+      where: { id: options.userId },
+      select: {
+        id: true,
+        subscription: {
+          select: {
+            status: true,
+          },
+        },
+      },
+    }),
+    prisma.promoCode.findUnique({
+      where: { code: normalizedCode },
+      select: {
+        id: true,
+        type: true,
+        isActive: true,
+        startsAt: true,
+        expiresAt: true,
+        maxRedemptions: true,
+        currentRedemptions: true,
+        isSingleUse: true,
+        grantedPlan: true,
+        inviteDurationDays: true,
+      },
+    }),
+  ]);
+
+  if (!user || !code) {
+    return { applied: false, reason: 'not_found' };
+  }
+
+  if (!isInvitePromoCode(code.type)) {
+    return { applied: false, reason: 'invalid_type' };
+  }
+
+  if (isEntitledSubscriptionStatus(user.subscription?.status)) {
+    return { applied: false, reason: 'already_paid_plan' };
+  }
+
+  if (!code.isActive) {
+    return { applied: false, reason: 'inactive' };
+  }
+
+  const now = new Date();
+  if (code.startsAt && code.startsAt > now) {
+    return { applied: false, reason: 'not_started' };
+  }
+
+  if (code.expiresAt && code.expiresAt <= now) {
+    return { applied: false, reason: 'expired' };
+  }
+
+  if (code.maxRedemptions !== null && code.currentRedemptions >= code.maxRedemptions) {
+    return { applied: false, reason: 'max_redemptions_reached' };
+  }
+
+  const existingRedemption = await prisma.promoCodeRedemption.findUnique({
+    where: {
+      promoCodeId_userId: {
+        promoCodeId: code.id,
+        userId: user.id,
+      },
+    },
+    select: { id: true },
+  });
+
+  if (existingRedemption) {
+    return { applied: false, reason: 'already_redeemed' };
+  }
+
+  const grantedPlan = code.grantedPlan ?? 'INVITE';
+  const inviteDurationDays = code.inviteDurationDays ?? 14;
+  const expiresAt = new Date(now.getTime() + inviteDurationDays * 24 * 60 * 60 * 1000);
+
+  await prisma.$transaction(async (tx) => {
+    await tx.user.update({
+      where: { id: user.id },
+      data: {
+        planOverride: grantedPlan,
+        planOverrideExpiresAt: expiresAt,
+      },
+    });
+
+    await tx.promoCodeRedemption.create({
+      data: {
+        promoCodeId: code.id,
+        userId: user.id,
+        status: 'REDEEMED',
+      },
+    });
+
+    await tx.promoCode.update({
+      where: { id: code.id },
+      data: {
+        currentRedemptions: {
+          increment: 1,
+        },
+      },
+    });
+  });
+
+  return {
+    applied: true,
+    code: normalizedCode,
+    grantedPlan,
+    expiresAt,
+  };
 }
 
 export async function getBillingStatusForUser(userId: string) {
