@@ -4,11 +4,14 @@ var mockConstructEvent = jest.fn();
 var mockRetrieveSubscription = jest.fn();
 var mockSyncStripeSubscription = jest.fn();
 var mockUpdateUserStripeCustomerId = jest.fn();
+var mockRecordPromoCodeRedemptionFromCheckout = jest.fn();
 var mockGetStripeWebhookSecrets = jest.fn();
 
 jest.mock('../../../../../lib/billing', () => ({
   syncStripeSubscription: (...args: unknown[]) => mockSyncStripeSubscription(...args),
   updateUserStripeCustomerId: (...args: unknown[]) => mockUpdateUserStripeCustomerId(...args),
+  recordPromoCodeRedemptionFromCheckout: (...args: unknown[]) =>
+    mockRecordPromoCodeRedemptionFromCheckout(...args),
 }));
 
 jest.mock('../../../../../lib/stripe', () => ({
@@ -41,6 +44,7 @@ describe('POST /api/webhooks/stripe', () => {
     });
     mockSyncStripeSubscription.mockResolvedValue(undefined);
     mockUpdateUserStripeCustomerId.mockResolvedValue(undefined);
+    mockRecordPromoCodeRedemptionFromCheckout.mockResolvedValue(undefined);
   });
 
   it('returns 400 when the Stripe signature is missing', async () => {
@@ -61,6 +65,10 @@ describe('POST /api/webhooks/stripe', () => {
           customer: 'cus_123',
           mode: 'subscription',
           subscription: 'sub_123',
+          metadata: {
+            promoCode: 'PRODUCER10',
+          },
+          id: 'cs_test_123',
         },
       },
     });
@@ -81,6 +89,12 @@ describe('POST /api/webhooks/stripe', () => {
     expect(mockSyncStripeSubscription).toHaveBeenCalledWith(
       expect.objectContaining({ id: 'sub_123' }),
     );
+    expect(mockRecordPromoCodeRedemptionFromCheckout).toHaveBeenCalledWith({
+      rawCode: 'PRODUCER10',
+      userId: 'user-1',
+      checkoutSessionId: 'cs_test_123',
+      stripeSubscriptionId: 'sub_123',
+    });
     expect(body).toEqual({ received: true });
   });
 
