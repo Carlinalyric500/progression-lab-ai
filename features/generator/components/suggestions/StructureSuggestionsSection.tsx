@@ -224,13 +224,13 @@ export default function StructureSuggestionsSection({
             <PdfDownloadButton
               variant="outlined"
               size="small"
-              label="PDF"
+              label={t('ui.buttons.pdf')}
               chartOptions={arrangementChartOptions}
             />
             <MidiDownloadButton
               variant="outlined"
               size="small"
-              progressionName="Arrangement"
+              progressionName={t('ui.labels.arrangementName')}
               voicings={arrangementVoicings}
               tempoBpm={tempoBpm}
             />

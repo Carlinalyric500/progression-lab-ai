@@ -170,7 +170,8 @@
       "playArrangement": "アレンジを再生",
       "stopArrangement": "アレンジを停止",
       "saveArrangement": "アレンジを保存",
-      "edit": "編集"
+      "edit": "編集",
+      "pdf": "PDF"
     },
     "sectionTitles": {
       "nextChordSuggestions": "次のコード候補",
@@ -179,7 +180,17 @@
     },
     "labels": {
       "commonChordExamples": "一般的なコード例",
-      "harmonicSource": "ハーモニーの元: {{label}}"
+      "harmonicSource": "ハーモニーの元: {{label}}",
+      "arrangementName": "Arrangement",
+      "romanNumeralLabel": "Roman numeral:",
+      "tensionLabel": "Tension:",
+      "confidenceLabel": "Confidence:",
+      "voicingHintLabel": "Voicing hint:",
+      "leftHandLabel": "Left hand:",
+      "rightHandLabel": "Right hand:",
+      "leftHandShort": "LH:",
+      "rightHandShort": "RH:",
+      "tempoBpmLabel": "Tempo: {{tempo}} BPM"
     },
     "messages": {
       "noGuitarDiagram": "利用できるギター図はありません。",
@@ -248,6 +259,18 @@
       "initializingAudioEllipsis": "Initializing audio...",
       "playPlaybackAriaLabel": "Play playback",
       "stopPlaybackAriaLabel": "Stop playback"
+    },
+    "playbackSettings": {
+      "attackLabel": "Attack",
+      "decayLabel": "Decay",
+      "attackAriaLabel": "Attack time",
+      "decayAriaLabel": "Decay time",
+      "attackValue": "Attack: {{value}}s",
+      "decayValue": "Decay: {{value}}s",
+      "octaveShiftAriaLabel": "Octave shift",
+      "inversionRegisterAriaLabel": "Inversion register",
+      "playbackStyleAriaLabel": "Playback style",
+      "timeSignatureAriaLabel": "Time signature"
     }
   }
 }

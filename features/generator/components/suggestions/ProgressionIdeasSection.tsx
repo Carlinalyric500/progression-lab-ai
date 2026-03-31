@@ -297,7 +297,7 @@ export default function ProgressionIdeasSection({
                     ) : null}
                   </Stack>
                   <Typography variant="caption" color="text.secondary">
-                    Tempo: {tempoBpm} BPM
+                    {t('ui.labels.tempoBpmLabel', { tempo: tempoBpm })}
                   </Typography>
                 </Stack>
               ) : null}
@@ -328,14 +328,14 @@ export default function ProgressionIdeasSection({
                             <Stack spacing={0.5}>
                               <Typography variant="body2">
                                 <Box component="span" sx={{ fontWeight: 700 }}>
-                                  LH:
+                                  {t('ui.labels.leftHandShort')}
                                 </Box>{' '}
                                 {voicing.leftHand.join(', ')}
                               </Typography>
 
                               <Typography variant="body2">
                                 <Box component="span" sx={{ fontWeight: 700 }}>
-                                  RH:
+                                  {t('ui.labels.rightHandShort')}
                                 </Box>{' '}
                                 {voicing.rightHand.join(', ')}
                               </Typography>

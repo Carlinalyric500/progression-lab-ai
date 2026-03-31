@@ -166,6 +166,7 @@
     "buttons": {
       "save": "Save",
       "settings": "Settings",
+      "pdf": "PDF",
       "pads": "Pads",
       "piano": "Piano",
       "guitar": "Guitar",
@@ -185,7 +186,17 @@
     },
     "labels": {
       "commonChordExamples": "Common Chord Examples",
-      "harmonicSource": "Harmonic source: {{label}}"
+      "harmonicSource": "Harmonic source: {{label}}",
+      "arrangementName": "Arrangement",
+      "romanNumeralLabel": "Roman numeral:",
+      "tensionLabel": "Tension:",
+      "confidenceLabel": "Confidence:",
+      "voicingHintLabel": "Voicing hint:",
+      "leftHandLabel": "Left hand:",
+      "rightHandLabel": "Right hand:",
+      "leftHandShort": "LH:",
+      "rightHandShort": "RH:",
+      "tempoBpmLabel": "Tempo: {{tempo}} BPM"
     },
     "messages": {
       "noGuitarDiagram": "No guitar diagram available.",
@@ -193,6 +204,18 @@
     },
     "settingsDialog": {
       "title": "Playback Settings"
+    },
+    "playbackSettings": {
+      "attackLabel": "Attack",
+      "decayLabel": "Decay",
+      "attackAriaLabel": "Attack time",
+      "decayAriaLabel": "Decay time",
+      "attackValue": "Attack: {{value}}s",
+      "decayValue": "Decay: {{value}}s",
+      "octaveShiftAriaLabel": "Octave shift",
+      "inversionRegisterAriaLabel": "Inversion register",
+      "playbackStyleAriaLabel": "Playback style",
+      "timeSignatureAriaLabel": "Time signature"
     },
     "chordGrid": {
       "title": "Composer",

@@ -80,9 +80,9 @@ export default function NextChordSuggestionsSection({
             <PdfDownloadButton
               variant="outlined"
               size="small"
-              label="PDF"
+              label={t('ui.buttons.pdf')}
               chartOptions={{
-                title: 'Next Chord Suggestions',
+                title: t('ui.sectionTitles.nextChordSuggestions'),
                 scale,
                 genre,
                 tempoBpm,
@@ -133,18 +133,18 @@ export default function NextChordSuggestionsSection({
                   </Typography>
                   {item.romanNumeral ? (
                     <Typography variant="body2">
-                      <strong>Roman numeral:</strong> {item.romanNumeral}
+                      <strong>{t('ui.labels.romanNumeralLabel')}</strong> {item.romanNumeral}
                     </Typography>
                   ) : null}
                   <Typography variant="body2">
-                    <strong>Tension:</strong> {item.tensionLevel}/5
+                    <strong>{t('ui.labels.tensionLabel')}</strong> {item.tensionLevel}/5
                   </Typography>
                   <Typography variant="body2">
-                    <strong>Confidence:</strong> {item.confidence}/5
+                    <strong>{t('ui.labels.confidenceLabel')}</strong> {item.confidence}/5
                   </Typography>
                   {item.voicingHint ? (
                     <Typography variant="body2">
-                      <strong>Voicing hint:</strong> {item.voicingHint}
+                      <strong>{t('ui.labels.voicingHintLabel')}</strong> {item.voicingHint}
                     </Typography>
                   ) : null}
                   {pianoVoicing ? (
@@ -216,10 +216,10 @@ export default function NextChordSuggestionsSection({
                   {progressionDiagramInstrument === 'piano' && pianoVoicing ? (
                     <Box sx={{ mt: 1 }}>
                       <Typography variant="body2">
-                        <strong>Left hand:</strong> {pianoVoicing.leftHand.join(', ')}
+                        <strong>{t('ui.labels.leftHandLabel')}</strong> {pianoVoicing.leftHand.join(', ')}
                       </Typography>
                       <Typography variant="body2">
-                        <strong>Right hand:</strong> {pianoVoicing.rightHand.join(', ')}
+                        <strong>{t('ui.labels.rightHandLabel')}</strong> {pianoVoicing.rightHand.join(', ')}
                       </Typography>
                     </Box>
                   ) : null}
