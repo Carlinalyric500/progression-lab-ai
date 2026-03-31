@@ -14,7 +14,7 @@ import type { AuthenticationResponseJSON } from '@simplewebauthn/server';
 export async function POST(request: NextRequest) {
   try {
     const pendingAuth = getPendingAuthFromRequest(request);
-    if (!pendingAuth || pendingAuth.role !== 'ADMIN') {
+    if (!pendingAuth || (pendingAuth.role !== 'ADMIN' && pendingAuth.role !== 'AUDITOR')) {
       return NextResponse.json({ message: 'Pending admin authentication required' }, { status: 401 });
     }
 

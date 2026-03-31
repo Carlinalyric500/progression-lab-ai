@@ -57,7 +57,9 @@ export async function POST(request: NextRequest) {
     const activeCredentials = await listActiveCredentials(user.id);
     const hasActiveCredentials = activeCredentials.length > 0;
     const requiresWebAuthn =
-      !bypassActive && (user.role === 'ADMIN' || (user.role === 'AUDITOR' && hasActiveCredentials));
+      user.role === 'ADMIN'
+        ? hasActiveCredentials ? !bypassActive : true
+        : !bypassActive && hasActiveCredentials;
 
     if (!requiresWebAuthn) {
       const response = NextResponse.json({
